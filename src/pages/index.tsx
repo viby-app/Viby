@@ -18,21 +18,19 @@ export default function Home() {
           <h1 className="mt-5 text-4xl font-bold">Welcome to Viby</h1>
           <p className="mt-4 text-lg">Your appointment management solution.</p>
 
-          <div className="mt-5 ml-3 self-start max-w-full overflow-hidden">
-            <h2 className="font-bold">my businesses</h2>
-            <div className="carousel snap-x snap-mandatory space-x-4">
-              <div className="carousel-item snap-start w-1/2">
-                <BusinessCard businessName={"barbershop"} />
-              </div>
-              <div className="carousel-item snap-start">
-                <BusinessCard businessName={"barbershop"} />
-              </div>
-              <div className="carousel-item snap-start">
-                <BusinessCard businessName={"barbershop"} />
-              </div>
-              <div className="carousel-item snap-start">
-                <BusinessCard businessName={"barbershop"} />
-              </div>
+          <h2 className="font-bold">my businesses</h2>
+          <div className="px-1 carousel max-w-full snap-x snap-always space-x-2 rounded-xl p-2">
+            <div className="carousel-item snap-start">
+              <BusinessCard businessName={"barbershop"} />
+            </div>
+            <div className="carousel-item snap-start">
+              <BusinessCard businessName={"barbershop"} />
+            </div>
+            <div className="carousel-item snap-start">
+              <BusinessCard businessName={"barbershop"} />
+            </div>
+            <div className="carousel-item snap-start">
+              <BusinessCard businessName={"barbershop"} />
             </div>
           </div>
           <h2 className="ml-5 self-start font-bold">explore new businesses</h2>
