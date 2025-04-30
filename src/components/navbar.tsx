@@ -2,9 +2,8 @@ import { pages } from "~/utils";
 
 const Navbar = () => {
   return (
-    <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around border-t border-gray-800 bg-[#48A6A7] p-4 py-2">
+    <nav className="fixed bottom-0 z-50 flex w-full items-center justify-around border-t border-gray-800 bg-[#48A6A7] p-4 py-2 lg:top-0 lg:max-h-10">
       <div className="container mx-auto flex items-center justify-between">
-        <div className="text-lg font-bold text-white">Viby</div>
         <ul className="flex space-x-4">
           {pages.map((page) => (
             <li key={page.name} className="min-w-10">
@@ -15,6 +14,7 @@ const Navbar = () => {
           ))}
         </ul>
       </div>
+      <div className="text-lg font-bold text-white">Viby</div>
     </nav>
   );
 };
