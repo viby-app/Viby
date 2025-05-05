@@ -1,6 +1,4 @@
 import { pages } from "~/utils";
-import Button from "./button";
-import { signOut } from "next-auth/react";
 
 const Navbar = () => {
   return (
