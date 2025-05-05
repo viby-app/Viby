@@ -1,3 +1,5 @@
+import { useSession } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
 import Head from "next/head";
 import BusinessCard from "~/components/bussinesCard";
 import Layout from "~/components/layout";
@@ -8,7 +10,7 @@ export default function HomePage() {
   const allBusinesses = api.business.getAllBusinesses.useQuery();
 
   return (
-    <html lang="he" dir="rtl">
+    <>
       <Head>
         <title>Viby</title>
         <meta
@@ -62,6 +64,6 @@ export default function HomePage() {
           </div>
         </div>
       </Layout>
-    </html>
+    </>
   );
 }

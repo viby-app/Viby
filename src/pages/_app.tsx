@@ -17,7 +17,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <div className={geist.className}>
+      <div className={geist.className} dir="rtl" lang="he">
         <Component {...pageProps} />
       </div>
     </SessionProvider>
