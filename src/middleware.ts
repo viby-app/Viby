@@ -1,17 +1,18 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  console.log("Token:", token); // Debugging line to check the token value
+  console.log("Token: ", token);
   const { pathname } = req.nextUrl;
 
-  // Redirect if not logged in
-  if (!token && pathname !== "/login") {
-    const loginUrl = new URL("/login", req.url);
-    return NextResponse.redirect(loginUrl);
+  if (
+    !token &&
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/api/auth")
+  ) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   if (token && pathname === "/login") {
@@ -22,6 +23,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/unauthorized"],
-  // Only run middleware on the specified paths
+  matcher: ["/((?!api|_next|static|favicon.ico).*)"],
 };
