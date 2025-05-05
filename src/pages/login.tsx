@@ -1,9 +1,8 @@
 import Head from "next/head";
 import Button from "~/components/button";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 export default function AuthPage() {
-  const { data: session } = useSession();
   return (
     <>
       <Head>
