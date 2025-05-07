@@ -8,7 +8,7 @@ export default function HomePage() {
   const allBusinesses = api.business.getAllBusinesses.useQuery();
 
   return (
-    <html lang="he" dir="rtl">
+    <>
       <Head>
         <title>Viby</title>
         <meta
@@ -62,6 +62,6 @@ export default function HomePage() {
           </div>
         </div>
       </Layout>
-    </html>
+    </>
   );
 }
