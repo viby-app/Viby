@@ -20,7 +20,6 @@ export default function HomePage() {
       <Layout>
         <div className="flex min-h-screen flex-col items-center bg-[#F2EFE7] py-2">
           <h1 className="mt-5 text-4xl font-bold">ברוכים הבאים ל viby</h1>
-          <p className="mt-4 text-lg">הפתרון שלך לניהול לקוחות</p>
 
           {/* My Businesses */}
           <div className="mt-10 w-full px-5">
