@@ -26,7 +26,7 @@ export default function HomePage() {
           <div className="mt-10 w-full px-5">
             <h2 className="mb-4 text-2xl font-bold">העסקים שלי</h2>
             {myBusinesses.isLoading ? (
-              <span className="loading loading-dots loading-xs" />
+              <span className="loading loading-dots loading-md" />
             ) : myBusinesses.data?.length === 0 ||
               myBusinesses.data === undefined ? (
               <p className="text-lg">לא עוקב אחרי עסקים</p>
@@ -48,7 +48,7 @@ export default function HomePage() {
             <h2 className="mb-4 text-2xl font-bold">עסקים שעוד לא הכרת</h2>
             <div className="grid h-full w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {allBusinesses.isLoading ? (
-                <span className="loading loading-dots loading-xs" />
+                <span className="loading loading-dots loading-md" />
               ) : allBusinesses.data?.length === 0 ||
                 allBusinesses.data === undefined ? (
                 <p className="text-lg">עדיין אין לנו עסקים להציג לך</p>
