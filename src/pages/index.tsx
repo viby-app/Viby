@@ -20,8 +20,6 @@ export default function HomePage() {
       <Layout>
         <div className="flex min-h-screen flex-col items-center py-2">
           <h1 className="mt-5 text-4xl font-bold">ברוכים הבאים ל viby</h1>
-
-          {/* My Businesses */}
           <div className="mt-10 w-full px-5">
             <h2 className="mb-4 text-2xl font-bold">העסקים שלי</h2>
             {myBusinesses.isLoading ? (
@@ -41,8 +39,6 @@ export default function HomePage() {
               </div>
             )}
           </div>
-
-          {/* Explore Section */}
           <div className="mt-10 mb-5 w-full px-5">
             <h2 className="mb-4 text-2xl font-bold">עסקים שעוד לא הכרת</h2>
             <div className="grid h-full w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
