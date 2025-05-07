@@ -18,7 +18,7 @@ export default function HomePage() {
         <link rel="icon" href="/logo.png" />
       </Head>
       <Layout>
-        <div className="flex min-h-screen flex-col items-center bg-[#F2EFE7] py-2">
+        <div className="flex min-h-screen flex-col items-center py-2">
           <h1 className="mt-5 text-4xl font-bold">ברוכים הבאים ל viby</h1>
 
           {/* My Businesses */}
