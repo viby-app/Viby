@@ -35,41 +35,43 @@ model Session {
 }
 
 model User {
-    id             String           @id @default(cuid())
-    name           String
-    phone          String?
-    email          String?          @unique
-    emailVerified  DateTime?
-    image          String?
-    accounts       Account[]
-    sessions       Session[]
-    role           Role             @default(USER)
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime?        @updatedAt
-    businessOwner  Business[]       @relation("BusinessOwner")
-    reviews        Review[]
-    appointments   Appointment[]
-    UserConnectionA UserConnection[] @relation("UserA")
-    UserConnectionB UserConnection[] @relation("UserB")
+    id               String              @id @default(cuid())
+    name             String
+    phone            String?
+    email            String?             @unique
+    emailVerified    DateTime?
+    isPhoneVerified  Boolean?
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    role             Role                @default(USER)
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime?           @updatedAt
+    businessOwner    Business[]          @relation("BusinessOwner")
+    reviews          Review[]
+    appointments     Appointment[]
+    UserConnectionA  UserConnection[]    @relation("UserA")
+    UserConnectionB  UserConnection[]    @relation("UserB")
     BusinessFollower BusinessFollowing[] @relation("BusinessFollower")
 }
 
 model BusinessFollowing {
-  id         Int      @id @default(autoincrement())
-  follower       User     @relation("BusinessFollower", fields: [followerId], references: [id])
-  followerId     String
-  business   Business @relation("FollowedBussines", fields: [businessId], references: [id])
-  businessId Int
+    id         Int      @id @default(autoincrement())
+    follower   User     @relation("BusinessFollower", fields: [followerId], references: [id])
+    followerId String
+    business   Business @relation("FollowedBussines", fields: [businessId], references: [id])
+    businessId Int
 
-  @@unique([followerId, businessId])
+    @@unique([followerId, businessId])
 }
 
 model UserConnection {
     id              Int    @id @default(autoincrement())
     userA           User   @relation("UserA", fields: [userConnectionA], references: [id])
-    UserB           User @relation("UserB", fields: [userConnectionB], references: [id])
+    UserB           User   @relation("UserB", fields: [userConnectionB], references: [id])
     userConnectionA String
     userConnectionB String
+
     @@unique([userConnectionA, userConnectionB])
 }
 
@@ -88,10 +90,10 @@ model Business {
     owner   User   @relation("BusinessOwner", fields: [ownerId], references: [id])
     ownerId String
 
-    services     BusinessService[]
-    appointments Appointment[]
-    reviews      Review[]
-    images       Image[]
+    services         BusinessService[]
+    appointments     Appointment[]
+    reviews          Review[]
+    images           Image[]
     FollowedBussines BusinessFollowing[] @relation("FollowedBussines")
 }
 
