@@ -1,5 +1,3 @@
-import { useSession } from "next-auth/react";
-import { redirect } from "next/dist/server/api-utils";
 import Head from "next/head";
 import BusinessCard from "~/components/bussinesCard";
 import Layout from "~/components/layout";

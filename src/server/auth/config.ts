@@ -4,7 +4,6 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "~/server/db";
 
-
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
@@ -14,17 +13,6 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
   pages: {
     signIn: "/login",
   },
