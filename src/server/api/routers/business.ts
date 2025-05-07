@@ -7,19 +7,32 @@ import {
 } from "~/server/api/trpc";
 
 export const businessRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const business = await ctx.db.business.findFirst({
+  getAllBusinesses: protectedProcedure.query(async ({ ctx }) => {
+    const businesses = await ctx.db.business.findMany({
       orderBy: { createdAt: "desc" },
     });
 
-    return business ?? null;
+    return businesses;
+  }),
+
+  getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
+    const businesses = await ctx.db.businessFollowing.findMany({
+      where: {
+        follower: {
+          id: ctx.session.user.id,
+        },
+      },
+      select: {
+        business: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    return businesses;
   }),
 });
