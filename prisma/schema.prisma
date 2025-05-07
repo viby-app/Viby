@@ -1,32 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
 
 datasource db {
     provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
-// Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
     userId                   String
@@ -55,16 +35,130 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    id               String              @id @default(cuid())
+    name             String
+    phone            String?
+    email            String?             @unique
+    emailVerified    DateTime?
+    isPhoneVerified  Boolean             @default(false)
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    role             Role                @default(USER)
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime?           @updatedAt
+    businessOwner    Business[]          @relation("BusinessOwner")
+    reviews          Review[]
+    appointments     Appointment[]
+    UserConnectionA  UserConnection[]    @relation("UserA")
+    UserConnectionB  UserConnection[]    @relation("UserB")
+    BusinessFollower BusinessFollowing[] @relation("BusinessFollower")
 }
 
+model BusinessFollowing {
+    id         Int      @id @default(autoincrement())
+    follower   User     @relation("BusinessFollower", fields: [followerId], references: [id])
+    followerId String
+    business   Business @relation("FollowedBussines", fields: [businessId], references: [id])
+    businessId Int
+
+    @@unique([followerId, businessId])
+}
+
+model UserConnection {
+    id              Int    @id @default(autoincrement())
+    userA           User   @relation("UserA", fields: [userConnectionA], references: [id])
+    UserB           User   @relation("UserB", fields: [userConnectionB], references: [id])
+    userConnectionA String
+    userConnectionB String
+
+    @@unique([userConnectionA, userConnectionB])
+}
+
+model Business {
+    id            Int        @id @default(autoincrement())
+    name          String
+    description   String?
+    address       String
+    phone         String
+    whatsappLink  String?
+    instagramLink String?
+    categories    Category[]
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+
+    owner   User   @relation("BusinessOwner", fields: [ownerId], references: [id])
+    ownerId String
+
+    services         BusinessService[]
+    appointments     Appointment[]
+    reviews          Review[]
+    images           Image[]
+    FollowedBussines BusinessFollowing[] @relation("FollowedBussines")
+}
+
+model Review {
+    id      Int     @id @default(autoincrement())
+    rating  Int
+    comment String?
+
+    business   Business @relation(fields: [businessId], references: [id])
+    businessId Int
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    createdAt DateTime @default(now())
+}
+
+model Image {
+    id         Int      @id @default(autoincrement())
+    key        String // S3 key
+    business   Business @relation(fields: [businessId], references: [id])
+    businessId Int
+}
+
+model Service {
+    id              Int      @id @default(autoincrement())
+    name            String
+    description     String?
+    durationMinutes Int
+    price           Float
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    businessServices BusinessService[]
+    appointments     Appointment[]
+}
+
+model Appointment {
+    id          Int               @id @default(autoincrement())
+    description String?
+    date        DateTime
+    status      AppointmentStatus
+
+    business   Business @relation(fields: [businessId], references: [id])
+    businessId Int
+
+    service   Service @relation(fields: [serviceId], references: [id])
+    serviceId Int
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusinessService {
+    id         Int      @id @default(autoincrement())
+    business   Business @relation(fields: [businessId], references: [id])
+    businessId Int
+    service    Service  @relation(fields: [serviceId], references: [id])
+    serviceId  Int
+
+    @@unique([businessId, serviceId])
+}
 
 model VerificationToken {
     identifier String
@@ -72,4 +166,23 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+enum Role {
+    USER
+    BUSINESS_OWNER
+    ADMIN
+}
+
+enum Category {
+    MEN_BARBER
+    WOMEN_BARBER
+    NAILS_BEAUTY
+    COSMETICS
+}
+
+enum AppointmentStatus {
+    BOOKED
+    CANCELLED
+    COMPLETED
 }
