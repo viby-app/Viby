@@ -55,6 +55,15 @@ model User {
     BusinessFollower BusinessFollowing[] @relation("BusinessFollower")
 }
 
+model Workers {
+    id         Int      @id @default(autoincrement())
+    name       String
+    wage       Float
+    phone      String?
+    business   Business @relation("BusinessWorker", fields: [businessId], references: [id])
+    businessId Int
+}
+
 model BusinessFollowing {
     id         Int      @id @default(autoincrement())
     follower   User     @relation("BusinessFollower", fields: [followerId], references: [id])
@@ -94,7 +103,32 @@ model Business {
     appointments     Appointment[]
     reviews          Review[]
     images           Image[]
-    FollowedBussines BusinessFollowing[] @relation("FollowedBussines")
+    followedBussines BusinessFollowing[] @relation("FollowedBussines")
+    workers          Workers[]           @relation("BusinessWorker")
+    openingHour      OpeningHour[]
+    closedDays       ClosedDay[]
+}
+
+model OpeningHour {
+    id         Int      @id @default(autoincrement())
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId Int
+    dayOfWeek  Int // 0 = Sunday, 6 = Saturday
+    openTime   DateTime @db.Time
+    closeTime  DateTime @db.Time
+
+    @@unique([businessId, dayOfWeek])
+}
+
+model ClosedDay {
+    id         Int      @id @default(autoincrement())
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+    businessId Int
+    date       DateTime
+    startTime  DateTime @db.Time
+    endTime    DateTime @db.Time
+
+    @@unique([businessId, date])
 }
 
 model Review {
