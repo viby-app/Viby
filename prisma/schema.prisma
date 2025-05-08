@@ -105,11 +105,11 @@ model Business {
     images           Image[]
     followedBussines BusinessFollowing[] @relation("FollowedBussines")
     workers          Workers[]           @relation("BusinessWorker")
-    openingHour      OpeningHour[]
+    openingHour      OpeningHours[]
     closedDays       ClosedDay[]
 }
 
-model OpeningHour {
+model OpeningHours {
     id         Int      @id @default(autoincrement())
     business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
