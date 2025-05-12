@@ -41,4 +41,17 @@ export const businessRouter = createTRPCRouter({
       });
       return business;
     }),
+  getBusinessTimesById: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const businessTimes = await ctx.db.openingHours.findMany({
+        where: {
+          businessId: input.businessId,
+        },
+        orderBy: {
+          dayOfWeek: "asc",
+        },
+      });
+      return businessTimes;
+    }),
 });

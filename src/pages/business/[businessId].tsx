@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import Button from "~/components/button";
 import ImageWithDynamicSrc from "~/components/image";
 import Layout from "~/components/layout";
+import { numberToWeekday } from "~/lib/utils";
 import { api } from "~/utils/api";
 
 const BusinessPage: NextPage = () => {
@@ -26,6 +27,12 @@ const BusinessPage: NextPage = () => {
       },
       { enabled: !!businessId },
     );
+  const { data: businessTimes } = api.business.getBusinessTimesById.useQuery(
+    {
+      businessId: Number(businessId),
+    },
+    { enabled: !!businessId },
+  );
 
   return (
     <Layout>
@@ -90,6 +97,34 @@ const BusinessPage: NextPage = () => {
                       height={500}
                       src={`/api/image/${image.key}`}
                     />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex w-full flex-col items-center justify-center">
+              <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
+                שעות פעילות
+              </h2>
+              <div className="flex w-2/3 flex-col space-y-2 rounded-md bg-[#9ACBD0] p-4">
+                {businessTimes?.map((day) => (
+                  <div
+                    key={day.dayOfWeek}
+                    className="flex flex-row justify-between"
+                  >
+                    <p className="text-md">{numberToWeekday(day.dayOfWeek)}</p>
+                    <p className="text-md">
+                      {day.openTime.getUTCHours() +
+                        ":" +
+                        (day.openTime.getUTCMinutes() == 0
+                          ? "00"
+                          : day.openTime.getUTCMinutes()) +
+                        " - " +
+                        day.closeTime.getUTCHours() +
+                        ":" +
+                        (day.closeTime.getUTCMinutes() == 0
+                          ? "00"
+                          : day.closeTime.getUTCMinutes())}
+                    </p>
                   </div>
                 ))}
               </div>
