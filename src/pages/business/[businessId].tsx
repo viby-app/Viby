@@ -56,13 +56,13 @@ const BusinessPage: NextPage = () => {
                 <Phone className="h-5 w-5" />
               </a>
               <a
-                href={business.whatsappLink ? business.whatsappLink : "#"}
+                href={business.whatsappLink ?? "#"}
                 className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
                 <MessageCircle className="h-5 w-5" />
               </a>
               <a
-                href={business.instagramLink ? business.instagramLink : "#"}
+                href={business.instagramLink ?? "#"}
                 className="flex w-min flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
                 <Instagram className="h-5 w-5" />
