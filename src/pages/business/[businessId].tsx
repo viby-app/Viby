@@ -36,12 +36,12 @@ const BusinessPage: NextPage = () => {
             <div className="flex w-full flex-row space-x-2 rounded-md p-1 sm:h-1/4 lg:flex-row lg:space-y-0 lg:space-x-4">
               <div className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4">
                 <MapPin className="h-5 w-5" />
-                <p className="text-md">{business.address || "אין כתובת"}</p>
+                <p className="text-md">{business.address ?? "אין כתובת"}</p>
               </div>
             </div>
             <div className="mx-0.5 flex flex-col">
               <p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
-                {business.description || "אין תיאור"}
+                {business.description ?? "אין תיאור"}
               </p>
               <div className="flex space-x-2">
                 <Button className="mt-3 w-1/3 self-end">לקבוע תור</Button>
