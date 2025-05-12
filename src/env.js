@@ -7,6 +7,7 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    S3_BUCKET_NAME: z.string(),
     S3_BUCKET_URL: z.string().url(),
     S3_ACCESS_KEY: z.string(),
     S3_SECRET_KEY: z.string(),
@@ -28,7 +29,6 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_S3_BUCKET_NAME: z.string(),
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
@@ -37,7 +37,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    NEXT_PUBLIC_S3_BUCKET_NAME: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+    S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
     S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
     S3_SECRET_KEY: process.env.S3_SECRET_KEY,
     S3_BUCKET_URL: process.env.S3_BUCKET_URL,
