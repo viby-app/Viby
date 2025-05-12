@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinesses: protectedProcedure.query(async ({ ctx }) => {
@@ -35,4 +31,14 @@ export const businessRouter = createTRPCRouter({
 
     return businesses;
   }),
+  getBusinessById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const business = await ctx.db.business.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+      return business;
+    }),
 });

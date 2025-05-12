@@ -1,3 +1,4 @@
+"use client";
 import { pages } from "~/utils";
 
 const Navbar = () => {
