@@ -1,9 +1,24 @@
 import Image from "next/image";
 import { useMemo } from "react";
 
-function ImageWithDynamicSrc({ src, alt }: { src: string; alt?: string }) {
+interface Props {
+  src: string;
+  alt?: string;
+  width: number;
+  height: number;
+}
+
+function ImageWithDynamicSrc({ src, alt, width, height }: Props) {
   const image = useMemo(() => {
-    return <Image src={src} alt={alt ?? "pic"} />;
+    return (
+      <Image
+        width={width}
+        height={height}
+        src={src}
+        className="w-full"
+        alt="Tailwind CSS Carousel component"
+      />
+    );
   }, [src]);
 
   return image;

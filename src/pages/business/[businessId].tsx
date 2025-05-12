@@ -11,19 +11,21 @@ const BusinessPage: NextPage = () => {
   const router = useRouter();
   const { businessId } = router.query;
 
-  const { data: business } = api.business.getBusinessById.useQuery(
-    {
-      id: Number(businessId),
-    },
-    { enabled: !!businessId },
-  );
+  const { data: business, isLoading: isBusinessLaoding } =
+    api.business.getBusinessById.useQuery(
+      {
+        id: Number(businessId),
+      },
+      { enabled: !!businessId },
+    );
 
-  const { data: images } = api.image.getImagesByBusinessId.useQuery(
-    {
-      businessId: Number(businessId),
-    },
-    { enabled: !!businessId },
-  );
+  const { data: images, isLoading: isImagesLoading } =
+    api.image.getImagesByBusinessId.useQuery(
+      {
+        businessId: Number(businessId),
+      },
+      { enabled: !!businessId },
+    );
 
   return (
     <Layout>
@@ -72,13 +74,25 @@ const BusinessPage: NextPage = () => {
               גלריה
             </h2>
             <div className="flex flex-row space-x-2 overflow-x-auto">
-              {images?.map((image) => (
-                <ImageWithDynamicSrc
-                  key={image.id}
-                  src={"/api/image/" + image.key}
-                  alt={image.id.toString()}
-                />
-              ))}
+              {isImagesLoading || isBusinessLaoding ? (
+                <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
+              ) : images?.length === 0 ? (
+                <p className="text-md text-gray-500">אין תמונות</p>
+              ) : (
+                <></>
+              )}
+              <div className="carousel rounded-box h-1/2 w-full">
+                {images?.map((image) => (
+                  <div className="carousel-item w-full" key={image.id}>
+                    <ImageWithDynamicSrc
+                      key={image.id}
+                      width={400}
+                      height={500}
+                      src={`/api/image/${image.key}`}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
