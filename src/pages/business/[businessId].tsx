@@ -1,6 +1,5 @@
 "use client";
 import {
-  CheckCircle,
   Instagram,
   MapPin,
   MessageCircle,
@@ -54,12 +53,6 @@ const BusinessPage: NextPage = () => {
   const handleFollow = api.business.addFollowerBusiness.useMutation({
     onSuccess: () => {
       void refetchFollowing();
-      toast("הוסף בתור עוקב", {
-        type: "success",
-        autoClose: 3000,
-        className: "w-1/2",
-        position: "bottom-right",
-      });
     },
     onError: (err) => toast.error("Follow error:" + err.message.toString()),
   });
@@ -67,12 +60,6 @@ const BusinessPage: NextPage = () => {
   const handleUnfollow = api.business.removeFollowerBusiness.useMutation({
     onSuccess: () => {
       void refetchFollowing();
-      toast("הוסר בתור עוקב", {
-        type: "success",
-        position: "bottom-right",
-        autoClose: 3000,
-        icon: <CheckCircle className="h-5 w-5" aria-label="success" />,
-      });
     },
     onError: (err) => toast.error("Unfollow error:" + err.message.toString()),
   });
@@ -93,12 +80,12 @@ const BusinessPage: NextPage = () => {
   return (
     <Layout>
       {business && (
-        <div className="flex flex-col items-center justify-center">
+        <div className="m-2 mb-4 flex flex-col items-center justify-center">
           <span className="mt-5 text-4xl font-semibold text-[#006A71]">
             {business.name}
           </span>
 
-          <div className="mt-5 flex w-full flex-col space-y-2 bg-[#48A6A7] p-4 text-center">
+          <div className="mt-5 flex w-full flex-col space-y-2 rounded-xl bg-[#48A6A7] p-4 text-center">
             <div className="flex flex-row space-x-2 rounded-md p-1">
               <div className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4">
                 <MapPin className="h-5 w-5" aria-label="address" />
@@ -169,7 +156,7 @@ const BusinessPage: NextPage = () => {
                 <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
               )}
               {!isImagesLoading && images?.length === 0 && (
-                <p className="text-md text-gray-500">אין תמונות</p>
+                <div className="skeleton h-48 w-48 rounded-md bg-gray-200" />
               )}
               <div className="carousel rounded-box h-1/2 w-full">
                 {images?.map((image) => (
@@ -184,24 +171,30 @@ const BusinessPage: NextPage = () => {
                 ))}
               </div>
             </div>
-
             <div className="flex w-full flex-col items-center justify-center">
-              <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
-                שעות פעילות
-              </h2>
-              <div className="flex w-2/3 flex-col space-y-2 rounded-md bg-[#9ACBD0] p-4">
-                {businessTimes?.map((day) => (
-                  <div
-                    key={day.dayOfWeek}
-                    className="flex flex-row justify-between"
-                  >
-                    <p className="text-md">{numberToWeekday(day.dayOfWeek)}</p>
-                    <p className="text-md">
-                      {formatTime(day.openTime)} - {formatTime(day.closeTime)}
-                    </p>
+              {businessTimes && businessTimes.length > 0 && (
+                <>
+                  <h2 className="mt-5 mb-2 text-2xl font-semibold text-[#006A71]">
+                    שעות פעילות
+                  </h2>
+                  <div className="flex w-4/5 flex-col space-y-2 rounded-md bg-[#9ACBD0] p-4">
+                    {businessTimes?.map((day) => (
+                      <div
+                        key={day.dayOfWeek}
+                        className="flex flex-row justify-between"
+                      >
+                        <p className="text-md">
+                          {numberToWeekday(day.dayOfWeek)}
+                        </p>
+                        <p className="text-md">
+                          {formatTime(day.openTime)} -{" "}
+                          {formatTime(day.closeTime)}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
