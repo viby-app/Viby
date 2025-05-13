@@ -53,7 +53,7 @@ const BusinessPage: NextPage = () => {
 
   const handleFollow = api.business.addFollowerBusiness.useMutation({
     onSuccess: () => {
-      refetchFollowing();
+      void refetchFollowing();
       toast("הוסף בתור עוקב", {
         type: "success",
         autoClose: 3000,
@@ -66,7 +66,7 @@ const BusinessPage: NextPage = () => {
 
   const handleUnfollow = api.business.removeFollowerBusiness.useMutation({
     onSuccess: () => {
-      refetchFollowing();
+      void refetchFollowing();
       toast("הוסר בתור עוקב", {
         type: "success",
         position: "bottom-right",
