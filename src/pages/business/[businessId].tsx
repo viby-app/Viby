@@ -1,10 +1,5 @@
 "use client";
-import {
-  Instagram,
-  MapPin,
-  MessageCircle,
-  Phone,
-} from "lucide-react";
+import { Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -121,7 +116,7 @@ const BusinessPage: NextPage = () => {
               </Button>
             </div>
 
-            <div className="mt-4 flex space-x-2 rounded-md p-1">
+            <div className="mt-4 mb-4 flex space-x-2 rounded-md p-1">
               <a
                 href={`tel:${business.phone}`}
                 target="_blank"
@@ -147,10 +142,6 @@ const BusinessPage: NextPage = () => {
                 <Instagram className="h-5 w-5" aria-label="instagram" />
               </a>
             </div>
-
-            <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
-              גלריה
-            </h2>
             <div className="flex flex-row justify-center space-x-2 overflow-x-auto">
               {(isImagesLoading || isBusinessLoading) && (
                 <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
@@ -158,7 +149,7 @@ const BusinessPage: NextPage = () => {
               {!isImagesLoading && images?.length === 0 && (
                 <div className="skeleton h-48 w-48 rounded-md bg-gray-200" />
               )}
-              <div className="carousel rounded-box h-1/2 w-full">
+              <div className="carousel rounded-box h-1/2 w-full space-x-2 px-4">
                 {images?.map((image) => (
                   <div className="carousel-item w-full" key={image.id}>
                     <ImageWithDynamicSrc

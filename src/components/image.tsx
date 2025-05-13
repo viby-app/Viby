@@ -15,7 +15,7 @@ function ImageWithDynamicSrc({ src, alt, width, height }: Props) {
         width={width}
         height={height}
         src={src}
-        className="w-full"
+        className="rounded-box w-full"
         alt="Tailwind CSS Carousel component"
       />
     );
