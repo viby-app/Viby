@@ -11,7 +11,7 @@ export default async function handler(
   if (typeof key !== "string") {
     return res.status(400).json({ error: "Missing or invalid key" });
   }
-  console.log("Fetching image with key:", key);
+
   try {
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
