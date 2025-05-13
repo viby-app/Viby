@@ -54,4 +54,62 @@ export const businessRouter = createTRPCRouter({
       });
       return businessTimes;
     }),
+  addFollowerBusiness: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        userId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existingFollow = await ctx.db.businessFollowing.findFirst({
+        where: {
+          businessId: input.businessId,
+          followerId: input.userId,
+        },
+      });
+      if (existingFollow) {
+        throw new Error("User is already following this business");
+      }
+      const business = await ctx.db.businessFollowing.create({
+        data: {
+          businessId: input.businessId,
+          followerId: input.userId,
+        },
+      });
+      return business;
+    }),
+  isUserFollowingBusiness: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        userId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const follow = await ctx.db.businessFollowing.findFirst({
+        where: {
+          businessId: input.businessId,
+          followerId: input.userId,
+        },
+      });
+      return follow !== null;
+    }),
+  removeFollowerBusiness: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        userId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.businessFollowing.delete({
+        where: {
+          followerId_businessId: {
+            followerId: input.userId,
+            businessId: input.businessId,
+          },
+        },
+      });
+    }),
 });

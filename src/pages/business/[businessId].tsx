@@ -1,106 +1,149 @@
 "use client";
 import { Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import Button from "~/components/button";
 import ImageWithDynamicSrc from "~/components/image";
 import Layout from "~/components/layout";
-import { numberToWeekday } from "~/lib/utils";
+import { numberToWeekday, formatTime } from "~/lib/utils";
 import { api } from "~/utils/api";
 
 const BusinessPage: NextPage = () => {
+  const { data: session, status: userStatus } = useSession();
   const router = useRouter();
-  const { businessId } = router.query;
+  const businessId = Number(router.query.businessId);
 
-  const { data: business, isLoading: isBusinessLaoding } =
-    api.business.getBusinessById.useQuery(
-      {
-        id: Number(businessId),
-      },
-      { enabled: !!businessId },
-    );
+  const enabled = !isNaN(businessId);
 
+  const { data: business, isLoading: isBusinessLoading } =
+    api.business.getBusinessById.useQuery({ id: businessId }, { enabled });
   const { data: images, isLoading: isImagesLoading } =
-    api.image.getImagesByBusinessId.useQuery(
-      {
-        businessId: Number(businessId),
-      },
-      { enabled: !!businessId },
-    );
+    api.image.getImagesByBusinessId.useQuery({ businessId }, { enabled });
   const { data: businessTimes } = api.business.getBusinessTimesById.useQuery(
-    {
-      businessId: Number(businessId),
-    },
-    { enabled: !!businessId },
+    { businessId },
+    { enabled },
   );
+
+  const {
+    data: isFollowing,
+    refetch: refetchFollowing,
+    isLoading: isFollowingLoading,
+  } = api.business.isUserFollowingBusiness.useQuery(
+    { businessId, userId: session?.user.id ?? "" },
+    { enabled: !!session?.user.id && enabled },
+  );
+
+  const handleFollow = api.business.addFollowerBusiness.useMutation({
+    onSuccess: () => refetchFollowing(),
+    onError: (err) => console.error("Follow error:", err),
+  });
+
+  const handleUnfollow = api.business.removeFollowerBusiness.useMutation({
+    onSuccess: () => refetchFollowing(),
+    onError: (err) => console.error("Unfollow error:", err),
+  });
+
+  const handleFollowing = () => {
+    if (!session?.user.id) return;
+    if (isFollowing) {
+      handleUnfollow.mutate({ businessId, userId: session.user.id });
+    } else {
+      handleFollow.mutate({ businessId, userId: session.user.id });
+    }
+  };
+
+  if (!enabled) return null;
 
   return (
     <Layout>
-      {business ? (
+      {business && (
         <div className="flex flex-col items-center justify-center">
           <span className="mt-5 text-4xl font-semibold text-[#006A71]">
             {business.name}
           </span>
+
           <div className="mt-5 flex w-full flex-col space-y-2 bg-[#48A6A7] p-4 text-center">
-            <div className="flex w-full flex-row space-x-2 rounded-md p-1 sm:h-1/4 lg:flex-row lg:space-y-0 lg:space-x-4">
+            <div className="flex flex-row space-x-2 rounded-md p-1">
               <div className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4">
-                <MapPin className="h-5 w-5" />
+                <MapPin className="h-5 w-5" aria-label="address" />
                 <p className="text-md">{business.address ?? "אין כתובת"}</p>
               </div>
             </div>
-            <div className="mx-0.5 flex flex-col">
-              <p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
-                {business.description ?? "אין תיאור"}
-              </p>
-              <div className="flex space-x-2">
-                <Button className="mt-3 w-1/3 self-end">לקבוע תור</Button>
-                <Button className="mt-3 w-1/3 self-end">לעקוב</Button>
-              </div>
+
+            <p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
+              {business.description ?? "אין תיאור"}
+            </p>
+
+            <div className="flex space-x-2">
+              <Button className="mt-3 w-1/3 self-end">לקבוע תור</Button>
+              <Button
+                onClick={handleFollowing}
+                disabled={
+                  handleFollow.isPending ||
+                  handleUnfollow.isPending ||
+                  isFollowingLoading
+                }
+                className="mt-3 w-1/3 self-end"
+              >
+                {userStatus === "loading" ||
+                isFollowingLoading ||
+                handleFollow.isPending ||
+                handleUnfollow.isPending ? (
+                  <div className="loading" />
+                ) : isFollowing ? (
+                  "לא לעקוב"
+                ) : (
+                  "לעקוב"
+                )}
+              </Button>
             </div>
-            <div className="mt-4 flex w-min flex-row space-x-2 rounded-md p-1 sm:h-1/4 lg:flex-row lg:space-y-0 lg:space-x-4">
+
+            <div className="mt-4 flex space-x-2 rounded-md p-1">
               <a
                 href={`tel:${business.phone}`}
                 className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-5 w-5" aria-label="call" />
               </a>
               <a
                 href={business.whatsappLink ?? "#"}
                 className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
-                <MessageCircle className="h-5 w-5" />
+                <MessageCircle className="h-5 w-5" aria-label="whatsapp" />
               </a>
               <a
                 href={business.instagramLink ?? "#"}
-                className="flex w-min flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
+                className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-5 w-5" aria-label="instagram" />
               </a>
             </div>
+
             <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
               גלריה
             </h2>
             <div className="flex flex-row space-x-2 overflow-x-auto">
-              {isImagesLoading || isBusinessLaoding ? (
+              {(isImagesLoading || isBusinessLoading) && (
                 <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
-              ) : images?.length === 0 ? (
+              )}
+              {!isImagesLoading && images?.length === 0 && (
                 <p className="text-md text-gray-500">אין תמונות</p>
-              ) : (
-                <></>
               )}
               <div className="carousel rounded-box h-1/2 w-full">
                 {images?.map((image) => (
                   <div className="carousel-item w-full" key={image.id}>
                     <ImageWithDynamicSrc
-                      key={image.id}
                       width={400}
                       height={500}
                       src={`/api/image/${image.key}`}
+                      alt={`Business image ${image.id}`}
                     />
                   </div>
                 ))}
               </div>
             </div>
+
             <div className="flex w-full flex-col items-center justify-center">
               <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
                 שעות פעילות
@@ -113,17 +156,7 @@ const BusinessPage: NextPage = () => {
                   >
                     <p className="text-md">{numberToWeekday(day.dayOfWeek)}</p>
                     <p className="text-md">
-                      {day.openTime.getUTCHours() +
-                        ":" +
-                        (day.openTime.getUTCMinutes() == 0
-                          ? "00"
-                          : day.openTime.getUTCMinutes()) +
-                        " - " +
-                        day.closeTime.getUTCHours() +
-                        ":" +
-                        (day.closeTime.getUTCMinutes() == 0
-                          ? "00"
-                          : day.closeTime.getUTCMinutes())}
+                      {formatTime(day.openTime)} - {formatTime(day.closeTime)}
                     </p>
                   </div>
                 ))}
@@ -131,8 +164,6 @@ const BusinessPage: NextPage = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <></>
       )}
     </Layout>
   );
