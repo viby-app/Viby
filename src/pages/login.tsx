@@ -1,3 +1,4 @@
+"use client";
 import Head from "next/head";
 import Button from "~/components/button";
 import { signIn } from "next-auth/react";
