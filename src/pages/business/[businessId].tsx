@@ -1,5 +1,11 @@
 "use client";
-import { Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
+import {
+  CheckCircle,
+  Instagram,
+  MapPin,
+  MessageCircle,
+  Phone,
+} from "lucide-react";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -8,8 +14,13 @@ import ImageWithDynamicSrc from "~/components/image";
 import Layout from "~/components/layout";
 import { numberToWeekday, formatTime } from "~/lib/utils";
 import { api } from "~/utils/api";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 
 const BusinessPage: NextPage = () => {
+  const [optimisticFollowing, setOptimisticFollowing] = useState<
+    boolean | null
+  >(null);
   const { data: session, status: userStatus } = useSession();
   const router = useRouter();
   const businessId = Number(router.query.businessId);
@@ -34,19 +45,43 @@ const BusinessPage: NextPage = () => {
     { enabled: !!session?.user.id && enabled },
   );
 
+  useEffect(() => {
+    if (typeof isFollowing === "boolean") {
+      setOptimisticFollowing(isFollowing);
+    }
+  }, [isFollowing]);
+
   const handleFollow = api.business.addFollowerBusiness.useMutation({
-    onSuccess: () => refetchFollowing(),
-    onError: (err) => console.error("Follow error:", err),
+    onSuccess: () => {
+      refetchFollowing();
+      toast("הוסף בתור עוקב", {
+        type: "success",
+        autoClose: 3000,
+        className: "w-1/2",
+        position: "bottom-right",
+      });
+    },
+    onError: (err) => toast.error("Follow error:" + err.message.toString()),
   });
 
   const handleUnfollow = api.business.removeFollowerBusiness.useMutation({
-    onSuccess: () => refetchFollowing(),
-    onError: (err) => console.error("Unfollow error:", err),
+    onSuccess: () => {
+      refetchFollowing();
+      toast("הוסר בתור עוקב", {
+        type: "success",
+        position: "bottom-right",
+        autoClose: 3000,
+        icon: <CheckCircle className="h-5 w-5" aria-label="success" />,
+      });
+    },
+    onError: (err) => toast.error("Unfollow error:" + err.message.toString()),
   });
 
   const handleFollowing = () => {
     if (!session?.user.id) return;
-    if (isFollowing) {
+    const newFollowState = !optimisticFollowing;
+    setOptimisticFollowing(newFollowState);
+    if (optimisticFollowing) {
       handleUnfollow.mutate({ businessId, userId: session.user.id });
     } else {
       handleFollow.mutate({ businessId, userId: session.user.id });
@@ -91,7 +126,7 @@ const BusinessPage: NextPage = () => {
                 handleFollow.isPending ||
                 handleUnfollow.isPending ? (
                   <div className="loading" />
-                ) : isFollowing ? (
+                ) : optimisticFollowing ? (
                   "לא לעקוב"
                 ) : (
                   "לעקוב"
@@ -102,19 +137,25 @@ const BusinessPage: NextPage = () => {
             <div className="mt-4 flex space-x-2 rounded-md p-1">
               <a
                 href={`tel:${business.phone}`}
-                className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 justify-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
                 <Phone className="h-5 w-5" aria-label="call" />
               </a>
               <a
                 href={business.whatsappLink ?? "#"}
-                className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 justify-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
                 <MessageCircle className="h-5 w-5" aria-label="whatsapp" />
               </a>
               <a
                 href={business.instagramLink ?? "#"}
-                className="flex flex-1 items-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 justify-center space-x-1 rounded-xl bg-[#9ACBD0] p-4"
               >
                 <Instagram className="h-5 w-5" aria-label="instagram" />
               </a>
@@ -123,7 +164,7 @@ const BusinessPage: NextPage = () => {
             <h2 className="mt-5 text-2xl font-semibold text-[#006A71]">
               גלריה
             </h2>
-            <div className="flex flex-row space-x-2 overflow-x-auto">
+            <div className="flex flex-row justify-center space-x-2 overflow-x-auto">
               {(isImagesLoading || isBusinessLoading) && (
                 <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
               )}
