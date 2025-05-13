@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 interface Props {
   src: string;
-  alt?: string;
+  alt: string;
   width: number;
   height: number;
 }
@@ -16,7 +16,7 @@ function ImageWithDynamicSrc({ src, alt, width, height }: Props) {
         height={height}
         src={src}
         className="rounded-box w-full"
-        alt="Tailwind CSS Carousel component"
+        alt={alt}
       />
     );
   }, [src]);
