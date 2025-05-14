@@ -112,4 +112,10 @@ export const businessRouter = createTRPCRouter({
         },
       });
     }),
+  getAvailableTimes: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(() => {
+      const availableTimes = ["10:00", "11:00", "10:30", "12:00"];
+      return availableTimes;
+    }),
 });

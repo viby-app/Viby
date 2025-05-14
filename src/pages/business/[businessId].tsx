@@ -10,11 +10,13 @@ import { numberToWeekday, formatTime } from "~/lib/utils";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import BookAppointmentModal from "~/components/bookAppointmentModal";
 
 const BusinessPage: NextPage = () => {
   const [optimisticFollowing, setOptimisticFollowing] = useState<
     boolean | null
   >(null);
+  const [showModal, setShowModal] = useState(false);
   const { data: session, status: userStatus } = useSession();
   const router = useRouter();
   const businessId = Number(router.query.businessId);
@@ -93,7 +95,12 @@ const BusinessPage: NextPage = () => {
             </p>
 
             <div className="flex space-x-2">
-              <Button className="mt-3 w-1/3 self-end">לקבוע תור</Button>
+              <Button
+                className="mt-3 w-1/3 self-end"
+                onClick={() => setShowModal(!showModal)}
+              >
+                לקבוע תור
+              </Button>
               <Button
                 onClick={handleFollowing}
                 disabled={
@@ -109,7 +116,7 @@ const BusinessPage: NextPage = () => {
                 handleUnfollow.isPending ? (
                   <div className="loading" />
                 ) : optimisticFollowing ? (
-                  "לא לעקוב"
+                  "עוקב"
                 ) : (
                   "לעקוב"
                 )}
@@ -188,6 +195,11 @@ const BusinessPage: NextPage = () => {
               )}
             </div>
           </div>
+          <BookAppointmentModal
+            showModal={showModal}
+            businessId={businessId}
+            setShowModal={setShowModal}
+          />
         </div>
       )}
     </Layout>
