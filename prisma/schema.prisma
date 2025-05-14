@@ -45,6 +45,7 @@ model User {
     accounts         Account[]
     sessions         Session[]
     role             Role                @default(USER)
+    gender           Gender              @default(MALE)
     createdAt        DateTime            @default(now())
     updatedAt        DateTime?           @updatedAt
     businessOwner    Business[]          @relation("BusinessOwner")
@@ -214,6 +215,12 @@ enum Role {
     USER
     BUSINESS_OWNER
     ADMIN
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
 }
 
 enum Category {
