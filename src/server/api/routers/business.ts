@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const businessRouter = createTRPCRouter({
@@ -117,12 +119,16 @@ export const businessRouter = createTRPCRouter({
     .input(
       z.object({
         businessId: z.number(),
-        date: z.date(),
+        date: z.date(), // Expected to be in UTC
         serviceId: z.number().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const dayOfWeek = input.date.getDay();
+      const inputDateUTC = dayjs.utc(input.date);
+      const dayOfWeek = inputDateUTC.day();
+
+      const startOfDay = inputDateUTC.startOf("day").toDate();
+      const endOfDay = inputDateUTC.endOf("day").toDate();
 
       const [openingHours, closedDay, services, appointments] =
         await Promise.all([
@@ -134,7 +140,7 @@ export const businessRouter = createTRPCRouter({
           ctx.db.closedDay.findFirst({
             where: {
               businessId: input.businessId,
-              date: new Date(input.date.toDateString()),
+              date: startOfDay, // assumes closedDay.date is stored in UTC
             },
           }),
           ctx.db.businessService.findMany({
@@ -145,8 +151,8 @@ export const businessRouter = createTRPCRouter({
             where: {
               businessId: input.businessId,
               date: {
-                gte: dayjs(input.date).startOf("day").toDate(),
-                lte: dayjs(input.date).endOf("day").toDate(),
+                gte: startOfDay,
+                lte: endOfDay,
               },
             },
           }),
@@ -154,31 +160,33 @@ export const businessRouter = createTRPCRouter({
 
       if (!openingHours || closedDay) return [];
 
-      const start = dayjs(input.date)
-        .hour(openingHours.openTime.getHours())
-        .minute(openingHours.openTime.getMinutes());
-      const end = dayjs(input.date)
-        .hour(openingHours.closeTime.getHours())
-        .minute(openingHours.closeTime.getMinutes());
+      const openTimeUTC = inputDateUTC
+        .hour(openingHours.openTime.getUTCHours())
+        .minute(openingHours.openTime.getUTCMinutes());
+
+      const closeTimeUTC = inputDateUTC
+        .hour(openingHours.closeTime.getUTCHours())
+        .minute(openingHours.closeTime.getUTCMinutes());
 
       const shortestDuration = Math.min(
         ...services.map((bs) => bs.service.durationMinutes),
       );
-      const intervals = [];
+
+      const intervals: string[] = [];
 
       for (
-        let time = start;
-        time.add(shortestDuration, "minute").isBefore(end);
+        let time = openTimeUTC.clone();
+        time.add(shortestDuration, "minute").isBefore(closeTimeUTC);
         time = time.add(shortestDuration, "minute")
       ) {
-        const timeStart = time.toDate();
-        const timeEnd = time.add(shortestDuration, "minute").toDate();
+        const timeStart = time;
+        const timeEnd = timeStart.add(shortestDuration, "minute");
 
-        const isConflicting = appointments.some(
-          (apt) =>
-            dayjs(apt.date).isBefore(timeEnd) &&
-            dayjs(apt.date).add(shortestDuration, "minute").isAfter(timeStart),
-        );
+        const isConflicting = appointments.some((apt) => {
+          const aptStart = dayjs.utc(apt.date);
+          const aptEnd = aptStart.add(shortestDuration, "minute");
+          return aptStart.isBefore(timeEnd) && aptEnd.isAfter(timeStart);
+        });
 
         if (!isConflicting) intervals.push(time.format("HH:mm"));
       }

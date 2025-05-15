@@ -6,6 +6,8 @@ import { api } from "~/utils/api";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 import { showSuccessToast } from "./successToast";
 
 interface Props {
@@ -41,7 +43,7 @@ export default function BookingModal({
   } = api.business.getAvailableTimes.useQuery(
     {
       businessId,
-      date: bookingDate,
+      date: dayjs(bookingDate).utc().startOf("day").toDate(),
     },
     { enabled: !!businessId },
   );
@@ -143,7 +145,7 @@ export default function BookingModal({
               mode="single"
               selected={bookingDate}
               onSelect={(date) => {
-                if (date) setBookingDate(date);
+                if (date) setBookingDate(dayjs(date).utc().toDate());
                 setShowDatePicker(false);
               }}
               className="react-day-picker fixed left-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-white p-4 shadow-lg"
