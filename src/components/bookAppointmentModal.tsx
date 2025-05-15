@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Button from "./button";
 import { api } from "~/utils/api";
+import { DayPicker } from "react-day-picker";
+import { he } from "react-day-picker/locale";
+import dayjs from "dayjs";
 
 interface Props {
   showModal: boolean;
@@ -15,26 +18,43 @@ export default function BookingModal({
   setShowModal,
   businessId,
 }: Props) {
-  const [step, setStep] = useState<"worker" | "service" | "time">("worker");
   const [selectedWorker, setSelectedWorker] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [bookingDate, setBookingDate] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { data: workers } = api.workers.getAllWorkersByBusinessId.useQuery({
-    businessId: businessId,
+    businessId,
   });
+
   const { data: businessService } =
     api.service.getServicesByBusinessId.useQuery({
-      bussinesId: businessId,
+      businessId: businessId,
     });
-  const { data: times } = api.business.getAvailableTimes.useQuery({
-    businessId: businessId,
-  });
+
+  const { data: times } = api.business.getAvailableTimes.useQuery(
+    {
+      businessId,
+      date: bookingDate,
+    },
+    { enabled: !!businessId },
+  );
+
+  const createAppointmentMutation =
+    api.appointment.createAppointment.useMutation();
 
   const handleSubmit = () => {
     if (selectedWorker && selectedService && selectedTime) {
-      console.log({ selectedWorker, selectedService, selectedTime });
-      setShowModal(false);
+      createAppointmentMutation.mutate({
+        businessId,
+        date: dayjs(bookingDate)
+          .hour(Number(selectedTime.split(":")[0]))
+          .minute(Number(selectedTime.split(":")[1]))
+          .toDate(),
+        serviceId: selectedService,
+      });
+      handleReset();
     }
   };
 
@@ -43,17 +63,17 @@ export default function BookingModal({
     setSelectedService(null);
     setSelectedTime(null);
     setSelectedWorker(null);
-    setStep("worker");
   };
 
   const TEXT = {
     bookAnAppointment: "קבע תור",
     selectWorker: "בחר עובד",
     selectService: "בחר שירות",
-    selectTime: "בחר שעה",
+    selectDay: "בחר יום",
     back: "חזור",
     confirm: "אישור",
     cancel: "ביטול",
+    noAvailableAppointments: "אין תורים להיום",
   };
 
   return (
@@ -61,85 +81,98 @@ export default function BookingModal({
       id="booking_modal"
       className={`modal ${showModal ? "modal-open" : ""}`}
     >
-      <div className="modal-box w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg">
+      <div className="modal-box h-2/3 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg">
         <h3 className="mb-4 text-center text-lg font-bold">
           {TEXT.bookAnAppointment}
         </h3>
 
-        {step === "worker" && (
-          <div className="space-y-4">
-            <p>{TEXT.selectWorker}</p>
-            <div className="grid w-1/2 grid-cols-1 items-center gap-2">
-              {workers?.map((worker) => (
-                <Button
-                  key={worker.id}
-                  onClick={() => {
-                    setSelectedWorker(worker.id);
-                    setStep("service");
-                  }}
-                  className="w-full"
-                >
-                  {worker.name}
-                </Button>
-              ))}
-            </div>
-            <div className="w-1/2 text-center">
-              <Button onClick={handleReset}>{TEXT.cancel}</Button>
-            </div>
-          </div>
-        )}
-
-        {step === "service" && (
-          <div className="space-y-4">
-            <p>{TEXT.selectService}</p>
-            <div className="self- mb-5 grid grid-cols-1 gap-2">
-              {businessService?.map(({ service }) => (
-                <Button
-                  key={service.id}
-                  onClick={() => {
-                    setSelectedService(service.id);
-                    setStep("time");
-                  }}
-                  className="w-full"
-                >
-                  {service.name} - ₪{service.price}
-                </Button>
-              ))}
-            </div>
-            <div className="w-1/2 text-center">
-              <Button onClick={() => setStep("worker")}>{TEXT.back}</Button>
-            </div>
-          </div>
-        )}
-
-        {step === "time" && (
-          <div className="space-y-4">
-            <p>{TEXT.selectTime}</p>
-            <div className="grid grid-cols-3 gap-2">
-              {times?.map((time, idx) => (
-                <Button
-                  key={idx}
-                  onClick={() => setSelectedTime(time)}
-                  className={`w-full ${selectedTime === time ? "btn-primary" : ""}`}
-                >
-                  {time}
-                </Button>
-              ))}
-            </div>
-            <div className="flex space-x-2">
-              <Button onClick={() => setStep("service")}>{TEXT.back}</Button>
+        {/* Select Worker */}
+        <div className="mb-2">
+          <p>{TEXT.selectWorker}</p>
+          <div className="grid grid-cols-1 items-center gap-2">
+            {workers?.map((worker) => (
               <Button
-                onClick={() => {
-                  handleSubmit();
-                  handleReset();
-                }}
-                disabled={!selectedTime}
+                key={worker.id}
+                onClick={() => setSelectedWorker(worker.id)}
+                className={`w-full ${worker.id === selectedWorker ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
               >
-                {TEXT.confirm}
+                {worker.name}
               </Button>
-            </div>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* Select Service */}
+        <div>
+          <p>{TEXT.selectService}</p>
+          <div className="mb-5 grid grid-cols-1 gap-2">
+            {businessService?.map(({ service }) => (
+              <Button
+                key={service.id}
+                onClick={() => setSelectedService(service.id)}
+                className={`w-full ${selectedService === service.id ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
+              >
+                {service.name} - ₪{service.price}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Date + Time */}
+        <div>
+          <p>{TEXT.selectDay}</p>
+
+          <button
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            className="input input-border mb-2 w-full text-left"
+          >
+            {bookingDate ? bookingDate.toLocaleDateString() : "בחר תאריך"}
+          </button>
+
+          {showDatePicker && (
+            <DayPicker
+              dir="rtl"
+              locale={he}
+              mode="single"
+              selected={bookingDate}
+              onSelect={(date) => {
+                if (date) setBookingDate(date);
+                setShowDatePicker(false);
+              }}
+              className="react-day-picker"
+            />
+          )}
+
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {times?.length === 0 ? (
+              <p>{TEXT.noAvailableAppointments}</p>
+            ) : (
+              <>
+                {times?.map((time, idx) => (
+                  <Button
+                    key={idx}
+                    onClick={() => setSelectedTime(time)}
+                    className={`w-full ${selectedTime === time ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
+                  >
+                    {time}
+                  </Button>
+                ))}
+              </>
+            )}
+          </div>
+
+          <div className="my-4 flex space-x-2">
+            <Button
+              onClick={handleSubmit}
+              disabled={!selectedTime || !selectedService || !selectedWorker}
+            >
+              {TEXT.confirm}
+            </Button>
+            <Button className="bg-red-400" onClick={handleReset}>
+              {TEXT.cancel}
+            </Button>
+          </div>
+        </div>
       </div>
     </dialog>
   );

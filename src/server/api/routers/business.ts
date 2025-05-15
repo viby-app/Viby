@@ -1,6 +1,8 @@
 import { z } from "zod";
 
+import dayjs from "dayjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { db } from "~/server/db";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinesses: protectedProcedure.query(async ({ ctx }) => {
@@ -113,9 +115,75 @@ export const businessRouter = createTRPCRouter({
       });
     }),
   getAvailableTimes: protectedProcedure
-    .input(z.object({ businessId: z.number() }))
-    .query(() => {
-      const availableTimes = ["10:00", "11:00", "10:30", "12:00"];
-      return availableTimes;
+    .input(
+      z.object({
+        businessId: z.number(),
+        date: z.date(),
+        serviceId: z.number().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const dayOfWeek = input.date.getDay();
+
+      const [openingHours, closedDay, services, appointments] =
+        await Promise.all([
+          ctx.db.openingHours.findUnique({
+            where: {
+              businessId_dayOfWeek: { businessId: input.businessId, dayOfWeek },
+            },
+          }),
+          ctx.db.closedDay.findFirst({
+            where: {
+              businessId: input.businessId,
+              date: new Date(input.date.toDateString()),
+            },
+          }),
+          ctx.db.businessService.findMany({
+            where: { businessId: input.businessId },
+            include: { service: true },
+          }),
+          ctx.db.appointment.findMany({
+            where: {
+              businessId: input.businessId,
+              date: {
+                gte: dayjs(input.date).startOf("day").toDate(),
+                lte: dayjs(input.date).endOf("day").toDate(),
+              },
+            },
+          }),
+        ]);
+
+      if (!openingHours || closedDay) return [];
+
+      const start = dayjs(input.date)
+        .hour(openingHours.openTime.getHours())
+        .minute(openingHours.openTime.getMinutes());
+      const end = dayjs(input.date)
+        .hour(openingHours.closeTime.getHours())
+        .minute(openingHours.closeTime.getMinutes());
+
+      const shortestDuration = Math.min(
+        ...services.map((bs) => bs.service.durationMinutes),
+      );
+      const intervals = [];
+
+      for (
+        let time = start;
+        time.add(shortestDuration, "minute").isBefore(end);
+        time = time.add(shortestDuration, "minute")
+      ) {
+        const timeStart = time.toDate();
+        const timeEnd = time.add(shortestDuration, "minute").toDate();
+
+        const isConflicting = appointments.some(
+          (apt) =>
+            dayjs(apt.date).isBefore(timeEnd) &&
+            dayjs(apt.date).add(shortestDuration, "minute").isAfter(timeStart),
+        );
+
+        if (!isConflicting) intervals.push(time.format("HH:mm"));
+      }
+
+      return intervals;
     }),
 });
