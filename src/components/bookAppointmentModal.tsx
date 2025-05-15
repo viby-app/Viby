@@ -59,7 +59,7 @@ export default function BookingModal({
         },
         { onSuccess: () => showSuccessToast(TEXT.successfullAppointment) },
       );
-      refetchTimes();
+      void refetchTimes();
       handleReset();
     }
   };

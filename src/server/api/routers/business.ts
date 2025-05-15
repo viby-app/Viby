@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import dayjs from "dayjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { db } from "~/server/db";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinesses: protectedProcedure.query(async ({ ctx }) => {
