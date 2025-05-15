@@ -4,11 +4,11 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const serviceRouter = createTRPCRouter({
   getServicesByBusinessId: protectedProcedure
-    .input(z.object({ bussinesId: z.number() }))
+    .input(z.object({ businessId: z.number() }))
     .query(({ ctx, input }) => {
       const services = ctx.db.businessService.findMany({
         where: {
-          businessId: input.bussinesId,
+          businessId: input.businessId,
         },
         include: {
           service: true,
