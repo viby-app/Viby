@@ -34,14 +34,17 @@ export default function BookingModal({
       businessId: businessId,
     });
 
-  const { data: times, refetch: refetchTimes } =
-    api.business.getAvailableTimes.useQuery(
-      {
-        businessId,
-        date: bookingDate,
-      },
-      { enabled: !!businessId },
-    );
+  const {
+    data: times,
+    refetch: refetchTimes,
+    isLoading: isLoadingTimes,
+  } = api.business.getAvailableTimes.useQuery(
+    {
+      businessId,
+      date: bookingDate,
+    },
+    { enabled: !!businessId },
+  );
 
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
@@ -148,7 +151,9 @@ export default function BookingModal({
           )}
 
           <div className="mt-3 grid grid-cols-3 gap-2">
-            {times?.length === 0 ? (
+            {isLoadingTimes ? (
+              <div className="loading" />
+            ) : times?.length === 0 ? (
               <p>{TEXT.noAvailableAppointments}</p>
             ) : (
               <>
