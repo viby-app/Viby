@@ -118,16 +118,19 @@ export const businessRouter = createTRPCRouter({
     .input(
       z.object({
         businessId: z.number(),
-        date: z.date(),
+        date: z.date(), // local date (without time) from frontend
         serviceId: z.number().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      const inputDateUTC = dayjs.utc(input.date);
-      const dayOfWeek = inputDateUTC.day();
+      // Assume input.date is a date at midnight in local time — convert to dayjs in local and then to UTC
+      const dateLocal = dayjs(input.date);
+      const inputDateUTC = dateLocal.utc();
 
-      const startOfDay = inputDateUTC.startOf("day").toDate();
-      const endOfDay = inputDateUTC.endOf("day").toDate();
+      const dayOfWeek = dateLocal.day(); // still use local day of week (business logic)
+
+      const startOfDayUTC = inputDateUTC.startOf("day");
+      const endOfDayUTC = inputDateUTC.endOf("day");
 
       const [openingHours, closedDay, services, appointments] =
         await Promise.all([
@@ -139,7 +142,10 @@ export const businessRouter = createTRPCRouter({
           ctx.db.closedDay.findFirst({
             where: {
               businessId: input.businessId,
-              date: startOfDay,
+              date: {
+                gte: startOfDayUTC.toDate(),
+                lte: endOfDayUTC.toDate(),
+              },
             },
           }),
           ctx.db.businessService.findMany({
@@ -150,8 +156,8 @@ export const businessRouter = createTRPCRouter({
             where: {
               businessId: input.businessId,
               date: {
-                gte: startOfDay,
-                lte: endOfDay,
+                gte: startOfDayUTC.toDate(),
+                lte: endOfDayUTC.toDate(),
               },
             },
           }),
@@ -159,13 +165,14 @@ export const businessRouter = createTRPCRouter({
 
       if (!openingHours || closedDay) return [];
 
-      const openTimeUTC = inputDateUTC
-        .hour(openingHours.openTime.getUTCHours())
-        .minute(openingHours.openTime.getUTCMinutes());
+      // Convert business open/close times into UTC for that day
+      const openTimeUTC = startOfDayUTC
+        .hour(openingHours.openTime.getHours())
+        .minute(openingHours.openTime.getMinutes());
 
-      const closeTimeUTC = inputDateUTC
-        .hour(openingHours.closeTime.getUTCHours())
-        .minute(openingHours.closeTime.getUTCMinutes());
+      const closeTimeUTC = startOfDayUTC
+        .hour(openingHours.closeTime.getHours())
+        .minute(openingHours.closeTime.getMinutes());
 
       const shortestDuration = Math.min(
         ...services.map((bs) => bs.service.durationMinutes),
@@ -187,7 +194,9 @@ export const businessRouter = createTRPCRouter({
           return aptStart.isBefore(timeEnd) && aptEnd.isAfter(timeStart);
         });
 
-        if (!isConflicting) intervals.push(time.format("HH:mm"));
+        if (!isConflicting) {
+          intervals.push(time.local().format("HH:mm")); 
+        }
       }
 
       return intervals;
