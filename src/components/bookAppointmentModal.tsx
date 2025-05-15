@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import dayjs from "dayjs";
+import { showSuccessToast } from "./successToast";
 
 interface Props {
   showModal: boolean;
@@ -33,27 +34,32 @@ export default function BookingModal({
       businessId: businessId,
     });
 
-  const { data: times } = api.business.getAvailableTimes.useQuery(
-    {
-      businessId,
-      date: bookingDate,
-    },
-    { enabled: !!businessId },
-  );
+  const { data: times, refetch: refetchTimes } =
+    api.business.getAvailableTimes.useQuery(
+      {
+        businessId,
+        date: bookingDate,
+      },
+      { enabled: !!businessId },
+    );
 
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
 
   const handleSubmit = () => {
     if (selectedWorker && selectedService && selectedTime) {
-      createAppointmentMutation.mutate({
-        businessId,
-        date: dayjs(bookingDate)
-          .hour(Number(selectedTime.split(":")[0]))
-          .minute(Number(selectedTime.split(":")[1]))
-          .toDate(),
-        serviceId: selectedService,
-      });
+      createAppointmentMutation.mutate(
+        {
+          businessId,
+          date: dayjs(bookingDate)
+            .hour(Number(selectedTime.split(":")[0]))
+            .minute(Number(selectedTime.split(":")[1]))
+            .toDate(),
+          serviceId: selectedService,
+        },
+        { onSuccess: () => showSuccessToast(TEXT.successfullAppointment) },
+      );
+      refetchTimes();
       handleReset();
     }
   };
@@ -74,6 +80,7 @@ export default function BookingModal({
     confirm: "אישור",
     cancel: "ביטול",
     noAvailableAppointments: "אין תורים להיום",
+    successfullAppointment: "תור נקבע בהצלחה!",
   };
 
   return (
@@ -86,7 +93,6 @@ export default function BookingModal({
           {TEXT.bookAnAppointment}
         </h3>
 
-        {/* Select Worker */}
         <div className="mb-2">
           <p>{TEXT.selectWorker}</p>
           <div className="grid grid-cols-1 items-center gap-2">
@@ -102,7 +108,6 @@ export default function BookingModal({
           </div>
         </div>
 
-        {/* Select Service */}
         <div>
           <p>{TEXT.selectService}</p>
           <div className="mb-5 grid grid-cols-1 gap-2">
@@ -118,7 +123,6 @@ export default function BookingModal({
           </div>
         </div>
 
-        {/* Date + Time */}
         <div>
           <p>{TEXT.selectDay}</p>
 
@@ -139,7 +143,7 @@ export default function BookingModal({
                 if (date) setBookingDate(date);
                 setShowDatePicker(false);
               }}
-              className="react-day-picker"
+              className="react-day-picker fixed left-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-white p-4 shadow-lg"
             />
           )}
 

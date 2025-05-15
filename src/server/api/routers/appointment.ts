@@ -15,7 +15,7 @@ export const appointmetRouter = createTRPCRouter({
       const appointment = ctx.db.appointment.create({
         data: {
           status: "BOOKED",
-          date: input.date,
+          date: input.date.toISOString(),
           businessId: input.businessId,
           serviceId: input.serviceId,
           userId: ctx.session.user.id,
