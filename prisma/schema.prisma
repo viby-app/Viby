@@ -168,7 +168,7 @@ model Service {
 model Appointment {
     id          Int               @id @default(autoincrement())
     description String?
-    date        DateTime
+    date        DateTime          @db.Timestamptz()
     status      AppointmentStatus
 
     business   Business @relation(fields: [businessId], references: [id])

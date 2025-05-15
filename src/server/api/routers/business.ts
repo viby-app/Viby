@@ -13,7 +13,6 @@ export const businessRouter = createTRPCRouter({
 
     return businesses;
   }),
-
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {
@@ -119,7 +118,7 @@ export const businessRouter = createTRPCRouter({
     .input(
       z.object({
         businessId: z.number(),
-        date: z.date(), // Expected to be in UTC
+        date: z.date(),
         serviceId: z.number().optional(),
       }),
     )
@@ -140,7 +139,7 @@ export const businessRouter = createTRPCRouter({
           ctx.db.closedDay.findFirst({
             where: {
               businessId: input.businessId,
-              date: startOfDay, // assumes closedDay.date is stored in UTC
+              date: startOfDay,
             },
           }),
           ctx.db.businessService.findMany({

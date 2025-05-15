@@ -1,4 +1,7 @@
 import { z } from "zod";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -15,7 +18,7 @@ export const appointmetRouter = createTRPCRouter({
       const appointment = ctx.db.appointment.create({
         data: {
           status: "BOOKED",
-          date: input.date.toISOString(),
+          date: dayjs(input.date).utc().toDate(),
           businessId: input.businessId,
           serviceId: input.serviceId,
           userId: ctx.session.user.id,
