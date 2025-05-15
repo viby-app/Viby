@@ -1,8 +1,6 @@
 import { z } from "zod";
-
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const businessRouter = createTRPCRouter({
@@ -118,33 +116,33 @@ export const businessRouter = createTRPCRouter({
     .input(
       z.object({
         businessId: z.number(),
-        date: z.date(), // local date (without time) from frontend
+        date: z.date(),
         serviceId: z.number().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
-      // Assume input.date is a date at midnight in local time — convert to dayjs in local and then to UTC
-      const dateLocal = dayjs(input.date);
-      const inputDateUTC = dateLocal.utc();
+      const dayjsDate = dayjs(input.date);
+      const dayOfWeek = dayjsDate.day();
 
-      const dayOfWeek = dateLocal.day(); // still use local day of week (business logic)
-
-      const startOfDayUTC = inputDateUTC.startOf("day");
-      const endOfDayUTC = inputDateUTC.endOf("day");
+      const startOfDay = dayjsDate.startOf("day").toDate();
+      const endOfDay = dayjsDate.endOf("day").toDate();
 
       const [openingHours, closedDay, services, appointments] =
         await Promise.all([
           ctx.db.openingHours.findUnique({
             where: {
-              businessId_dayOfWeek: { businessId: input.businessId, dayOfWeek },
+              businessId_dayOfWeek: {
+                businessId: input.businessId,
+                dayOfWeek,
+              },
             },
           }),
           ctx.db.closedDay.findFirst({
             where: {
               businessId: input.businessId,
               date: {
-                gte: startOfDayUTC.toDate(),
-                lte: endOfDayUTC.toDate(),
+                gte: startOfDay,
+                lte: endOfDay,
               },
             },
           }),
@@ -156,23 +154,17 @@ export const businessRouter = createTRPCRouter({
             where: {
               businessId: input.businessId,
               date: {
-                gte: startOfDayUTC.toDate(),
-                lte: endOfDayUTC.toDate(),
+                gte: startOfDay,
+                lte: endOfDay,
               },
             },
           }),
         ]);
 
-      if (!openingHours || closedDay) return [];
+        if (!openingHours || closedDay) return [];
 
-      // Convert business open/close times into UTC for that day
-      const openTimeUTC = startOfDayUTC
-        .hour(openingHours.openTime.getHours())
-        .minute(openingHours.openTime.getMinutes());
-
-      const closeTimeUTC = startOfDayUTC
-        .hour(openingHours.closeTime.getHours())
-        .minute(openingHours.closeTime.getMinutes());
+      const openTime = dayjs(openingHours.openTime);
+      const closeTime = dayjs(openingHours.closeTime);
 
       const shortestDuration = Math.min(
         ...services.map((bs) => bs.service.durationMinutes),
@@ -181,21 +173,35 @@ export const businessRouter = createTRPCRouter({
       const intervals: string[] = [];
 
       for (
-        let time = openTimeUTC.clone();
-        time.add(shortestDuration, "minute").isBefore(closeTimeUTC);
+        let time = openTime.clone();
+        time.add(shortestDuration, "minute").isBefore(closeTime);
         time = time.add(shortestDuration, "minute")
       ) {
         const timeStart = time;
-        const timeEnd = timeStart.add(shortestDuration, "minute");
 
         const isConflicting = appointments.some((apt) => {
-          const aptStart = dayjs.utc(apt.date);
-          const aptEnd = aptStart.add(shortestDuration, "minute");
-          return aptStart.isBefore(timeEnd) && aptEnd.isAfter(timeStart);
+          const aptTime = dayjs(apt.date);
+
+          const timeStartInAptDay = aptTime
+            .clone()
+            .hour(timeStart.hour())
+            .minute(timeStart.minute())
+            .second(0)
+            .millisecond(0);
+
+          const timeEndInAptDay = timeStartInAptDay.add(
+            shortestDuration,
+            "minute",
+          );
+
+          return (
+            aptTime.isBefore(timeEndInAptDay) &&
+            aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+          );
         });
 
         if (!isConflicting) {
-          intervals.push(time.local().format("HH:mm")); 
+          intervals.push(time.local().format("HH:mm"));
         }
       }
 

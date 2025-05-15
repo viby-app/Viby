@@ -113,9 +113,9 @@ model OpeningHours {
     id         Int      @id @default(autoincrement())
     business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
-    dayOfWeek  Int // 0 = Sunday, 6 = Saturday
-    openTime   DateTime @db.Time
-    closeTime  DateTime @db.Time
+    dayOfWeek  Int
+    openTime   DateTime @db.Timestamptz()
+    closeTime  DateTime @db.Timestamptz()
 
     @@unique([businessId, dayOfWeek])
 }

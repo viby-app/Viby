@@ -43,7 +43,7 @@ export default function BookingModal({
   } = api.business.getAvailableTimes.useQuery(
     {
       businessId,
-      date: dayjs(bookingDate).utc().startOf("day").toDate(),
+      date: bookingDate,
     },
     { enabled: !!businessId },
   );
@@ -62,9 +62,14 @@ export default function BookingModal({
             .toDate(),
           serviceId: selectedService,
         },
-        { onSuccess: () => showSuccessToast(TEXT.successfullAppointment) },
+
+        {
+          onSuccess: () => {
+            showSuccessToast(TEXT.successfullAppointment);
+            void refetchTimes();
+          },
+        },
       );
-      void refetchTimes();
       handleReset();
     }
   };
