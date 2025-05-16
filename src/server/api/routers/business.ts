@@ -161,7 +161,7 @@ export const businessRouter = createTRPCRouter({
           }),
         ]);
 
-        if (!openingHours || closedDay) return [];
+      if (!openingHours || closedDay) return [];
 
       const openTime = dayjs(openingHours.openTime);
       const closeTime = dayjs(openingHours.closeTime);
@@ -201,7 +201,7 @@ export const businessRouter = createTRPCRouter({
         });
 
         if (!isConflicting) {
-          intervals.push(time.local().format("HH:mm"));
+          intervals.push(time.tz("Asia/Jerusalem").format("HH:mm"));
         }
       }
 
