@@ -43,7 +43,7 @@ export default function BookingModal({
   } = api.business.getAvailableTimes.useQuery(
     {
       businessId,
-      date: bookingDate,
+      date: dayjs(bookingDate).utc().toDate(),
     },
     { enabled: !!businessId },
   );
@@ -151,7 +151,10 @@ export default function BookingModal({
               mode="single"
               selected={bookingDate}
               onSelect={(date) => {
-                if (date) setBookingDate(dayjs(date).utc().toDate());
+                if (date) {
+                  const normalized = dayjs(date).startOf("day").toDate();
+                  setBookingDate(normalized);
+                }
                 setShowDatePicker(false);
               }}
               className="react-day-picker fixed left-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-white p-4 shadow-lg"
