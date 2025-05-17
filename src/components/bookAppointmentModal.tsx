@@ -43,7 +43,7 @@ export default function BookingModal({
   } = api.business.getAvailableTimes.useQuery(
     {
       businessId,
-      date: dayjs(bookingDate).utc().toDate(),
+      date: dayjs(bookingDate).tz("Asia/Jerusalem").toDate(),
     },
     { enabled: !!businessId },
   );
