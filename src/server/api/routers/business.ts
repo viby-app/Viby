@@ -121,90 +121,105 @@ export const businessRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const dayjsDate = dayjs(input.date);
-      const dayOfWeek = dayjsDate.day();
+      try {
+        const dayjsDate = dayjs(input.date);
 
-      const startOfDay = dayjsDate.startOf("day").toDate();
-      const endOfDay = dayjsDate.endOf("day").toDate();
+        if (!dayjsDate.isValid()) {
+          throw new Error(`Invalid date input: ${input.date}`);
+        }
 
-      const [openingHours, closedDay, services, appointments] =
-        await Promise.all([
-          ctx.db.openingHours.findUnique({
-            where: {
-              businessId_dayOfWeek: {
+        const dayOfWeek = dayjsDate.day();
+        const startOfDay = dayjsDate.startOf("day").toDate();
+        const endOfDay = dayjsDate.endOf("day").toDate();
+
+        const [openingHours, closedDay, services, appointments] =
+          await Promise.all([
+            ctx.db.openingHours.findUnique({
+              where: {
+                businessId_dayOfWeek: {
+                  businessId: input.businessId,
+                  dayOfWeek,
+                },
+              },
+            }),
+            ctx.db.closedDay.findFirst({
+              where: {
                 businessId: input.businessId,
-                dayOfWeek,
+                date: {
+                  gte: startOfDay,
+                  lte: endOfDay,
+                },
               },
-            },
-          }),
-          ctx.db.closedDay.findFirst({
-            where: {
-              businessId: input.businessId,
-              date: {
-                gte: startOfDay,
-                lte: endOfDay,
+            }),
+            ctx.db.businessService.findMany({
+              where: { businessId: input.businessId },
+              include: { service: true },
+            }),
+            ctx.db.appointment.findMany({
+              where: {
+                businessId: input.businessId,
+                date: {
+                  gte: startOfDay,
+                  lte: endOfDay,
+                },
               },
-            },
-          }),
-          ctx.db.businessService.findMany({
-            where: { businessId: input.businessId },
-            include: { service: true },
-          }),
-          ctx.db.appointment.findMany({
-            where: {
-              businessId: input.businessId,
-              date: {
-                gte: startOfDay,
-                lte: endOfDay,
-              },
-            },
-          }),
-        ]);
+            }),
+          ]);
 
-      if (!openingHours || closedDay) return [];
+        if (!openingHours || closedDay) return [];
 
-      const openTime = dayjs(openingHours.openTime);
-      const closeTime = dayjs(openingHours.closeTime);
+        const openTime = dayjs(openingHours.openTime);
+        const closeTime = dayjs(openingHours.closeTime);
 
-      const shortestDuration = Math.min(
-        ...services.map((bs) => bs.service.durationMinutes),
-      );
+        const shortestDuration = Math.min(
+          ...services.map((bs) => bs.service.durationMinutes),
+        );
 
-      const intervals: string[] = [];
+        const intervals: string[] = [];
 
-      for (
-        let time = openTime.clone();
-        time.add(shortestDuration, "minute").isBefore(closeTime);
-        time = time.add(shortestDuration, "minute")
-      ) {
-        const timeStart = time;
+        for (
+          let time = openTime.clone();
+          time.add(shortestDuration, "minute").isBefore(closeTime);
+          time = time.add(shortestDuration, "minute")
+        ) {
+          const timeStart = time;
 
-        const isConflicting = appointments.some((apt) => {
-          const aptTime = dayjs(apt.date);
+          const isConflicting = appointments.some((apt) => {
+            const aptTime = dayjs(apt.date);
 
-          const timeStartInAptDay = aptTime
-            .clone()
-            .hour(timeStart.hour())
-            .minute(timeStart.minute())
-            .second(0)
-            .millisecond(0);
+            const timeStartInAptDay = aptTime
+              .clone()
+              .hour(timeStart.hour())
+              .minute(timeStart.minute())
+              .second(0)
+              .millisecond(0);
 
-          const timeEndInAptDay = timeStartInAptDay.add(
-            shortestDuration,
-            "minute",
-          );
+            const timeEndInAptDay = timeStartInAptDay.add(
+              shortestDuration,
+              "minute",
+            );
 
-          return (
-            aptTime.isBefore(timeEndInAptDay) &&
-            aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
-          );
+            return (
+              aptTime.isBefore(timeEndInAptDay) &&
+              aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+            );
+          });
+
+          if (!isConflicting) {
+            intervals.push(time.tz("Asia/Jerusalem").format("HH:mm"));
+          }
+        }
+
+        return intervals;
+      } catch (error) {
+        console.error("getAvailableTimes error:", {
+          input,
+          error,
         });
 
-        if (!isConflicting) {
-          intervals.push(time.tz("Asia/Jerusalem").format("HH:mm"));
-        }
+        throw new Error(
+          "Failed to fetch available times. Please try again later.",
+        );
       }
-
-      return intervals;
     }),
 });
