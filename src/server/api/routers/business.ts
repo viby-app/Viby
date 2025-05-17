@@ -124,10 +124,6 @@ export const businessRouter = createTRPCRouter({
       try {
         const dayjsDate = dayjs(input.date);
 
-        if (!dayjsDate.isValid()) {
-          throw new Error(`Invalid date input: ${input.date}`);
-        }
-
         const dayOfWeek = dayjsDate.day();
         const startOfDay = dayjsDate.startOf("day").toDate();
         const endOfDay = dayjsDate.endOf("day").toDate();
