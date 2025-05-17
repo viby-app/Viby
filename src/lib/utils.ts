@@ -1,11 +1,7 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+import dayjs from "~/utils/dayjs";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
 export function cn(...inputs: (string | undefined | null | boolean)[]) {
   return twMerge(clsx(inputs));
 }

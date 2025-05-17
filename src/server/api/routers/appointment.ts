@@ -1,7 +1,5 @@
 import { z } from "zod";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 

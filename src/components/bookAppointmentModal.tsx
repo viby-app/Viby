@@ -5,9 +5,8 @@ import Button from "./button";
 import { api } from "~/utils/api";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-dayjs.extend(utc);
+import dayjs from "~/utils/dayjs";
+
 import { showSuccessToast } from "./successToast";
 
 interface Props {

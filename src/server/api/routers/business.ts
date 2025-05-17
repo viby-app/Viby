@@ -1,10 +1,5 @@
 import { z } from "zod";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -127,8 +122,7 @@ export const businessRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
-        const dayjsDate = dayjs(input.date);
-
+        const dayjsDate = dayjs(input.date).tz("Asia/Jerusalem");
         const dayOfWeek = dayjsDate.day();
         const startOfDay = dayjsDate.startOf("day").toDate();
         const endOfDay = dayjsDate.endOf("day").toDate();
@@ -169,8 +163,8 @@ export const businessRouter = createTRPCRouter({
 
         if (!openingHours || closedDay) return [];
 
-        const openTime = dayjs(openingHours.openTime);
-        const closeTime = dayjs(openingHours.closeTime);
+        const openTime = dayjs(openingHours.openTime).tz("Asia/Jerusalem");
+        const closeTime = dayjs(openingHours.closeTime).tz("Asia/Jerusalem");
 
         const shortestDuration = Math.min(
           ...services.map((bs) => bs.service.durationMinutes),
@@ -186,7 +180,7 @@ export const businessRouter = createTRPCRouter({
           const timeStart = time;
 
           const isConflicting = appointments.some((apt) => {
-            const aptTime = dayjs(apt.date);
+            const aptTime = dayjs(apt.date).tz("Asia/Jerusalem");
 
             const timeStartInAptDay = aptTime
               .clone()
@@ -207,7 +201,7 @@ export const businessRouter = createTRPCRouter({
           });
 
           if (!isConflicting) {
-            intervals.push(time.tz("Asia/Jerusalem").format("HH:mm"));
+            intervals.push(time.format("HH:mm"));
           }
         }
 
@@ -215,7 +209,7 @@ export const businessRouter = createTRPCRouter({
       } catch (error) {
         console.error("getAvailableTimes error:", {
           input,
-          error,
+          error: error instanceof Error ? error.message : error,
         });
 
         throw new Error(
