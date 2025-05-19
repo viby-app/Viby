@@ -26,7 +26,7 @@ export default function BookingModal({
   const [bookingDate, setBookingDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [pickerValue, setPickerValue] = useState({
-    time: selectedTime || "",
+    time: selectedTime ?? "",
   });
 
   const { data: workers } = api.workers.getAllWorkersByBusinessId.useQuery({
@@ -54,7 +54,7 @@ export default function BookingModal({
     api.appointment.createAppointment.useMutation();
 
   useEffect(() => {
-    setSelectedTime(pickerValue.time || times?.[0] || null);
+    setSelectedTime(pickerValue.time ?? times?.[0] ?? null);
   }, [pickerValue, times]);
 
   const handleSubmit = () => {
