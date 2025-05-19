@@ -85,6 +85,7 @@ export default function BookingModal({
     setShowModal(false);
     setSelectedService(null);
     setSelectedWorker(null);
+    setSelectedTime(null);
   };
 
   const TEXT = {
