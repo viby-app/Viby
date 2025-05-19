@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./button";
 import { api } from "~/utils/api";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import dayjs from "~/utils/dayjs";
-
 import { showSuccessToast } from "./successToast";
+import Picker from "react-mobile-picker";
 
 interface Props {
   showModal: boolean;
@@ -25,6 +25,9 @@ export default function BookingModal({
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [bookingDate, setBookingDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [pickerValue, setPickerValue] = useState({
+    time: selectedTime || "",
+  });
 
   const { data: workers } = api.workers.getAllWorkersByBusinessId.useQuery({
     businessId,
@@ -49,6 +52,10 @@ export default function BookingModal({
 
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
+
+  useEffect(() => {
+    setSelectedTime(pickerValue.time || times?.[0] || null);
+  }, [pickerValue, times]);
 
   const handleSubmit = () => {
     if (selectedWorker && selectedService && selectedTime) {
@@ -77,7 +84,6 @@ export default function BookingModal({
   const handleReset = () => {
     setShowModal(false);
     setSelectedService(null);
-    setSelectedTime(null);
     setSelectedWorker(null);
   };
 
@@ -160,23 +166,27 @@ export default function BookingModal({
             />
           )}
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div>
             {isLoadingTimes ? (
               <div className="loading" />
             ) : times?.length === 0 ? (
               <p>{TEXT.noAvailableAppointments}</p>
             ) : (
-              <>
-                {times?.map((time, idx) => (
-                  <Button
-                    key={idx}
-                    onClick={() => setSelectedTime(time)}
-                    className={`w-full ${selectedTime === time ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
-                  >
-                    {time}
-                  </Button>
-                ))}
-              </>
+              <div>
+                <Picker
+                  className="h-full"
+                  value={pickerValue}
+                  onChange={setPickerValue}
+                >
+                  <Picker.Column name="time">
+                    {times?.map((time) => (
+                      <Picker.Item key={time} value={time}>
+                        {time}
+                      </Picker.Item>
+                    ))}
+                  </Picker.Column>
+                </Picker>
+              </div>
             )}
           </div>
 
