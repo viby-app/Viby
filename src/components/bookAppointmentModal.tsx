@@ -8,6 +8,7 @@ import { he } from "react-day-picker/locale";
 import dayjs from "~/utils/dayjs";
 import { showSuccessToast } from "./successToast";
 import Picker from "react-mobile-picker";
+import ScrollTimePicker from "./scrollTimePicker";
 
 interface Props {
   showModal: boolean;
@@ -174,19 +175,11 @@ export default function BookingModal({
               <p>{TEXT.noAvailableAppointments}</p>
             ) : (
               <div>
-                <Picker
-                  className="h-full"
-                  value={pickerValue}
-                  onChange={setPickerValue}
-                >
-                  <Picker.Column name="time">
-                    {times?.map((time) => (
-                      <Picker.Item key={time} value={time}>
-                        {time}
-                      </Picker.Item>
-                    ))}
-                  </Picker.Column>
-                </Picker>
+                <ScrollTimePicker
+                  times={times ?? []}
+                  selectedTime={selectedTime ?? ""}
+                  setSelectedTime={setSelectedTime}
+                />
               </div>
             )}
           </div>
