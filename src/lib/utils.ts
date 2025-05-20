@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import dayjs from "~/utils/dayjs";
 
 export function cn(...inputs: (string | undefined | null | boolean)[]) {
   return twMerge(clsx(inputs));
@@ -27,7 +28,5 @@ export const numberToWeekday = (number: number) => {
 };
 
 export const formatTime = (date: Date) => {
-  const h = date.getUTCHours().toString().padStart(2, "0");
-  const m = date.getUTCMinutes().toString().padStart(2, "0");
-  return `${h}:${m}`;
+  return dayjs.utc(date).tz("Asia/Jerusalem").format("HH:mm");
 };

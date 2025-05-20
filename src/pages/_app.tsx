@@ -18,7 +18,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer rtl={true} position="bottom-right" />
       <SessionProvider session={session}>
         <div className={geist.className} dir="rtl" lang="he">
           <Component {...pageProps} />

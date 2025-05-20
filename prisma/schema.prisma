@@ -53,15 +53,20 @@ model User {
     UserConnectionA  UserConnection[]    @relation("UserA")
     UserConnectionB  UserConnection[]    @relation("UserB")
     BusinessFollower BusinessFollowing[] @relation("BusinessFollower")
+    Worker           Workers[]           @relation("userWorker")
 }
 
 model Workers {
-    id         Int      @id @default(autoincrement())
-    name       String
-    wage       Float
-    phone      String?
+    id   Int   @id @default(autoincrement())
+    wage Float
+
     business   Business @relation("BusinessWorker", fields: [businessId], references: [id])
     businessId Int
+
+    Worker User   @relation("userWorker", fields: [userId], references: [id])
+    userId String
+
+    Appointment Appointment[]
 }
 
 model BusinessFollowing {
@@ -113,9 +118,9 @@ model OpeningHours {
     id         Int      @id @default(autoincrement())
     business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
-    dayOfWeek  Int // 0 = Sunday, 6 = Saturday
-    openTime   DateTime @db.Time
-    closeTime  DateTime @db.Time
+    dayOfWeek  Int
+    openTime   DateTime @db.Timestamptz()
+    closeTime  DateTime @db.Timestamptz()
 
     @@unique([businessId, dayOfWeek])
 }
@@ -147,7 +152,7 @@ model Review {
 
 model Image {
     id         Int      @id @default(autoincrement())
-    key        String // S3 key
+    key        String
     business   Business @relation(fields: [businessId], references: [id])
     businessId Int
 }
@@ -168,7 +173,7 @@ model Service {
 model Appointment {
     id          Int               @id @default(autoincrement())
     description String?
-    date        DateTime
+    date        DateTime          @db.Timestamptz()
     status      AppointmentStatus
 
     business   Business @relation(fields: [businessId], references: [id])
@@ -179,6 +184,9 @@ model Appointment {
 
     user   User   @relation(fields: [userId], references: [id])
     userId String
+
+    worker   Workers @relation(fields: [workerId], references: [id])
+    workerId Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
