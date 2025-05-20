@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Button from "./button";
 import { api } from "~/utils/api";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import dayjs from "~/utils/dayjs";
 import { showSuccessToast } from "./successToast";
-import Picker from "react-mobile-picker";
 import ScrollTimePicker from "./scrollTimePicker";
 
 interface Props {
@@ -21,6 +20,8 @@ export default function BookingModal({
   setShowModal,
   businessId,
 }: Props) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const [selectedWorker, setSelectedWorker] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -32,9 +33,7 @@ export default function BookingModal({
   });
 
   const { data: businessService } =
-    api.service.getServicesByBusinessId.useQuery({
-      businessId: businessId,
-    });
+    api.service.getServicesByBusinessId.useQuery({ businessId });
 
   const {
     data: times,
@@ -65,7 +64,6 @@ export default function BookingModal({
             .toDate(),
           serviceId: selectedService,
         },
-
         {
           onSuccess: () => {
             showSuccessToast(TEXT.successfullAppointment);
@@ -84,6 +82,21 @@ export default function BookingModal({
     setSelectedTime(null);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        showModal &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        handleReset();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showModal]);
+
   const TEXT = {
     bookAnAppointment: "קבע תור",
     selectWorker: "בחר עובד",
@@ -99,11 +112,11 @@ export default function BookingModal({
   };
 
   return (
-    <dialog
-      id="booking_modal"
-      className={`modal ${showModal ? "modal-open" : ""}`}
-    >
-      <div className="modal-box h-2/3 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg">
+    <dialog className={`modal ${showModal ? "modal-open" : ""}`}>
+      <div
+        ref={modalRef}
+        className="modal-box h-2/3 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg"
+      >
         <h3 className="mb-4 text-center text-lg font-bold">
           {TEXT.bookAnAppointment}
         </h3>
@@ -171,27 +184,25 @@ export default function BookingModal({
             ) : !selectedWorker ? (
               <h1>{TEXT.selectWorkerToSeeTimes}</h1>
             ) : (
-              <div>
-                <ScrollTimePicker
-                  times={times ?? []}
-                  selectedTime={selectedTime ?? ""}
-                  setSelectedTime={setSelectedTime}
-                />
-              </div>
+              <ScrollTimePicker
+                times={times ?? []}
+                selectedTime={selectedTime ?? ""}
+                setSelectedTime={setSelectedTime}
+              />
             )}
           </div>
+        </div>
 
-          <div className="my-4 flex space-x-2">
-            <Button
-              onClick={handleSubmit}
-              disabled={!selectedTime || !selectedService || !selectedWorker}
-            >
-              {TEXT.confirm}
-            </Button>
-            <Button className="bg-red-400" onClick={handleReset}>
-              {TEXT.cancel}
-            </Button>
-          </div>
+        <div className="my-4 flex space-x-2">
+          <Button
+            onClick={handleSubmit}
+            disabled={!selectedTime || !selectedService || !selectedWorker}
+          >
+            {TEXT.confirm}
+          </Button>
+          <Button className="bg-red-400" onClick={handleReset}>
+            {TEXT.cancel}
+          </Button>
         </div>
       </div>
     </dialog>
