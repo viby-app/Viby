@@ -1,1 +1,20 @@
-export const hayushim = 'היושים';
+export const hebrewDictionary = {
+    friends: 'חברים',
+    personalDetails: 'פרטים אישיים',
+    business: 'עסק',
+    businesses: 'עסקים',
+    businessName: 'שם העסק',
+    businessDescription: 'תיאור העסק',
+    businessAddress: 'כתובת העסק',
+    businessPhoneNumber: 'מספר טלפון של העסק',
+    businessEmail: 'אימייל של העסק',
+    businessWebsite: 'אתר אינטרנט של העסק',
+    businessSocialMedia: 'רשתות חברתיות של העסק',
+    hey: 'היי',
+    welcome: 'ברוכים הבאים',
+    myBusinesses: 'העסקים שלי',
+    allBusinesses: 'כל העסקים',
+    follow: 'עקוב',
+    unfollow: 'בטל מעקב',
+    lastVisit: 'ביקור אחרון',
+}
