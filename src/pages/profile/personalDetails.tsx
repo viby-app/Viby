@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
-import { CircleUserIcon } from "lucide-react";
-import { hayushim } from "../utils/constants";
-import { useState } from "react";
-
 
 const ProfilePage = () => {
     const { data: user, isLoading: isUserLoading } = api.profile.getUser.useQuery();
+    const { data: linkedUsers } = api.profile.getUserFriends.useQuery();
+
     const [userFullName, setUserFullName] = useState("");
+    const [userFriends, setUserFriends] = useState<number>(0);
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         if (user?.fullName) {
@@ -16,6 +16,12 @@ const ProfilePage = () => {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (linkedUsers) {
+            const friendsCount = linkedUsers.length;
+            setUserFriends(friendsCount);
+        }
+    }, [linkedUsers]);
 
     if (isUserLoading) {
         return <div>Loading...</div>;
@@ -24,30 +30,15 @@ const ProfilePage = () => {
     return (
         <Layout>
             {user && (
-                <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md text-right space-y-9">
-                    <h1 className="text-5xl font-bold text-right">{hayushim} {user.firstName}!</h1>
-
-                    <div className="flex flex-row-reverse items-center justify-end gap-4">
-                        <p className="text-lg font-semibold">{user.fullName}</p>
-                        {user.image ? (
-                            <img
-                                src={user.image}
-                                alt="User"
-                                className="w-15 h-15 rounded-full object-cover"
-                            />
-                        ) : (
-                            <CircleUserIcon className="w-24 h-24 text-gray-400" />
-                        )}
-                    </div>
+                <div className="flex flex-col items-center py-2 mb-2 justify-center min-h-screen bg-[#F2EFE7] px-4">
 
                     <div>
                         <input
                             type="text"
-                            value={userFullName ?? "כגדגעכג"}
+                            value={userFullName ?? ""}
                             onChange={(e) => setUserFullName(e.target.value)}
                             className="w-full text-lg font-semibold border border-gray-300 rounded px-3 py-2 bg-white text-black"
                         />
-
                     </div>
 
                     <div>
