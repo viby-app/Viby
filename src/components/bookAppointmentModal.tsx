@@ -26,9 +26,6 @@ export default function BookingModal({
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [bookingDate, setBookingDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [pickerValue, setPickerValue] = useState({
-    time: selectedTime ?? "",
-  });
 
   const { data: workers } = api.workers.getAllWorkersByBusinessId.useQuery({
     businessId,
@@ -45,24 +42,22 @@ export default function BookingModal({
     isLoading: isLoadingTimes,
   } = api.business.getAvailableTimes.useQuery(
     {
+      workerId: selectedWorker ?? 0,
       businessId,
       date: dayjs(bookingDate).tz("Asia/Jerusalem").toDate(),
     },
-    { enabled: !!businessId },
+    { enabled: !!businessId && !!selectedWorker },
   );
 
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
-
-  useEffect(() => {
-    setSelectedTime(pickerValue.time ?? times?.[0] ?? null);
-  }, [pickerValue, times]);
 
   const handleSubmit = () => {
     if (selectedWorker && selectedService && selectedTime) {
       createAppointmentMutation.mutate(
         {
           businessId,
+          workerId: selectedWorker,
           date: dayjs(bookingDate)
             .hour(Number(selectedTime.split(":")[0]))
             .minute(Number(selectedTime.split(":")[1]))
@@ -99,6 +94,8 @@ export default function BookingModal({
     cancel: "ביטול",
     noAvailableAppointments: "אין תורים להיום",
     successfullAppointment: "תור נקבע בהצלחה!",
+    selectWorkerToSeeTimes: "בחר עובד כדי לראות תורים",
+    chooseDate: "בחר תאריך",
   };
 
   return (
@@ -143,14 +140,12 @@ export default function BookingModal({
 
         <div>
           <p>{TEXT.selectDay}</p>
-
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
             className="input input-border mb-2 w-full text-left"
           >
-            {bookingDate ? bookingDate.toLocaleDateString() : "בחר תאריך"}
+            {bookingDate ? bookingDate.toLocaleDateString() : TEXT.chooseDate}
           </button>
-
           {showDatePicker && (
             <DayPicker
               dir="rtl"
@@ -173,6 +168,8 @@ export default function BookingModal({
               <div className="loading" />
             ) : times?.length === 0 ? (
               <p>{TEXT.noAvailableAppointments}</p>
+            ) : !selectedWorker ? (
+              <h1>{TEXT.selectWorkerToSeeTimes}</h1>
             ) : (
               <div>
                 <ScrollTimePicker

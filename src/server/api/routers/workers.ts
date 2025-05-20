@@ -10,8 +10,18 @@ export const workersRouter = createTRPCRouter({
         where: {
           businessId: input.businessId,
         },
+        include: {
+          Worker: true,
+        },
       });
 
-      return workers;
+      return workers.map((worker) => {
+        return {
+          id: worker.id,
+          name: worker.Worker.name,
+          businessId: worker.businessId,
+          wage: worker.wage,
+        };
+      });
     }),
 });

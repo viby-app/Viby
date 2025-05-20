@@ -118,6 +118,7 @@ export const businessRouter = createTRPCRouter({
         businessId: z.number(),
         date: z.date(),
         serviceId: z.number().optional(),
+        workerId: z.number(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -152,6 +153,7 @@ export const businessRouter = createTRPCRouter({
             }),
             ctx.db.appointment.findMany({
               where: {
+                workerId: input.workerId,
                 businessId: input.businessId,
                 date: {
                   gte: startOfDay,

@@ -10,11 +10,13 @@ export const appointmetRouter = createTRPCRouter({
         date: z.date(),
         businessId: z.number(),
         serviceId: z.number(),
+        workerId: z.number()
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const appointment = ctx.db.appointment.create({
         data: {
+          workerId: input.workerId,
           status: "BOOKED",
           date: dayjs(input.date).utc().toDate(),
           businessId: input.businessId,
