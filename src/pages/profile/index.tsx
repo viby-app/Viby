@@ -55,7 +55,7 @@ const ProfilePage = () => {
                                         <CircleUserIcon className="w-16 h-16 text-gray-300" />
                                     )}
                                     <div>
-                                        <p className="text-lg font-semibold text-gray-800">{user.fullName}</p>
+                                        <p className="text-lg font-semibold text-gray-800">{user.name}</p>
                                     </div>
                                 </div>
 
