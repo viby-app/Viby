@@ -11,8 +11,8 @@ const ProfilePage = () => {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
-        if (user?.fullName) {
-            setUserFullName(user.fullName);
+        if (user?.name) {
+            setUserFullName(user.name);
         }
     }, [user]);
 
