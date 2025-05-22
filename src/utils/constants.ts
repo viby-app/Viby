@@ -17,4 +17,11 @@ export const hebrewDictionary = {
     follow: 'עקוב',
     unfollow: 'בטל מעקב',
     lastVisit: 'ביקור אחרון',
+    myLastVisit: 'הביקור האחרון שלי',
+    links: 'לינקים',
+    inviteFriends: 'הזמנת חברים',
+    allMyAppointments: 'כל התורים שלי',
+    paymentAddress: 'אמצעי תשלום',
+    appointmentsHistory: 'היסטורית תורים',
+    chatInvite: 'בואו נשוחח'
 }
