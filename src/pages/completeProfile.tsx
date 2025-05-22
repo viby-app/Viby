@@ -59,35 +59,43 @@ export default function CompleteProfileForm() {
       <div className="flex h-screen items-center justify-center bg-[#F2EFE7]">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="h-1/2 w-5/6 space-y-4 rounded-lg bg-[#9ACBD0] p-6 shadow-md"
+          className="m-5 flex h-1/2 w-full max-w-md flex-col justify-between rounded-lg bg-[#9ACBD0] p-6 shadow-md"
         >
-          <h1 className="text-center text-2xl font-bold text-[#3A3A3A]">
-            {TEXT.completeProfile}
-          </h1>
+          <div className="space-y-6">
+            <h1 className="text-center text-2xl font-bold text-[#3A3A3A]">
+              {TEXT.completeProfile}
+            </h1>
 
-          <div>
-            <label className="block text-sm font-medium">{TEXT.phone}</label>
-            <input
-              {...register("phone")}
-              className="mt-1 w-full rounded-md border p-2"
-            />
-            {errors.phone && (
-              <p className="text-sm text-red-500">{errors.phone.message}</p>
-            )}
+            <div>
+              <label className="block text-sm font-medium text-[#3A3A3A]">
+                {TEXT.phone}
+              </label>
+              <input
+                {...register("phone")}
+                className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-[#3A3A3A] shadow-sm focus:ring-2 focus:ring-[#3A3A3A] focus:outline-none"
+              />
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone.message}</p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                {...register("isBusinessOwner")}
+                type="checkbox"
+                className="toggle border-gray-300 bg-white text-gray-400 checked:bg-white checked:text-gray-800 focus:ring-[#3A3A3A]"
+              />
+              <label className="text-sm font-medium text-[#3A3A3A]">
+                {TEXT.isBusinessOwner}
+              </label>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <input
-              {...register("isBusinessOwner")}
-              type="checkbox"
-              className="rounded border-gray-300"
-            />
-            <label className="text-sm font-medium">
-              {TEXT.isBusinessOwner}
-            </label>
+          <div className="mt-6">
+            <Button type="submit" className="w-full">
+              {TEXT.submit}
+            </Button>
           </div>
-
-          <Button type="submit">{TEXT.submit}</Button>
         </form>
       </div>
     </div>
