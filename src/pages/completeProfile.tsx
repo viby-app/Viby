@@ -39,9 +39,7 @@ export default function CompleteProfileForm() {
         },
         {
           onSuccess: () =>
-            data.isBusinessOwner
-              ? router.push("/profile/business")
-              : router.push("/"),
+            void router.push(data.isBusinessOwner ? "/profile/business" : "/"),
         },
       );
     } catch (error) {
