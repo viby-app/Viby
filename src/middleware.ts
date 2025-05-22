@@ -22,9 +22,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  if (token?.phone && pathname.startsWith("/completeProfile")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|static|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
