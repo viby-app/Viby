@@ -1,6 +1,5 @@
 import { z } from "zod";
 import dayjs from "~/utils/dayjs";
-
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const appointmetRouter = createTRPCRouter({
@@ -25,7 +24,19 @@ export const appointmetRouter = createTRPCRouter({
         },
       });
 
-      return appointment;
+            return appointment;
+        }),
+    getLastAppointmentByUserId: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
+        const appointment = await ctx.db.appointment.findFirst({
+            where: {
+                userId: input.userId,
+            },
+            orderBy: {
+                date: "desc",
+            },
+        });
+
+        return appointment;
     }),
   getAppointmentsByOwnerOrWorkerId: protectedProcedure
     .input(

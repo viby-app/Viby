@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         />
         <link rel="icon" href="/logo.png" />
       </Head>
-      <main className="min-h-screen bg-[#F2EFE7] pb-9 lg:pt-9 dark:bg-[#F2EFE7] dark:text-black">
+      <main className="min-h-screen bg-[#428e9d82] pb-9 lg:pt-9 dark:bg-[#F2EFE7] dark:text-black">
         {children}
       </main>
       <Navbar />
