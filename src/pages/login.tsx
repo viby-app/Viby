@@ -14,7 +14,11 @@ export default function AuthPage() {
           <h1 className="mb-5 text-center text-3xl font-bold text-[#006A71]">
             ברוכים הבאים ל Viby
           </h1>
-          <Button onClick={async () => await signIn("google")}>
+          <Button
+            onClick={async () =>
+              await signIn("google", { callbackUrl: "/completeProfile" })
+            }
+          >
             התחברות עם Google
           </Button>
         </div>
