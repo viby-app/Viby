@@ -43,8 +43,14 @@ export const appointmetRouter = createTRPCRouter({
         throw new Error("Business not found for the given owner ID");
       }
 
-      const startOfDay = dayjs(input.date).startOf("day").toDate();
-      const endOfDay = dayjs(input.date).endOf("day").toDate();
+      const startOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .startOf("day")
+        .toDate();
+      const endOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .endOf("day")
+        .toDate();
 
       const appointments = await ctx.db.appointment.findMany({
         orderBy: {
