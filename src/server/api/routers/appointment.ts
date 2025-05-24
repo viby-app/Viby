@@ -10,7 +10,7 @@ export const appointmetRouter = createTRPCRouter({
         date: z.date(),
         businessId: z.number(),
         serviceId: z.number(),
-        workerId: z.number()
+        workerId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -26,5 +26,52 @@ export const appointmetRouter = createTRPCRouter({
       });
 
       return appointment;
+    }),
+  getAppointmentsByOwnerId: protectedProcedure
+    .input(
+      z.object({
+        ownerId: z.string(),
+        date: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const business = await ctx.db.business.findFirst({
+        where: { ownerId: input.ownerId },
+      });
+
+      if (!business) {
+        throw new Error("Business not found for the given owner ID");
+      }
+
+      const startOfDay = dayjs(input.date).startOf("day").toDate();
+      const endOfDay = dayjs(input.date).endOf("day").toDate();
+
+      const appointments = await ctx.db.appointment.findMany({
+        orderBy: {
+          date: "asc",
+        },
+        where: {
+          businessId: business.id,
+          date: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+        include: {
+          worker: {
+            select: {
+              Worker: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          service: true,
+          user: true,
+        },
+      });
+
+      return appointments;
     }),
 });
