@@ -48,6 +48,12 @@ export default function BookingModal({
     { enabled: !!businessId && !!selectedWorker },
   );
 
+  useEffect(() => {
+    if (selectedTime && times && times.length > 0) {
+      setSelectedTime(times[0] ?? "");
+    }
+  }, [times]);
+
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
 
