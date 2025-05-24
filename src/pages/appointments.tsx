@@ -47,17 +47,19 @@ const AppointmentsManagementPage: NextPage = () => {
       businessOwner?.user.role !== "BUSINESS_OWNER" &&
       businessOwner?.user.role !== "ADMIN"
     ) {
-      router.push("/unauthorized");
+      void router.push("/unauthorized");
     }
   }, [businessOwner, status, router]);
 
+  const ownerId = businessOwner?.user?.id;
+  const date = selectedDate?.toISOString();
   const businessAppointment = api.appointment.getAppointmentsByOwnerId.useQuery(
     {
-      ownerId: businessOwner?.user.id!,
-      date: selectedDate?.toISOString()!,
+      ownerId: ownerId!,
+      date: date!,
     },
     {
-      enabled: !!businessOwner?.user.id && !!selectedDate,
+      enabled: !!ownerId && !!date,
     },
   );
 
@@ -109,7 +111,7 @@ const AppointmentsManagementPage: NextPage = () => {
                     {TEXT.status}{" "}
                     <span
                       className={
-                        statusColors[appointment.status] || "text-gray-700"
+                        statusColors[appointment.status] ?? "text-gray-700"
                       }
                     >
                       {TEXT[appointment.status]}
