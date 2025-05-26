@@ -80,4 +80,21 @@ export const appointmetRouter = createTRPCRouter({
 
       return appointments;
     }),
+  deleteAppointment: protectedProcedure
+    .input(z.object({ appointmentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const appointment = await ctx.db.appointment.findUnique({
+        where: { id: input.appointmentId },
+      });
+
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+
+      await ctx.db.appointment.delete({
+        where: { id: input.appointmentId },
+      });
+
+      return { success: true, message: "Appointment deleted successfully" };
+    }),
 });
