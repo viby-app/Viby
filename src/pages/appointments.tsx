@@ -10,6 +10,8 @@ import "react-day-picker/dist/style.css";
 import dayjs from "~/utils/dayjs";
 import { he } from "react-day-picker/locale";
 import { useRouter } from "next/router";
+import type { AppointmentModalDetails } from "~/utils";
+import AppointmentModal from "~/components/appointmentModal";
 
 const statusColors: Record<string, string> = {
   BOOKED: "border-yellow-400",
@@ -32,10 +34,14 @@ const TEXT = {
   time: "שעה: ",
   service: "שירות: ",
   date: "תאריך: ",
+  clientDetails: "פרטי לקוח: ",
+  loading: "טוען...",
 };
 
 const AppointmentsManagementPage: NextPage = () => {
   const { data: businessOwner, status } = useSession();
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentModalDetails | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date(),
   );
@@ -62,6 +68,18 @@ const AppointmentsManagementPage: NextPage = () => {
       enabled: !!ownerId && !!date,
     },
   );
+
+  if (
+    status === "loading" ||
+    (businessOwner?.user.role !== "BUSINESS_OWNER" &&
+      businessOwner?.user.role !== "ADMIN")
+  ) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>{TEXT.loading}</p>
+      </div>
+    );
+  }
 
   return (
     <Layout>
@@ -96,26 +114,26 @@ const AppointmentsManagementPage: NextPage = () => {
               {businessAppointment.data?.map((appointment) => (
                 <li
                   key={appointment.id}
-                  className={`rounded border-l-4 border-[#9ACBD0] bg-[#F2EFE7] p-3 shadow-sm ${statusColors[appointment.status]}`}
+                  onClick={() => setSelectedAppointment(appointment)}
+                  className={`cursor-pointer rounded border-l-4 border-[#9ACBD0] bg-[#F2EFE7] p-3 shadow-sm ${statusColors[appointment.status]}`}
                 >
                   <div className="flex justify-between">
                     <span className="font-medium">
-                      {appointment.service.name}
+                      {appointment.service.name} - {appointment.service.price} ₪
                     </span>
                     <span className="text-sm text-gray-600">
                       {dayjs(appointment.date).format("HH:mm")}
                     </span>
                   </div>
                   <div className="text-sm text-gray-700">
-                    {TEXT.worker} {appointment.worker.Worker.name} |{" "}
-                    {TEXT.status}{" "}
-                    <span
-                      className={
-                        statusColors[appointment.status] ?? "text-gray-700"
-                      }
-                    >
-                      {TEXT[appointment.status]}
-                    </span>
+                    {TEXT.worker} {appointment.worker.Worker.name}
+                  </div>
+                  <div>
+                    <p>
+                      {TEXT.clientDetails} {appointment.user.name}
+                      {" - "}
+                      {appointment.user.phone}
+                    </p>
                   </div>
                 </li>
               ))}
@@ -123,6 +141,13 @@ const AppointmentsManagementPage: NextPage = () => {
           )}
         </div>
       </div>
+      {selectedAppointment && (
+        <AppointmentModal
+          appointment={selectedAppointment}
+          onClose={() => setSelectedAppointment(null)}
+          refetch={() => businessAppointment.refetch()}
+        />
+      )}
     </Layout>
   );
 };
