@@ -29,6 +29,19 @@ export const pages = [
 ];
 
 export type AppointmentModalDetails = {
+  id: number;
+  status: $Enums.AppointmentStatus;
+  service: {
+    name: string;
+    id: number;
+    price: number;
+  };
+  worker: {
+    Worker: {
+      name: string;
+    };
+  };
+  date: Date;
   user: {
     name: string;
     id: string;

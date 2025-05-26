@@ -59,15 +59,16 @@ const AppointmentsManagementPage: NextPage = () => {
 
   const ownerId = businessOwner?.user?.id;
   const date = selectedDate?.toISOString();
-  const businessAppointment = api.appointment.getAppointmentsByOwnerId.useQuery(
-    {
-      ownerId: ownerId!,
-      date: date!,
-    },
-    {
-      enabled: !!ownerId && !!date,
-    },
-  );
+  const businessAppointments =
+    api.appointment.getAppointmentsByOwnerId.useQuery(
+      {
+        ownerId: ownerId!,
+        date: date!,
+      },
+      {
+        enabled: !!ownerId && !!date,
+      },
+    );
 
   if (
     status === "loading" ||
@@ -100,18 +101,18 @@ const AppointmentsManagementPage: NextPage = () => {
             {TEXT.meetingsForToday}{" "}
             {selectedDate ? dayjs(selectedDate).format("DD/MM/YYYY") : "-"}
           </h2>
-          {businessAppointment.isLoading ? (
+          {businessAppointments.isLoading ? (
             <p>{TEXT.loadingAppointments}</p>
-          ) : businessAppointment.isError ? (
+          ) : businessAppointments.isError ? (
             <p>
               {TEXT.errorLoadingAppointments}
-              {businessAppointment.error.message}
+              {businessAppointments.error.message}
             </p>
-          ) : businessAppointment.data?.length === 0 ? (
+          ) : businessAppointments.data?.length === 0 ? (
             <p>{TEXT.noAppointments}</p>
           ) : (
             <ul className="max-h-80 space-y-2 overflow-y-scroll">
-              {businessAppointment.data?.map((appointment) => (
+              {businessAppointments.data?.map((appointment) => (
                 <li
                   key={appointment.id}
                   onClick={() => setSelectedAppointment(appointment)}
@@ -145,7 +146,7 @@ const AppointmentsManagementPage: NextPage = () => {
         <AppointmentModal
           appointment={selectedAppointment}
           onClose={() => setSelectedAppointment(null)}
-          refetch={() => businessAppointment.refetch()}
+          refetch={() => businessAppointments.refetch()}
         />
       )}
     </Layout>

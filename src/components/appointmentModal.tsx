@@ -1,19 +1,11 @@
 import { type FC } from "react";
 import dayjs from "~/utils/dayjs";
+import { statusBadgeColors, type AppointmentModalDetails } from "~/utils";
+import { Clock, Scissors, User, UserCircle, PhoneCall } from "lucide-react";
 import { api } from "~/utils/api";
-import { Phone } from "lucide-react";
-import { statusBadgeColors } from "~/utils";
-import {
-  CalendarDays,
-  Clock,
-  Scissors,
-  User,
-  UserCircle,
-  PhoneCall,
-} from "lucide-react";
 
 interface AppointmentModalProps {
-  appointment: any; // replace with actual type
+  appointment: AppointmentModalDetails;
   onClose: () => void;
   refetch: () => void;
 }
@@ -23,12 +15,12 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
   onClose,
   refetch,
 }) => {
-  //   const deleteAppointment = api.appointment.deleteAppointment.useMutation({
-  //     onSuccess: () => {
-  //       refetch();
-  //       onClose();
-  //     },
-  //   });
+  const deleteAppointment = api.appointment.deleteAppointment.useMutation({
+    onSuccess: () => {
+      refetch();
+      onClose();
+    },
+  });
 
   return (
     <dialog id="appointment_modal" className="modal modal-open">
@@ -94,7 +86,9 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
           <div className="modal-action mt-6 flex justify-between">
             <button
               className="btn btn-error"
-              // onClick={() => deleteAppointment.mutate({ id: appointment.id })}
+              onClick={() =>
+                deleteAppointment.mutate({ appointmentId: appointment.id })
+              }
             >
               מחק פגישה
             </button>
