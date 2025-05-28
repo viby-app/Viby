@@ -10,7 +10,6 @@ import {
   Clock,
   UserCog,
   Scissors,
-  Timer,
   DollarSign,
 } from "lucide-react";
 import { indexToCurrentAppointmentStatus } from "~/lib/utils";
