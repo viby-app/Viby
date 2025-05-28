@@ -66,6 +66,8 @@ export default function BookingModal({
           date: dayjs(bookingDate)
             .hour(Number(selectedTime.split(":")[0]))
             .minute(Number(selectedTime.split(":")[1]))
+            .second(0)
+            .millisecond(0)
             .tz("Asia/Jerusalem")
             .toDate(),
           serviceId: selectedService,

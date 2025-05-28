@@ -73,7 +73,14 @@ export const appointmetRouter = createTRPCRouter({
               },
             },
           },
-          service: true,
+          service: {
+            select: {
+              durationMinutes: true,
+              name: true,
+              id: true,
+              price: true,
+            },
+          },
           user: true,
         },
       });

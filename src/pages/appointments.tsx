@@ -5,19 +5,11 @@ import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
-import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import dayjs from "~/utils/dayjs";
-import { he } from "react-day-picker/locale";
 import { useRouter } from "next/router";
 import type { AppointmentModalDetails } from "~/utils";
-import AppointmentModal from "~/components/appointmentModal";
-
-const statusColors: Record<string, string> = {
-  BOOKED: "border-yellow-400",
-  CANCELLED: "border-red-600",
-  COMPLETED: "border-green-600",
-};
+import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
+import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsView";
 
 const TEXT = {
   BOOKED: "הוזמן",
@@ -42,6 +34,10 @@ const AppointmentsManagementPage: NextPage = () => {
   const { data: businessOwner, status } = useSession();
   const [selectedAppointment, setSelectedAppointment] =
     useState<AppointmentModalDetails | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "current" | "customers">(
+    "all",
+  );
+
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date(),
   );
@@ -84,71 +80,42 @@ const AppointmentsManagementPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col items-center gap-4 px-4 py-6 text-[#3A3A3A]">
-        <h1 className="text-3xl font-bold">{TEXT.appointmentsManagement}</h1>
+      <div className="flex flex-col items-center gap-5 p-4">
+        <h1 className="text-3xl font-bold">ניהול פגישות</h1>
 
-        <DayPicker
-          dir="rtl"
-          locale={he}
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          className="h-1/2 rounded-lg border bg-[#F2EFE7] p-4 shadow"
-        />
-
-        <div className="mt-6 w-full max-w-xl rounded-lg bg-white p-4 shadow">
-          <h2 className="mb-2 text-xl font-semibold">
-            {TEXT.meetingsForToday}{" "}
-            {selectedDate ? dayjs(selectedDate).format("DD/MM/YYYY") : "-"}
-          </h2>
-          {businessAppointments.isLoading ? (
-            <p>{TEXT.loadingAppointments}</p>
-          ) : businessAppointments.isError ? (
-            <p>
-              {TEXT.errorLoadingAppointments}
-              {businessAppointments.error.message}
-            </p>
-          ) : businessAppointments.data?.length === 0 ? (
-            <p>{TEXT.noAppointments}</p>
-          ) : (
-            <ul className="max-h-80 space-y-2 overflow-y-scroll">
-              {businessAppointments.data?.map((appointment) => (
-                <li
-                  key={appointment.id}
-                  onClick={() => setSelectedAppointment(appointment)}
-                  className={`cursor-pointer rounded border-l-4 border-[#9ACBD0] bg-[#F2EFE7] p-3 shadow-sm ${statusColors[appointment.status]}`}
-                >
-                  <div className="flex justify-between">
-                    <span className="font-medium">
-                      {appointment.service.name} - {appointment.service.price} ₪
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {dayjs(appointment.date).format("HH:mm")}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-700">
-                    {TEXT.worker} {appointment.worker.Worker.name}
-                  </div>
-                  <div>
-                    <p>
-                      {TEXT.clientDetails} {appointment.user.name}
-                      {" - "}
-                      {appointment.user.phone}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+        <div className="tabs tabs-boxed rtl:tabs-boxed rounded-xl bg-[#6fc0c2] text-white">
+          <button
+            className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("all")}
+          >
+            כל הפגישות
+          </button>
+          <button
+            className={`tab ${activeTab === "current" ? "tab-active" : ""}`}
+            onClick={() => setActiveTab("current")}
+          >
+            פגישות נוכחיות
+          </button>
+        </div>
+        <div className="w-full max-w-3xl">
+          {activeTab === "all" && (
+            <AllAppointmentsTab
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              isLoadingAppointments={businessAppointments.isLoading}
+              businessAppointments={businessAppointments.data ?? []}
+              selectedAppointment={selectedAppointment}
+              setSelectedAppointment={setSelectedAppointment}
+              refetchAppointments={businessAppointments.refetch}
+            />
+          )}
+          {activeTab === "current" && (
+            <CurrentAppointmentsView
+              appointments={businessAppointments.data ?? []}
+            />
           )}
         </div>
       </div>
-      {selectedAppointment && (
-        <AppointmentModal
-          appointment={selectedAppointment}
-          onClose={() => setSelectedAppointment(null)}
-          refetch={() => businessAppointments.refetch()}
-        />
-      )}
     </Layout>
   );
 };

@@ -32,6 +32,7 @@ export type AppointmentModalDetails = {
   id: number;
   status: $Enums.AppointmentStatus;
   service: {
+    durationMinutes: number;
     name: string;
     id: number;
     price: number;
