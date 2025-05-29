@@ -47,7 +47,7 @@ const AllAppointmentsTab = ({
                 mode="single"
                 selected={selectedDate}
                 onSelect={(date) => {
-                  setSelectedDate(date);
+                  setSelectedDate(dayjs(date).tz("Asia/Jerusalem").toDate());
                   setShowDatePicker(false);
                 }}
               />
