@@ -1,33 +1,10 @@
-import dayjs from "dayjs";
+import dayjs from "~/utils/dayjs";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import AppointmentModal from "../appointmentModal";
-import type { AppointmentModalDetails } from "~/utils";
-
-const TEXT = {
-  BOOKED: "הוזמן",
-  CANCELLED: "מבוטל",
-  COMPLETED: "הושלם",
-  meetingsForToday: "פגישות להיום",
-  selectDate: "בחר תאריך",
-  appointmentsManagement: "ניהול תורים",
-  noAppointments: "אין פגישות ליום זה.",
-  loadingAppointments: "טוען פגישות...",
-  errorLoadingAppointments: "שגיאה בטעינת הפגישות: ",
-  worker: "עובד: ",
-  status: "סטטוס: ",
-  time: "שעה: ",
-  service: "שירות: ",
-  date: "תאריך: ",
-  clientDetails: "פרטי לקוח: ",
-  loading: "טוען...",
-};
-
-const statusColors: Record<string, string> = {
-  BOOKED: "border-yellow-400",
-  CANCELLED: "border-red-600",
-  COMPLETED: "border-green-600",
-};
+import { statusBorderColors, type AppointmentModalDetails } from "~/utils";
+import { hebrewDictionary } from "~/utils/constants";
+import { useState } from "react";
 
 interface AppointmentTabProps {
   selectedDate: Date | undefined;
@@ -47,34 +24,49 @@ const AllAppointmentsTab = ({
   setSelectedAppointment,
   refetchAppointments,
 }: AppointmentTabProps) => {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   return (
     <>
-      <div className="flex flex-col items-center gap-2 px-4 py-6 text-[#3A3A3A]">
-        <DayPicker
-          dir="rtl"
-          locale={he}
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          className="h-1/2 rounded-lg border bg-[#F2EFE7] p-4 shadow"
-        />
+      <div className="mt-7 flex w-full flex-col items-center gap-2 text-[#3A3A3A]">
+        <div className="relative z-10 max-w-xl px-4 text-[#3A3A3A]">
+          <button
+            onClick={() => setShowDatePicker((prev) => !prev)}
+            className="input input-border w-3xs rounded-lg"
+          >
+            {selectedDate
+              ? dayjs(selectedDate).format("DD/MM/YYYY")
+              : hebrewDictionary.chooseDate}
+          </button>
 
-        <div className="mt-6 w-full max-w-xl rounded-lg bg-white p-4 shadow">
-          <h2 className="mb-2 text-xl font-semibold">
-            {TEXT.meetingsForToday}{" "}
-            {selectedDate ? dayjs(selectedDate).format("DD/MM/YYYY") : "-"}
-          </h2>
+          {showDatePicker && (
+            <div className="fixed top-1/2 left-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-white p-4 shadow-xl">
+              <DayPicker
+                dir="rtl"
+                locale={he}
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setShowDatePicker(false);
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="w-full max-w-xl rounded-lg bg-white p-4 shadow">
           {isLoadingAppointments ? (
-            <p>{TEXT.loadingAppointments}</p>
+            <p>{hebrewDictionary.loadingAppointments}</p>
           ) : businessAppointments?.length === 0 ? (
-            <p>{TEXT.noAppointments}</p>
+            <p>{hebrewDictionary.noAppointments}</p>
           ) : (
-            <ul className="max-h-80 space-y-2 overflow-y-scroll">
+            <ul className="max-h-[600px] space-y-2 overflow-y-scroll">
               {businessAppointments?.map((appointment) => (
                 <li
                   key={appointment.id}
                   onClick={() => setSelectedAppointment(appointment)}
-                  className={`cursor-pointer rounded border-l-4 border-[#9ACBD0] bg-[#F2EFE7] p-3 shadow-sm ${statusColors[appointment.status]}`}
+                  className={`cursor-pointer rounded border-l-4 bg-[#F2EFE7] p-3 shadow-sm ${statusBorderColors[appointment.status]}`}
                 >
                   <div className="flex justify-between">
                     <span className="font-medium">
@@ -85,11 +77,11 @@ const AllAppointmentsTab = ({
                     </span>
                   </div>
                   <div className="text-sm text-gray-700">
-                    {TEXT.worker} {appointment.worker.Worker.name}
+                    {hebrewDictionary.worker} {appointment.worker.Worker.name}
                   </div>
                   <div>
                     <p>
-                      {TEXT.clientDetails} {appointment.user.name}
+                      {hebrewDictionary.clientDetails} {appointment.user.name}
                       {" - "}
                       {appointment.user.phone}
                     </p>

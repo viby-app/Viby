@@ -10,25 +10,7 @@ import { useRouter } from "next/router";
 import type { AppointmentModalDetails } from "~/utils";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
 import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsView";
-
-const TEXT = {
-  BOOKED: "הוזמן",
-  CANCELLED: "מבוטל",
-  COMPLETED: "הושלם",
-  meetingsForToday: "פגישות להיום",
-  selectDate: "בחר תאריך",
-  appointmentsManagement: "ניהול תורים",
-  noAppointments: "אין פגישות ליום זה.",
-  loadingAppointments: "טוען פגישות...",
-  errorLoadingAppointments: "שגיאה בטעינת הפגישות: ",
-  worker: "עובד: ",
-  status: "סטטוס: ",
-  time: "שעה: ",
-  service: "שירות: ",
-  date: "תאריך: ",
-  clientDetails: "פרטי לקוח: ",
-  loading: "טוען...",
-};
+import { hebrewDictionary } from "~/utils/constants";
 
 const AppointmentsManagementPage: NextPage = () => {
   const { data: businessOwner, status } = useSession();
@@ -73,31 +55,29 @@ const AppointmentsManagementPage: NextPage = () => {
   ) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>{TEXT.loading}</p>
+        <p>{hebrewDictionary.loading}</p>
       </div>
     );
   }
 
   return (
     <Layout>
-      <div className="flex flex-col items-center gap-5 p-4">
-        <h1 className="text-3xl font-bold">ניהול פגישות</h1>
-
+      <div className="flex flex-col items-center p-4">
         <div className="tabs tabs-boxed rtl:tabs-boxed rounded-xl bg-[#6fc0c2] text-white">
           <button
             className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
             onClick={() => setActiveTab("all")}
           >
-            כל הפגישות
+            {hebrewDictionary.allMyAppointments}
           </button>
           <button
             className={`tab ${activeTab === "current" ? "tab-active" : ""}`}
             onClick={() => setActiveTab("current")}
           >
-            פגישות נוכחיות
+            {hebrewDictionary.currentAppointments}
           </button>
         </div>
-        <div className="w-full max-w-3xl">
+        <>
           {activeTab === "all" && (
             <AllAppointmentsTab
               selectedDate={selectedDate}
@@ -114,7 +94,7 @@ const AppointmentsManagementPage: NextPage = () => {
               appointments={businessAppointments.data ?? []}
             />
           )}
-        </div>
+        </>
       </div>
     </Layout>
   );

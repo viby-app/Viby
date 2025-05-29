@@ -1,8 +1,17 @@
 import { type FC } from "react";
 import dayjs from "~/utils/dayjs";
 import { statusBadgeColors, type AppointmentModalDetails } from "~/utils";
-import { Clock, Scissors, User, UserCircle, PhoneCall } from "lucide-react";
+import {
+  Clock,
+  Scissors,
+  User,
+  UserCircle,
+  PhoneCall,
+  Trash2,
+  X,
+} from "lucide-react";
 import { api } from "~/utils/api";
+import { hebrewDictionary } from "~/utils/constants";
 
 interface AppointmentModalProps {
   appointment: AppointmentModalDetails;
@@ -25,25 +34,26 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
   return (
     <dialog id="appointment_modal" className="modal modal-open">
       <div className="modal-box max-w-md bg-[#F2EFE7] text-[#3A3A3A] shadow-lg">
-        <div
-          className="card space-y-4 rounded-xl bg-white p-5 shadow"
-          dir="rtl"
-        >
-          <h3 className="text-center text-2xl font-bold">פרטי פגישה</h3>
-
+        <div className="card rounded-xl bg-white p-5 shadow" dir="rtl">
+          <button className="btn w-1/6" onClick={onClose}>
+            <X />
+          </button>
           <div className="flex justify-center">
             <div
-              className={`badge ${statusBadgeColors[appointment.status]} px-4 py-2 text-sm text-white`}
+              className={`badge ${statusBadgeColors[appointment.status]} h-1/2 w-1/2 px-4 py-2 text-lg text-yellow-900`}
             >
-              {appointment.status}
+              {
+                hebrewDictionary[
+                  appointment.status.toLowerCase() as keyof typeof hebrewDictionary
+                ]
+              }
             </div>
           </div>
-
+          <div className="divider" />
           <div className="space-y-3 text-right text-sm">
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-[#3A3A3A]" />
               <span>
-                <strong>זמן:</strong>{" "}
                 {dayjs(appointment.date).tz("Asia/Jerusalem").fromNow()}
               </span>
             </div>
@@ -51,49 +61,43 @@ const AppointmentModal: FC<AppointmentModalProps> = ({
             <div className="flex items-center gap-2">
               <Scissors className="h-5 w-5 text-[#3A3A3A]" />
               <span>
-                <strong>שירות:</strong> {appointment.service.name} -{" "}
-                {appointment.service.price} ₪
+                {appointment.service.name} - {appointment.service.price} ₪
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <User className="h-5 w-5 text-[#3A3A3A]" />
               <span>
-                <strong>עובד:</strong> {appointment.worker.Worker.name}
+                <strong>{hebrewDictionary.worker}:</strong>{" "}
+                {appointment.worker.Worker.name}
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <UserCircle className="h-5 w-5 text-[#3A3A3A]" />
               <span>
-                <strong>לקוח:</strong> {appointment.user.name}
+                <strong>{hebrewDictionary.client}:</strong>{" "}
+                {appointment.user.name}
               </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <PhoneCall className="h-5 w-5 text-[#3A3A3A]" />
               <a
                 href={`tel:${appointment.user.phone}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl bg-[#9ACBD0] px-4 py-1 text-white hover:bg-[#7db4b8]"
               >
-                התקשר ללקוח
+                <PhoneCall className="h-5 w-5 text-[#3A3A3A]" />
               </a>
             </div>
           </div>
 
-          <div className="modal-action mt-6 flex justify-between">
+          <div className="modal-action mt-6 flex justify-start">
             <button
-              className="btn btn-error"
+              className="btn btn-error w-1/3"
               onClick={() =>
                 deleteAppointment.mutate({ appointmentId: appointment.id })
               }
             >
-              מחק פגישה
-            </button>
-            <button className="btn" onClick={onClose}>
-              סגור
+              <Trash2 />
             </button>
           </div>
         </div>

@@ -62,3 +62,9 @@ export const statusBadgeColors: Record<string, string> = {
   CANCELLED: "badge-error",
   COMPLETED: "badge-success",
 };
+
+export const statusBorderColors: Record<string, string> = {
+  BOOKED: "border-yellow-400",
+  CANCELLED: "border-red-600",
+  COMPLETED: "border-green-600",
+};
