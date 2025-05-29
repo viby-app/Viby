@@ -11,6 +11,7 @@ import router from "next/router";
 const completeProfileSchema = z.object({
   phone: z.string().min(6, "Phone number is required"),
   isBusinessOwner: z.boolean(),
+  name: z.string().min(2, "Name is required"),
 });
 
 type CompleteProfileFormValues = z.infer<typeof completeProfileSchema>;
@@ -23,6 +24,7 @@ export default function CompleteProfileForm() {
   } = useForm<CompleteProfileFormValues>({
     resolver: zodResolver(completeProfileSchema),
     defaultValues: {
+      name: "",
       phone: "",
       isBusinessOwner: false,
     },
@@ -30,20 +32,28 @@ export default function CompleteProfileForm() {
 
   const updateUserMutation = api.user.firstLoginUpdateUser.useMutation();
 
-  const onSubmit = (data: CompleteProfileFormValues) => {
+  const createBusinessMutation = api.business.createBusiness.useMutation();
+  const onSubmit = async (data: CompleteProfileFormValues) => {
     try {
-      updateUserMutation.mutate(
-        {
+      await updateUserMutation.mutateAsync({
+        phone: data.phone,
+        role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
+        name: data.name,
+      });
+
+      if (data.isBusinessOwner) {
+        await createBusinessMutation.mutateAsync({
           phone: data.phone,
-          role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
-        },
-        {
-          onSuccess: () =>
-            void router.push(data.isBusinessOwner ? "/profile/business" : "/"),
-        },
-      );
+        });
+
+        toast.success("Business created successfully!");
+        void router.push("/profile/business");
+      } else {
+        toast.success("Profile updated successfully!");
+        void router.push("/");
+      }
     } catch (error) {
-      toast.error(`Error updating user: ${String(error)}`);
+      toast.error(`Error: ${String(error)}`);
     }
   };
 
@@ -52,6 +62,7 @@ export default function CompleteProfileForm() {
     phone: "טלפון",
     isBusinessOwner: "אני בעל עסק",
     submit: "שלח",
+    name: "שם מלא",
   };
 
   return (
@@ -65,6 +76,19 @@ export default function CompleteProfileForm() {
             <h1 className="text-center text-2xl font-bold text-[#3A3A3A]">
               {TEXT.completeProfile}
             </h1>
+
+            <div>
+              <label className="block text-sm font-medium text-[#3A3A3A]">
+                {TEXT.name}
+              </label>
+              <input
+                {...register("name")}
+                className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-[#3A3A3A] shadow-sm focus:ring-2 focus:ring-[#3A3A3A] focus:outline-none"
+              />
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name.message}</p>
+              )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-[#3A3A3A]">

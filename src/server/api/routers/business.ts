@@ -11,15 +11,12 @@ export const businessRouter = createTRPCRouter({
           followerId: ctx.session.user.id,
         },
       });
-
       const businesses = await ctx.db.business.findMany({
         orderBy: { createdAt: "desc" },
       });
-
       if (followedBusinesses.length === 0) {
         return businesses;
       }
-
       return businesses.filter((business) =>
         followedBusinesses.some(
           (followed) => followed.businessId !== business.id,
@@ -27,6 +24,35 @@ export const businessRouter = createTRPCRouter({
       );
     },
   ),
+  createBusiness: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        phone: z.string().min(6, "Phone number is required"),
+        address: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existingBusiness = await ctx.db.business.findFirst({
+        where: {
+          ownerId: ctx.session.user.id,
+        },
+      });
+      if (existingBusiness) {
+        throw new Error("User already has a business");
+      }
+      const business = await ctx.db.business.create({
+        data: {
+          name: input.name ?? "",
+          description: input.description,
+          phone: input.phone,
+          address: input.address ?? "",
+          ownerId: ctx.session.user.id,
+        },
+      });
+      return business;
+    }),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {
