@@ -34,11 +34,11 @@ export const formatTime = (date: Date) => {
 export const indexToCurrentAppointmentStatus = (index: number) => {
   switch (index) {
     case 0:
-      return "פגישה קודמת";
+      return "פגישה הבאה";
     case 1:
       return "פגישה נוכחית";
     case 2:
-      return "פגישה הבאה";
+      return "פגישה קודמת";
     default:
       return "";
   }

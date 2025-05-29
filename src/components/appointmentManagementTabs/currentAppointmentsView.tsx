@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { AppointmentModalDetails } from "~/utils";
 import dayjs from "~/utils/dayjs";
 import Image from "next/image";
@@ -48,7 +48,7 @@ const CurrentAppointmentsTab = ({ appointments }: Props) => {
         }
       }
 
-      setCurrentAppointments([last, current, upcoming]);
+      setCurrentAppointments([upcoming, current, last]);
     };
 
     updateAppointments();
@@ -58,32 +58,32 @@ const CurrentAppointmentsTab = ({ appointments }: Props) => {
   }, [appointments]);
 
   return (
-    <div className="grid gap-6 sm:grid-cols-3">
+    <div className="mt-10 grid w-full gap-5 sm:grid-cols-3">
       {currentAppointments.map((appt, index) => (
         <div
           key={index}
-          className="mx-auto mb-6 w-full max-w-md rounded-2xl border bg-white p-6 shadow-md"
+          className="w-full max-w-md rounded-2xl border bg-white p-4 shadow-md"
         >
           <h2 className="mb-4 text-center text-xl font-bold text-[#3A3A3A]">
             {indexToCurrentAppointmentStatus(index)}
           </h2>
           {appt ? (
             <>
-              <div className="mb-4 flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 {appt.user?.image ? (
                   <Image
                     src={appt.user.image}
                     alt="User"
                     width={64}
                     height={64}
-                    className="h-16 w-16 rounded-full border border-gray-300 object-cover shadow"
+                    className="h-14 w-14 rounded-full border border-gray-300 object-cover shadow"
                   />
                 ) : (
                   <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
                     <CircleUserIcon className="h-10 w-10 text-gray-400" />
                   </div>
                 )}
-                <div className="flex w-fit space-x-2">
+                <div className="flex w-fit gap-5">
                   <span className="text-base font-semibold">
                     {appt.user.name}
                   </span>
@@ -95,14 +95,13 @@ const CurrentAppointmentsTab = ({ appointments }: Props) => {
                       className="inline-flex items-center gap-1 rounded-full bg-[#9ACBD0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#80b4bb]"
                     >
                       <Phone className="h-4 w-4" />
-                      התקשר
                     </a>
                   )}
                 </div>
               </div>
-
+              <div className="divider"></div>
               <div className="grid grid-cols-2 grid-rows-2 gap-x-2 gap-y-2 text-sm text-gray-800">
-                <div className="flex items-center rounded-lg bg-[#5ed1d3] p-1">
+                <div className="flex items-center gap-2 rounded-lg bg-[#5ed1d3] p-1">
                   <Scissors className="h-4 w-4 text-black" />
                   {appt.service.name}
                 </div>
