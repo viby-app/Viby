@@ -4,7 +4,7 @@ import { api } from "~/utils/api";
 
 export default function HomePage() {
   const myBusinesses = api.business.getFollowedBusinessesByUser.useQuery();
-  const allBusinesses = api.business.getAllBusinesses.useQuery();
+  const allBusinesses = api.business.getAllBusinessesWithoutFollowing.useQuery();
 
   return (
     <Layout>
