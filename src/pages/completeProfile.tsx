@@ -7,6 +7,7 @@ import Button from "../components/button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import router from "next/router";
+import { profile } from "console";
 
 const completeProfileSchema = z.object({
   phone: z.string().min(6, "Phone number is required"),
@@ -15,6 +16,16 @@ const completeProfileSchema = z.object({
 });
 
 type CompleteProfileFormValues = z.infer<typeof completeProfileSchema>;
+
+const TEXT = {
+  completeProfile: "השלם את הפרופיל שלך",
+  phone: "טלפון",
+  isBusinessOwner: "אני בעל עסק",
+  submit: "שלח",
+  name: "שם מלא",
+  profileUpdated: "הפרופיל עודכן בהצלחה!",
+  businessCreated: "העסק נוצר בהצלחה!",
+};
 
 export default function CompleteProfileForm() {
   const {
@@ -46,23 +57,15 @@ export default function CompleteProfileForm() {
           phone: data.phone,
         });
 
-        toast.success("Business created successfully!");
+        toast.success(TEXT.businessCreated);
         void router.push("/profile/business");
       } else {
-        toast.success("Profile updated successfully!");
+        toast.success(TEXT.profileUpdated);
         void router.push("/");
       }
     } catch (error) {
       toast.error(`Error: ${String(error)}`);
     }
-  };
-
-  const TEXT = {
-    completeProfile: "השלם את הפרופיל שלך",
-    phone: "טלפון",
-    isBusinessOwner: "אני בעל עסק",
-    submit: "שלח",
-    name: "שם מלא",
   };
 
   return (
