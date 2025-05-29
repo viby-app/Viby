@@ -8,7 +8,18 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      phone: string;
+      role?: string;
     } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    phone?: string;
+    name?: string;
+    role?: string;
   }
 }
 
@@ -19,8 +30,8 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
@@ -31,12 +42,35 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+      }
+
+      if (token?.id) {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.id },
+          select: {
+            phone: true,
+            name: true,
+            role: true,
+          },
+        });
+
+        if (dbUser) {
+          token.phone = dbUser.phone ?? "";
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (token?.id) {
-        session.user.id = token.id as string;
+        session.user.id = token.id;
+        session.user.phone = token.phone!;
+        session.user.name = token.name!;
+        session.user.role = token.role!;
       }
       return session;
     },

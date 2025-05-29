@@ -48,6 +48,12 @@ export default function BookingModal({
     { enabled: !!businessId && !!selectedWorker },
   );
 
+  useEffect(() => {
+    if (selectedTime && times && times.length > 0) {
+      setSelectedTime(times[0] ?? "");
+    }
+  }, [times]);
+
   const createAppointmentMutation =
     api.appointment.createAppointment.useMutation();
 
@@ -60,6 +66,8 @@ export default function BookingModal({
           date: dayjs(bookingDate)
             .hour(Number(selectedTime.split(":")[0]))
             .minute(Number(selectedTime.split(":")[1]))
+            .second(0)
+            .millisecond(0)
             .tz("Asia/Jerusalem")
             .toDate(),
           serviceId: selectedService,
