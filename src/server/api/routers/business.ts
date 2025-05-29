@@ -33,13 +33,29 @@ export const businessRouter = createTRPCRouter({
       });
       return business;
     }),
-  getAllBusinesses: protectedProcedure.query(async ({ ctx }) => {
-    const businesses = await ctx.db.business.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+  getAllBusinessesWithoutFollowing: protectedProcedure.query(
+    async ({ ctx }) => {
+      const followedBusinesses = await ctx.db.businessFollowing.findMany({
+        where: {
+          followerId: ctx.session.user.id,
+        },
+      });
 
-    return businesses;
-  }),
+      const businesses = await ctx.db.business.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (followedBusinesses.length === 0) {
+        return businesses;
+      }
+
+      return businesses.filter((business) =>
+        followedBusinesses.some(
+          (followed) => followed.businessId !== business.id,
+        ),
+      );
+    },
+  ),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {
