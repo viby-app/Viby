@@ -2,10 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/complete-appointments",
-      "schedule": "0 0 * * *",  
-      "headers": {
-        "Authorization": "Bearer 4abd67ca9806d1dc6a528094726f9547"
-      }
+      "schedule": "0 0 * * *"
     }
   ]
 }
