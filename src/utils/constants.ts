@@ -45,4 +45,7 @@ export const hebrewDictionary = {
   loading: "טוען...",
   chooseDate: "בחר תאריך",
   currentAppointments: "תורים נוכחיים",
+  Cancel: "ביטול",
+  Confirm: "אישור",
+  confirmDelete: "האם אתה בטוח שברצונך למחוק את התור הזה?",
 };
