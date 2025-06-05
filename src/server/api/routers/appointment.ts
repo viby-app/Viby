@@ -27,16 +27,29 @@ export const appointmetRouter = createTRPCRouter({
 
       return appointment;
     }),
-  getAppointmentsByOwnerId: protectedProcedure
+  getAppointmentsByOwnerOrWorkerId: protectedProcedure
     .input(
       z.object({
-        ownerId: z.string(),
+        userId: z.string(),
         date: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const business = await ctx.db.business.findFirst({
-        where: { ownerId: input.ownerId },
+        where: {
+          OR: [
+            { ownerId: input.userId },
+            {
+              workers: {
+                some: {
+                  Worker: {
+                    id: input.userId,
+                  },
+                },
+              },
+            },
+          ],
+        },
       });
 
       if (!business) {

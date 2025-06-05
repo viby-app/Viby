@@ -13,7 +13,7 @@ import CurrentAppointmentsView from "~/components/appointmentManagementTabs/curr
 import { hebrewDictionary } from "~/utils/constants";
 
 const AppointmentsManagementPage: NextPage = () => {
-  const { data: businessOwner, status } = useSession();
+  const { data: user, status } = useSession();
   const [selectedAppointment, setSelectedAppointment] =
     useState<AppointmentModalDetails | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "current" | "customers">(
@@ -24,35 +24,30 @@ const AppointmentsManagementPage: NextPage = () => {
     new Date(),
   );
 
+  const isWorker = api.business.isWorkerOrOwnerByUserId.useQuery();
+
   const router = useRouter();
   useEffect(() => {
-    if (status === "loading") return;
-    if (
-      businessOwner?.user.role !== "BUSINESS_OWNER" &&
-      businessOwner?.user.role !== "ADMIN"
-    ) {
+    if (status === "loading" || isWorker.isLoading) return;
+    if (!isWorker.data) {
       void router.push("/unauthorized");
     }
-  }, [businessOwner, status, router]);
+  }, [status, isWorker.data]);
 
-  const ownerId = businessOwner?.user?.id;
+  const userId = user?.user?.id;
   const date = selectedDate?.toISOString();
   const businessAppointments =
-    api.appointment.getAppointmentsByOwnerId.useQuery(
+    api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
-        ownerId: ownerId!,
+        userId: userId!,
         date: date!,
       },
       {
-        enabled: !!ownerId && !!date,
+        enabled: !!userId && !!date,
       },
     );
 
-  if (
-    status === "loading" ||
-    (businessOwner?.user.role !== "BUSINESS_OWNER" &&
-      businessOwner?.user.role !== "ADMIN")
-  ) {
+  if (status === "loading" || !isWorker.data) {
     return (
       <div className="flex h-screen items-center justify-center">
         <p>{hebrewDictionary.loading}</p>
