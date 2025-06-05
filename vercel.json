@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/complete-appointments",
+      "schedule": "*/5 * * * *",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer 4abd67ca9806d1dc6a528094726f9547"
+      }
+    }
+  ]
+}
