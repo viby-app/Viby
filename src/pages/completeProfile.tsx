@@ -7,7 +7,7 @@ import Button from "../components/button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import router from "next/router";
-import { profile } from "console";
+import { signIn } from "next-auth/react";
 
 const completeProfileSchema = z.object({
   phone: z.string().min(6, "Phone number is required"),
@@ -50,6 +50,7 @@ export default function CompleteProfileForm() {
         role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
         name: data.name,
       });
+      await signIn("google", { redirect: false });
 
       if (data.isBusinessOwner) {
         await createBusinessMutation.mutateAsync({
@@ -88,7 +89,7 @@ export default function CompleteProfileForm() {
                 className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-[#3A3A3A] shadow-sm focus:ring-2 focus:ring-[#3A3A3A] focus:outline-none"
               />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
+                <p className="text-sm text-red-600">{errors.name.message}</p>
               )}
             </div>
 
@@ -101,7 +102,7 @@ export default function CompleteProfileForm() {
                 className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-[#3A3A3A] shadow-sm focus:ring-2 focus:ring-[#3A3A3A] focus:outline-none"
               />
               {errors.phone && (
-                <p className="text-sm text-red-500">{errors.phone.message}</p>
+                <p className="text-sm text-red-600">{errors.phone.message}</p>
               )}
             </div>
 
