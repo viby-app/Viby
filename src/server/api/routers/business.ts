@@ -4,23 +4,58 @@ import dayjs from "~/utils/dayjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const businessRouter = createTRPCRouter({
-  getAllBusinessesWithoutFollowing: protectedProcedure.query(async ({ ctx }) => {
-    const followedBusinesses = await ctx.db.businessFollowing.findMany({
-      where: {
-        followerId: ctx.session.user.id,
+  createBusiness: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        phone: z.string().min(6, "Phone number is required"),
+        address: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existingBusiness = await ctx.db.business.findFirst({
+        where: {
+          ownerId: ctx.session.user.id,
+        },
+      });
+      if (existingBusiness) {
+        throw new Error("User already has a business");
       }
-    })
-    
-    const businesses = await ctx.db.business.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+      const business = await ctx.db.business.create({
+        data: {
+          name: input.name ?? "",
+          description: input.description,
+          phone: input.phone,
+          address: input.address ?? "",
+          ownerId: ctx.session.user.id,
+        },
+      });
+      return business;
+    }),
+  getAllBusinessesWithoutFollowing: protectedProcedure.query(
+    async ({ ctx }) => {
+      const followedBusinesses = await ctx.db.businessFollowing.findMany({
+        where: {
+          followerId: ctx.session.user.id,
+        },
+      });
 
-    if (followedBusinesses.length === 0) {
-      return businesses;
-    }
+      const businesses = await ctx.db.business.findMany({
+        orderBy: { createdAt: "desc" },
+      });
 
-    return businesses.filter((business) => followedBusinesses.some((followed) => followed.businessId !== business.id));
-  }),
+      if (followedBusinesses.length === 0) {
+        return businesses;
+      }
+
+      return businesses.filter((business) =>
+        followedBusinesses.some(
+          (followed) => followed.businessId !== business.id,
+        ),
+      );
+    },
+  ),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {
