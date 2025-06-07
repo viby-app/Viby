@@ -128,7 +128,7 @@ export const businessRouter = createTRPCRouter({
         },
       });
     }),
-  getAvailableTimes: protectedProcedure
+  getAvailableAppointments: protectedProcedure
     .input(
       z.object({
         businessId: z.number(),
@@ -143,6 +143,8 @@ export const businessRouter = createTRPCRouter({
         const dayOfWeek = dayjsDate.day();
         const startOfDay = dayjsDate.startOf("day").toDate();
         const endOfDay = dayjsDate.endOf("day").toDate();
+        const now = dayjs().tz("Asia/Jerusalem");
+        const isToday = dayjsDate.isSame(now, "day");
 
         const [openingHours, closedDay, services, appointments] =
           await Promise.all([
@@ -192,18 +194,21 @@ export const businessRouter = createTRPCRouter({
 
         for (
           let time = openTime.clone();
-          time.add(shortestDuration, "minute").isBefore(closeTime);
+          time.isBefore(closeTime);
           time = time.add(shortestDuration, "minute")
         ) {
-          const timeStart = time;
+          const timeEnd = time.clone().add(shortestDuration, "minute");
+          if (timeEnd.isAfter(closeTime)) break;
+
+          if (isToday && time.isBefore(now)) continue;
 
           const isConflicting = appointments.some((apt) => {
             const aptTime = dayjs(apt.date).tz("Asia/Jerusalem");
 
             const timeStartInAptDay = aptTime
               .clone()
-              .hour(timeStart.hour())
-              .minute(timeStart.minute())
+              .hour(time.hour())
+              .minute(time.minute())
               .second(0)
               .millisecond(0);
 
@@ -214,7 +219,7 @@ export const businessRouter = createTRPCRouter({
 
             return (
               aptTime.isBefore(timeEndInAptDay) &&
-              aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+              aptTime.add(shortestDuration, "minute").isAfter(time)
             );
           });
 

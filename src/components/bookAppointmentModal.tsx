@@ -8,6 +8,7 @@ import { he } from "react-day-picker/locale";
 import dayjs from "~/utils/dayjs";
 import { showSuccessToast } from "./successToast";
 import ScrollTimePicker from "./scrollTimePicker";
+import { hebrewDictionary } from "~/utils/constants";
 
 interface Props {
   showModal: boolean;
@@ -39,7 +40,7 @@ export default function BookingModal({
     data: times,
     refetch: refetchTimes,
     isLoading: isLoadingTimes,
-  } = api.business.getAvailableTimes.useQuery(
+  } = api.business.getAvailableAppointments.useQuery(
     {
       workerId: selectedWorker ?? 0,
       businessId,
@@ -74,7 +75,7 @@ export default function BookingModal({
         },
         {
           onSuccess: () => {
-            showSuccessToast(TEXT.successfullAppointment);
+            showSuccessToast(hebrewDictionary.successfullAppointment);
             void refetchTimes();
           },
         },
@@ -105,20 +106,6 @@ export default function BookingModal({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showModal]);
 
-  const TEXT = {
-    bookAnAppointment: "קבע תור",
-    selectWorker: "בחר עובד",
-    selectService: "בחר שירות",
-    selectDay: "בחר יום",
-    back: "חזור",
-    confirm: "אישור",
-    cancel: "ביטול",
-    noAvailableAppointments: "אין תורים להיום",
-    successfullAppointment: "תור נקבע בהצלחה!",
-    selectWorkerToSeeTimes: "בחר עובד כדי לראות תורים",
-    chooseDate: "בחר תאריך",
-  };
-
   return (
     <dialog className={`modal ${showModal ? "modal-open" : ""}`}>
       <div
@@ -126,11 +113,11 @@ export default function BookingModal({
         className="modal-box h-2/3 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg"
       >
         <h3 className="mb-4 text-center text-lg font-bold">
-          {TEXT.bookAnAppointment}
+          {hebrewDictionary.bookAppointment}
         </h3>
 
         <div className="mb-2">
-          <p>{TEXT.selectWorker}</p>
+          <p>{hebrewDictionary.selectWorker}</p>
           <div className="grid grid-cols-1 items-center gap-2">
             {workers?.map((worker) => (
               <Button
@@ -145,7 +132,7 @@ export default function BookingModal({
         </div>
 
         <div>
-          <p>{TEXT.selectService}</p>
+          <p>{hebrewDictionary.selectService}</p>
           <div className="mb-5 grid grid-cols-1 gap-2">
             {businessService?.map(({ service }) => (
               <Button
@@ -160,12 +147,14 @@ export default function BookingModal({
         </div>
 
         <div>
-          <p>{TEXT.selectDay}</p>
+          <p>{hebrewDictionary.selectDay}</p>
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
             className="input input-border mb-2 w-full text-left"
           >
-            {bookingDate ? bookingDate.toLocaleDateString() : TEXT.chooseDate}
+            {bookingDate
+              ? bookingDate.toLocaleDateString()
+              : hebrewDictionary.chooseDate}
           </button>
           {showDatePicker && (
             <DayPicker
@@ -173,6 +162,9 @@ export default function BookingModal({
               locale={he}
               mode="single"
               selected={bookingDate}
+              disabled={{
+                before: dayjs().tz("Asia/Jerusalem").startOf("day").toDate(),
+              }}
               onSelect={(date) => {
                 if (date) {
                   const normalized = dayjs(date).startOf("day").toDate();
@@ -188,9 +180,9 @@ export default function BookingModal({
             {isLoadingTimes ? (
               <div className="loading" />
             ) : times?.length === 0 ? (
-              <p>{TEXT.noAvailableAppointments}</p>
+              <p>{hebrewDictionary.noAvailableAppointments}</p>
             ) : !selectedWorker ? (
-              <h1>{TEXT.selectWorkerToSeeTimes}</h1>
+              <h1>{hebrewDictionary.selectWorkerToSeeTimes}</h1>
             ) : (
               <ScrollTimePicker
                 times={times ?? []}
@@ -206,10 +198,10 @@ export default function BookingModal({
             onClick={handleSubmit}
             disabled={!selectedTime || !selectedService || !selectedWorker}
           >
-            {TEXT.confirm}
+            {hebrewDictionary.confirm}
           </Button>
           <Button className="bg-red-400" onClick={handleReset}>
-            {TEXT.cancel}
+            {hebrewDictionary.cancel}
           </Button>
         </div>
       </div>
