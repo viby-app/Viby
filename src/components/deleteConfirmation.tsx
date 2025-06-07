@@ -17,10 +17,10 @@ const ConfirmDialog = ({ open, onConfirm, onCancel }: ConfirmDialogProps) => {
         </h3>
         <div className="flex justify-center gap-4">
           <button className="btn btn-error" onClick={onConfirm}>
-            {hebrewDictionary.Confirm}
+            {hebrewDictionary.confirm}
           </button>
           <button className="btn" onClick={onCancel}>
-            {hebrewDictionary.Cancel}
+            {hebrewDictionary.cancel}
           </button>
         </div>
       </div>
