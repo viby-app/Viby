@@ -57,9 +57,9 @@ const AllAppointmentsTab = ({
 
         <div className="w-full max-w-xl rounded-lg bg-white p-4 shadow">
           {isLoadingAppointments ? (
-            <p>{hebrewDictionary.loadingAppointments}</p>
+            <div className="loading-ring loading" />
           ) : businessAppointments?.length === 0 ? (
-            <p>{hebrewDictionary.noAppointments}</p>
+            <p className="text-center">{hebrewDictionary.noAppointments}</p>
           ) : (
             <ul className="max-h-[600px] space-y-2 overflow-y-scroll">
               {businessAppointments?.map((appointment) => (

@@ -9,7 +9,7 @@ import "react-day-picker/dist/style.css";
 import { useRouter } from "next/router";
 import type { AppointmentModalDetails } from "~/utils";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
-import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsView";
+import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsTab";
 import { hebrewDictionary } from "~/utils/constants";
 
 const AppointmentsManagementPage: NextPage = () => {
@@ -50,7 +50,7 @@ const AppointmentsManagementPage: NextPage = () => {
   if (status === "loading" || !isWorker.data) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>{hebrewDictionary.loading}</p>
+        <div className="loading-dots loading" />
       </div>
     );
   }
