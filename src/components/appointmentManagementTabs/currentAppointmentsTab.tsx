@@ -62,7 +62,7 @@ const CurrentAppointmentsTab = ({ appointments }: Props) => {
       {currentAppointments.map((appt, index) => (
         <div
           key={index}
-          className="w-full max-w-md rounded-2xl border bg-white p-4 shadow-md"
+          className="w-full max-w-md rounded-2xl bg-white p-4 shadow-md"
         >
           <h2 className="mb-4 text-center text-xl font-bold text-[#3A3A3A]">
             {indexToCurrentAppointmentStatus(index)}
