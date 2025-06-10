@@ -30,3 +30,16 @@ export const numberToWeekday = (number: number) => {
 export const formatTime = (date: Date) => {
   return dayjs.utc(date).tz("Asia/Jerusalem").format("HH:mm");
 };
+
+export const indexToCurrentAppointmentStatus = (index: number) => {
+  switch (index) {
+    case 0:
+      return "פגישה הבאה";
+    case 1:
+      return "פגישה נוכחית";
+    case 2:
+      return "פגישה קודמת";
+    default:
+      return "";
+  }
+};
