@@ -110,7 +110,7 @@ export default function BookingModal({
     <dialog className={`modal ${showModal ? "modal-open" : ""}`}>
       <div
         ref={modalRef}
-        className="modal-box h-2/3 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg"
+        className="modal-box h-4/5 w-full max-w-sm bg-[#F2EFE7] transition-all duration-300 ease-in-out sm:max-w-lg"
       >
         <h3 className="mb-4 text-center text-lg font-bold">
           {hebrewDictionary.bookAppointment}
@@ -118,7 +118,7 @@ export default function BookingModal({
 
         <div className="mb-2">
           <p>{hebrewDictionary.selectWorker}</p>
-          <div className="grid grid-cols-1 items-center gap-2">
+          <div className="grid grid-cols-2 items-center gap-2">
             {workers?.map((worker) => (
               <Button
                 key={worker.id}
@@ -150,10 +150,10 @@ export default function BookingModal({
           <p>{hebrewDictionary.selectDay}</p>
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
-            className="input input-border mb-2 w-full text-left"
+            className="input mb-2 w-full border-none text-left shadow"
           >
             {bookingDate
-              ? bookingDate.toLocaleDateString()
+              ? dayjs(bookingDate).format("יום dddd ה DD בMMMM YYYY")
               : hebrewDictionary.chooseDate}
           </button>
           {showDatePicker && (

@@ -178,6 +178,14 @@ export const businessRouter = createTRPCRouter({
                   lte: endOfDay,
                 },
               },
+              select: {
+                date: true,
+                service: {
+                  select: {
+                    durationMinutes: true,
+                  },
+                },
+              },
             }),
           ]);
 
@@ -186,9 +194,17 @@ export const businessRouter = createTRPCRouter({
         const openTime = dayjs(openingHours.openTime).tz("Asia/Jerusalem");
         const closeTime = dayjs(openingHours.closeTime).tz("Asia/Jerusalem");
 
-        const shortestDuration = Math.min(
-          ...services.map((bs) => bs.service.durationMinutes),
-        );
+        if (openTime.isAfter(closeTime)) {
+          console.error("Invalid opening hours: openTime after closeTime", {
+            openTime: openTime.format(),
+            closeTime: closeTime.format(),
+          });
+          return [];
+        }
+
+        const shortestDuration = services.length
+          ? Math.min(...services.map((bs) => bs.service.durationMinutes))
+          : 30;
 
         const intervals: string[] = [];
 
@@ -200,27 +216,20 @@ export const businessRouter = createTRPCRouter({
           const timeEnd = time.clone().add(shortestDuration, "minute");
           if (timeEnd.isAfter(closeTime)) break;
 
-          if (isToday && time.isBefore(now)) continue;
+          if (isToday) {
+            if (
+              time.hour() < now.hour() ||
+              (time.hour() === now.hour() && time.minute() < now.minute())
+            )
+              continue;
+          }
 
           const isConflicting = appointments.some((apt) => {
-            const aptTime = dayjs(apt.date).tz("Asia/Jerusalem");
+            const aptStart = dayjs(apt.date).tz("Asia/Jerusalem");
+            const aptDuration = apt.service.durationMinutes || shortestDuration; // Use appointment duration or fallback
+            const aptEnd = aptStart.add(aptDuration, "minute");
 
-            const timeStartInAptDay = aptTime
-              .clone()
-              .hour(time.hour())
-              .minute(time.minute())
-              .second(0)
-              .millisecond(0);
-
-            const timeEndInAptDay = timeStartInAptDay.add(
-              shortestDuration,
-              "minute",
-            );
-
-            return (
-              aptTime.isBefore(timeEndInAptDay) &&
-              aptTime.add(shortestDuration, "minute").isAfter(time)
-            );
+            return time.isBefore(aptEnd) && timeEnd.isAfter(aptStart);
           });
 
           if (!isConflicting) {
@@ -230,11 +239,10 @@ export const businessRouter = createTRPCRouter({
 
         return intervals;
       } catch (error) {
-        console.error("getAvailableTimes error:", {
+        console.error("getAvailableAppointments error:", {
           input,
-          error: error instanceof Error ? error.message : error,
+          error: error instanceof Error ? error.message : String(error),
         });
-
         throw new Error(
           "Failed to fetch available times. Please try again later.",
         );
