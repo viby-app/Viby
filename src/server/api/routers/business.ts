@@ -225,11 +225,26 @@ export const businessRouter = createTRPCRouter({
           }
 
           const isConflicting = appointments.some((apt) => {
-            const aptStart = dayjs(apt.date).tz("Asia/Jerusalem");
-            const aptDuration = apt.service.durationMinutes || shortestDuration; // Use appointment duration or fallback
-            const aptEnd = aptStart.add(aptDuration, "minute");
+            const aptTime = dayjs(apt.date).tz("Asia/Jerusalem");
 
-            return time.isBefore(aptEnd) && timeEnd.isAfter(aptStart);
+            const timeStartInAptDay = aptTime
+              .clone()
+              .hour(time.hour())
+              .minute(time.minute())
+              .hour(time.hour())
+              .minute(time.minute())
+              .second(0)
+              .millisecond(0);
+
+            const timeEndInAptDay = timeStartInAptDay.add(
+              shortestDuration,
+              "minute",
+            );
+
+            return (
+              aptTime.isBefore(timeEndInAptDay) &&
+              aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+            );
           });
 
           if (!isConflicting) {
