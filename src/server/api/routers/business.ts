@@ -157,7 +157,7 @@ export const businessRouter = createTRPCRouter({
         },
       });
     }),
-  getAvailableTimes: protectedProcedure
+  getAvailableAppointments: protectedProcedure
     .input(
       z.object({
         businessId: z.number(),
@@ -172,6 +172,8 @@ export const businessRouter = createTRPCRouter({
         const dayOfWeek = dayjsDate.day();
         const startOfDay = dayjsDate.startOf("day").toDate();
         const endOfDay = dayjsDate.endOf("day").toDate();
+        const now = dayjs().tz("Asia/Jerusalem");
+        const isToday = dayjsDate.isSame(now, "day");
 
         const [openingHours, closedDay, services, appointments] =
           await Promise.all([
@@ -205,6 +207,14 @@ export const businessRouter = createTRPCRouter({
                   lte: endOfDay,
                 },
               },
+              select: {
+                date: true,
+                service: {
+                  select: {
+                    durationMinutes: true,
+                  },
+                },
+              },
             }),
           ]);
 
@@ -213,26 +223,45 @@ export const businessRouter = createTRPCRouter({
         const openTime = dayjs(openingHours.openTime).tz("Asia/Jerusalem");
         const closeTime = dayjs(openingHours.closeTime).tz("Asia/Jerusalem");
 
-        const shortestDuration = Math.min(
-          ...services.map((bs) => bs.service.durationMinutes),
-        );
+        if (openTime.isAfter(closeTime)) {
+          console.error("Invalid opening hours: openTime after closeTime", {
+            openTime: openTime.format(),
+            closeTime: closeTime.format(),
+          });
+          return [];
+        }
+
+        const shortestDuration = services.length
+          ? Math.min(...services.map((bs) => bs.service.durationMinutes))
+          : 30;
 
         const intervals: string[] = [];
 
         for (
           let time = openTime.clone();
-          time.add(shortestDuration, "minute").isBefore(closeTime);
+          time.isBefore(closeTime);
           time = time.add(shortestDuration, "minute")
         ) {
-          const timeStart = time;
+          const timeEnd = time.clone().add(shortestDuration, "minute");
+          if (timeEnd.isAfter(closeTime)) break;
+
+          if (isToday) {
+            if (
+              time.hour() < now.hour() ||
+              (time.hour() === now.hour() && time.minute() < now.minute())
+            )
+              continue;
+          }
 
           const isConflicting = appointments.some((apt) => {
             const aptTime = dayjs(apt.date).tz("Asia/Jerusalem");
 
             const timeStartInAptDay = aptTime
               .clone()
-              .hour(timeStart.hour())
-              .minute(timeStart.minute())
+              .hour(time.hour())
+              .minute(time.minute())
+              .hour(time.hour())
+              .minute(time.minute())
               .second(0)
               .millisecond(0);
 
@@ -254,14 +283,33 @@ export const businessRouter = createTRPCRouter({
 
         return intervals;
       } catch (error) {
-        console.error("getAvailableTimes error:", {
+        console.error("getAvailableAppointments error:", {
           input,
-          error: error instanceof Error ? error.message : error,
+          error: error instanceof Error ? error.message : String(error),
         });
-
         throw new Error(
           "Failed to fetch available times. Please try again later.",
         );
       }
     }),
+  isWorkerOrOwnerByUserId: protectedProcedure.query(async ({ ctx }) => {
+    const business = await ctx.db.business.findFirst({
+      where: {
+        OR: [
+          { ownerId: ctx.session.user.id },
+          {
+            workers: {
+              some: {
+                Worker: {
+                  id: ctx.session.user.id,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    return business ? true : false;
+  }),
 });

@@ -10,7 +10,7 @@ export const appointmetRouter = createTRPCRouter({
         date: z.date(),
         businessId: z.number(),
         serviceId: z.number(),
-        workerId: z.number()
+        workerId: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -26,5 +26,95 @@ export const appointmetRouter = createTRPCRouter({
       });
 
       return appointment;
+    }),
+  getAppointmentsByOwnerOrWorkerId: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        date: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const business = await ctx.db.business.findFirst({
+        where: {
+          OR: [
+            { ownerId: input.userId },
+            {
+              workers: {
+                some: {
+                  Worker: {
+                    id: input.userId,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      });
+
+      if (!business) {
+        throw new Error("Business not found for the given owner ID");
+      }
+
+      const startOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .startOf("day")
+        .toDate();
+      const endOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .endOf("day")
+        .toDate();
+
+      const appointments = await ctx.db.appointment.findMany({
+        orderBy: {
+          date: "asc",
+        },
+        where: {
+          businessId: business.id,
+          date: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+        include: {
+          worker: {
+            select: {
+              Worker: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          service: {
+            select: {
+              durationMinutes: true,
+              name: true,
+              id: true,
+              price: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      return appointments;
+    }),
+  deleteAppointment: protectedProcedure
+    .input(z.object({ appointmentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const appointment = await ctx.db.appointment.findUnique({
+        where: { id: input.appointmentId },
+      });
+
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+
+      await ctx.db.appointment.delete({
+        where: { id: input.appointmentId },
+      });
+
+      return { success: true, message: "Appointment deleted successfully" };
     }),
 });

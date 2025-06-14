@@ -9,6 +9,7 @@ declare module "next-auth" {
     user: {
       id: string;
       phone: string;
+      role?: string;
     } & DefaultSession["user"];
   }
 }
@@ -18,6 +19,7 @@ declare module "next-auth/jwt" {
     id: string;
     phone?: string;
     name?: string;
+    role?: string;
   }
 }
 
@@ -50,12 +52,14 @@ export const authOptions: NextAuthOptions = {
           select: {
             phone: true,
             name: true,
+            role: true,
           },
         });
 
         if (dbUser) {
           token.phone = dbUser.phone ?? "";
           token.name = dbUser.name;
+          token.role = dbUser.role;
         }
       }
 
@@ -66,6 +70,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.phone = token.phone!;
         session.user.name = token.name!;
+        session.user.role = token.role!;
       }
       return session;
     },
