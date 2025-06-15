@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { r2 } from "~/lib/r2";
 
 export default async function handler(
@@ -18,16 +19,11 @@ export default async function handler(
       Key: key,
     });
 
-    const data = await r2.send(command);
+    const url = await getSignedUrl(r2, command, { expiresIn: 60 * 5 }); // 5 minutes
 
-    const stream = data.Body as NodeJS.ReadableStream;
-
-    res.setHeader("Content-Type", data.ContentType ?? "image/jpeg");
-    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-
-    stream.pipe(res);
+    return res.status(200).json({ url });
   } catch (error) {
-    console.error("R2 image fetch error:", error);
-    res.status(404).json({ error: "Image not found" });
+    console.error("Failed to generate signed URL:", error);
+    return res.status(500).json({ error: "Failed to generate signed URL" });
   }
 }
