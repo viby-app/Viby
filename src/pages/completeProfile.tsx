@@ -7,7 +7,7 @@ import Button from "../components/button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import router from "next/router";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { hebrewDictionary } from "~/utils/constants";
 
 const completeProfileSchema = z.object({
@@ -42,7 +42,8 @@ export default function CompleteProfileForm() {
         role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
         name: data.name,
       });
-
+      await fetch("/api/auth/session");
+      await getSession();
       if (data.isBusinessOwner) {
         await createBusinessMutation.mutateAsync({ phone: data.phone });
         toast.success(hebrewDictionary.businessCreated);
