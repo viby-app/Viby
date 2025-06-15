@@ -64,5 +64,6 @@ export const hebrewDictionary = {
   InvalidPhoneNumber: "מספר הטלפון לא תקין",
   InvalidMail: "כתובת המייל לא תקינה",
   MailRequired: "אימייל הוא שדה חובה",
-  NameRequired: "שם הוא שדה חובה",  
+  NameRequired: "שם הוא שדה חובה",
+  updateSuccess: "הפרטים שלך עודכנו בהצלחה",
 };

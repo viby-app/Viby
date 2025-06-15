@@ -13,6 +13,7 @@ import ImageConfirmModal from "~/components/imageConfirmModal";
 import logger from "~/lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
+import { showSuccessToast } from "~/components/successToast";
 
 const PersonalDetailsPage = () => {
   const {
@@ -130,6 +131,7 @@ const PersonalDetailsPage = () => {
           onSuccess: () => {
             reset(data);
             void userRefetch();
+            showSuccessToast(hebrewDictionary.updateSuccess);
           },
           onError: (error) => {
             logger.error("Failed to update user data:", error);
