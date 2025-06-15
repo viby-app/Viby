@@ -93,31 +93,32 @@ model UserConnection {
 }
 
 model Business {
-    id            Int        @id @default(autoincrement())
-    name          String
-    description   String?
-    address       String
-    phone         String
-    whatsappLink  String?
-    instagramLink String?
-    categories    Category[]
-    createdAt     DateTime   @default(now())
-    updatedAt     DateTime   @updatedAt
+  id            Int        @id @default(autoincrement())
+  name          String
+  description   String?
+  address       String
+  phone         String
+  whatsappLink  String?
+  instagramLink String?
+  categories    Category[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  owner   User   @relation("BusinessOwner", fields: [ownerId], references: [id])
+  ownerId String
 
-    owner   User   @relation("BusinessOwner", fields: [ownerId], references: [id])
-    ownerId String
-
-    services         BusinessService[]
-    appointments     Appointment[]
-    reviews          Review[]
-    images           Image[]
-    followedBussines BusinessFollowing[] @relation("FollowedBussines")
-    workers          Workers[]           @relation("BusinessWorker")
-    openingHour      OpeningHours[]
-    closedDays       ClosedDay[]
+  services         BusinessService[]
+  appointments     Appointment[]
+  reviews          Review[]
+  images           Image[]
+  logo             String?
+  followedBussines BusinessFollowing[]  @relation("FollowedBussines")
+  workers          Workers[]            @relation("BusinessWorker")
+  openingHour      OpeningHours[]
+  closedDays       ClosedDay[]
 }
 
-model OpeningHours {
+
+    model OpeningHours {
     id         Int      @id @default(autoincrement())
     business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int

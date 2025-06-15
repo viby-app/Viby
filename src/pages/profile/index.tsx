@@ -1,180 +1,210 @@
 import React, { useEffect, useState } from "react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
-import { CircleUserIcon, MenuIcon } from "lucide-react";
+import { ChevronLeft, CircleUserIcon, MenuIcon } from "lucide-react";
 import { hebrewDictionary } from "../../utils/constants";
 import Link from "next/link";
 import Image from "next/image";
+import AppointmentCard from "~/components/appointmentCard";
+
+import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { motion } from "framer-motion";
+import logger from "~/lib/logger";
 
 const ProfilePage = () => {
-    const { data: user, isLoading: isUserLoading } = api.profile.getUser.useQuery();
-    const { data: linkedUsers } = api.profile.getUserFriends.useQuery();
+  const [userFriends, setUserFriends] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageLoading, setImageLoading] = useState<boolean>(true);
 
-    const [userFriends, setUserFriends] = useState<number>(0);
-
-    useEffect(() => {
-        if (linkedUsers) {
-            setUserFriends(linkedUsers.length);
-        }
-    }, [linkedUsers]);
-
-    if (isUserLoading) {
-        return (
-            <div className="flex items-center justify-center h-screen w-full">
-                <div className="loading w-16 h-16"></div>
-            </div>
-        );
-
-    }
-
-    return (
-        <Layout>
-            <div className="bg-[#428e9d82] flex items-center justify-center">
-                <div className="flex flex-col w-full rounded-2xl p-3 shadow-lg min-h-screen m-5 bg-white">
-                    {user && (
-                        <>
-                            <div>
-                                <div className="text-right flex items-center justify-between flex-row-reverse">
-                                    <Link href="/profile/settings" className="hover:bg-gray-300 transition duration-200 p-2 rounded-full">
-                                        <MenuIcon className="w-6 h-6 text-gray-800" />
-                                    </Link>
-                                    <h1 className="text-4xl font-extrabold text-gray-800">
-                                        {hebrewDictionary.hey} {user.firstName}!
-                                    </h1>
-                                </div>
-
-                                <div className="flex items-center justify-between m-4">
-                                    <div className="flex items-center gap-4">
-                                        {user?.image ? (
-                                            <>
-                                                <Image
-                                                    src={user.image}
-                                                    alt="User"
-                                                    width={64}
-                                                    height={64}
-                                                    className={`w-16 h-16 rounded-full object-cover transition-opacity duration-500`}
-                                                />
-                                            </>
-                                        ) : (
-                                            <CircleUserIcon className="w-16 h-16 text-gray-300" />
-                                        )}
-                                        <div>
-                                            <p className="text-lg font-semibold text-gray-800">{user.name}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="text-center">
-                                        <p className="text-sm text-gray-500">{hebrewDictionary.friends}</p>
-                                        <p className="text-2xl font-bold text-gray-800">{userFriends}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="divider my-0.5"></div>
-
-                            <div>
-                                <Link
-                                    href="/profile/personalDetails"
-                                    className="flex items-center justify-between px-4 py-3 rounded-lg bg-white hover:bg-gray-300 transition duration-200"
-                                >
-                                    <h4 className="text-xl font-semibold text-gray-800">{hebrewDictionary.personalDetails}</h4>
-                                    <svg
-                                        className="w-6 h-6 text-gray-600 transform"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                                <div className="divider my-0.5"></div>
-                            </div>
-                            <div className="flex items-center justify-between px-4 py-3">
-                                <h4 className="text-xl font-semibold text-gray-800">{hebrewDictionary.myLastVisit}</h4>
-                            </div>
-                            <div className="divider my-0.5"></div>
-                            <div className="flex flex-col items-start gap-2 px-4 py-3">
-                                <h4 className="text-xl font-semibold text-gray-800">
-                                    {hebrewDictionary.links}
-                                </h4>
-
-                                <Link
-                                    href="/profile/"
-                                    className="flex justify-between items-center w-full hover:bg-gray-300 transition duration-200 p-2 rounded-full"
-                                >
-                                    <h6 className="text-base font-semibold text-gray-800">
-                                        {hebrewDictionary.inviteFriends}
-                                    </h6>
-                                    <svg
-                                        className="w-6 h-6 text-gray-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                                <Link
-                                    href="/profile/"
-                                    className="flex justify-between items-center w-full hover:bg-gray-300 transition duration-200 p-2 rounded-full"
-                                >
-                                    <h6 className="text-base font-semibold text-gray-800">
-                                        {hebrewDictionary.appointmentsHistory}
-                                    </h6>
-                                    <svg
-                                        className="w-6 h-6 text-gray-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                                                                <Link
-                                    href="/profile/"
-                                    className="flex justify-between items-center w-full hover:bg-gray-300 transition duration-200 p-2 rounded-full"
-                                >
-                                    <h6 className="text-base font-semibold text-gray-800">
-                                        {hebrewDictionary.chatInvite}
-                                    </h6>
-                                    <svg
-                                        className="w-6 h-6 text-gray-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                            </div>
-                            <div className="divider my-0.5"></div>
-
-                            <div>
-                                <Link
-                                    href="/profile/"
-                                    className="flex items-center justify-between px-4 py-3 rounded-lg bg-white hover:bg-gray-300 transition duration-200"
-                                >
-                                    <h4 className="text-xl font-semibold text-gray-800">{hebrewDictionary.paymentAddress}</h4>
-                                    <svg
-                                        className="w-6 h-6 text-gray-600 transform"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                                <div className="divider my-0.5"></div>
-                            </div>
-                        </>)}
-                </div>
-            </div>
-        </Layout>
+  const { data: user, isLoading: isUserLoading } =
+    api.profile.getUser.useQuery();
+  const { data: linkedUsers } = api.profile.getUserFriends.useQuery();
+  const { data: lastAppointment } =
+    api.appointment.getLastAppointmentByUserId.useQuery(
+      { userId: user?.id ?? "" },
+      {
+        enabled: !!user?.id,
+      },
     );
+
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+      setImageLoading(true);
+      try {
+        if (user?.image) {
+          const url = await getPreSignedUrlFromKey(user.image);
+          setImageUrl(url);
+        } else {
+          setImageUrl("");
+        }
+      } catch (error) {
+        logger.error("Error fetching image URL: ", error);
+        setImageUrl("");
+      } finally {
+        setImageLoading(false);
+      }
+    };
+
+    void fetchImageUrl();
+  }, [user?.image]);
+
+  useEffect(() => {
+    if (linkedUsers) {
+      setUserFriends(linkedUsers.length);
+    }
+  }, [linkedUsers]);
+
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="loading loading-spinner h-16 w-16"></div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ scale: 0, opacity: 0, transformOrigin: "center center" }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0, transformOrigin: "center center" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      style={{ width: "100%", height: "100%" }}
+    >
+      <Layout>
+        <div className="flex items-center justify-center bg-[#428e9d82]">
+          <div className="m-5 flex min-h-screen w-full flex-col rounded-2xl border border-gray-300 bg-white p-3 shadow-2xl">
+            {user && (
+              <>
+                <div>
+                  <div className="flex flex-row-reverse items-center justify-between text-right">
+                    <Link
+                      href="/profile/settings"
+                      className="rounded-full p-2 transition duration-200 hover:bg-gray-300"
+                    >
+                      <MenuIcon className="h-6 w-6 text-gray-800" />
+                    </Link>
+                    <h1 className="text-4xl font-extrabold text-gray-800">
+                      {hebrewDictionary.hey} {user.firstName}!
+                    </h1>
+                  </div>
+
+                  <div className="m-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-16 w-16">
+                        {imageLoading ? (
+                          <div className="absolute inset-0 flex h-16 w-16 items-center justify-center">
+                            <div className="loading loading-spinner" />
+                          </div>
+                        ) : imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt="User"
+                            width={64}
+                            height={64}
+                            className="h-16 w-16 rounded-full object-cover"
+                          />
+                        ) : (
+                          <CircleUserIcon className="h-16 w-16 text-gray-300" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-gray-800">
+                          {user.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <p className="text-sm text-gray-500">
+                        {hebrewDictionary.friends}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-800">
+                        {userFriends}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="divider my-0.5"></div>
+
+                <div>
+                  <Link
+                    href="/profile/personalDetails"
+                    className="flex items-center justify-between rounded-lg bg-white px-4 py-3 transition duration-200 hover:bg-gray-300"
+                  >
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      {hebrewDictionary.personalDetails}
+                    </h4>
+                    <ChevronLeft />
+                  </Link>
+                  <div className="divider my-0.5"></div>
+                </div>
+                <div className="flex flex-col justify-between space-y-2 px-4 py-3">
+                  <h4 className="text-xl font-semibold text-gray-800">
+                    {hebrewDictionary.myLastVisit}
+                  </h4>
+                  <AppointmentCard
+                    date={lastAppointment?.date.toString() ?? ""}
+                    description={lastAppointment?.description ?? ""}
+                    serviceName={lastAppointment?.service.name ?? ""}
+                    businessName={lastAppointment?.business.name ?? ""}
+                    logo={lastAppointment?.business?.logo ?? ""}
+                  />
+                </div>
+                <div className="divider my-0.5"></div>
+                <div className="flex flex-col items-start gap-2 px-4 py-3">
+                  <h4 className="text-xl font-semibold text-gray-800">
+                    {hebrewDictionary.links}
+                  </h4>
+
+                  <Link
+                    href="/profile"
+                    className="flex w-full items-center justify-between rounded-full p-2 transition duration-200 hover:bg-gray-300"
+                  >
+                    <h6 className="text-base font-semibold text-gray-800">
+                      {hebrewDictionary.inviteFriends}
+                    </h6>
+                    <ChevronLeft />
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="flex w-full items-center justify-between rounded-full p-2 transition duration-200 hover:bg-gray-300"
+                  >
+                    <h6 className="text-base font-semibold text-gray-800">
+                      {hebrewDictionary.appointmentsHistory}
+                    </h6>
+                    <ChevronLeft />
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="flex w-full items-center justify-between rounded-full p-2 transition duration-200 hover:bg-gray-300"
+                  >
+                    <h6 className="text-base font-semibold text-gray-800">
+                      {hebrewDictionary.chatInvite}
+                    </h6>
+                    <ChevronLeft />
+                  </Link>
+                </div>
+                <div className="divider my-0.5"></div>
+
+                <div>
+                  <Link
+                    href="/profile/"
+                    className="flex items-center justify-between rounded-lg bg-white px-4 py-3 transition duration-200 hover:bg-gray-300"
+                  >
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      {hebrewDictionary.paymentAddress}
+                    </h4>
+                    <ChevronLeft />
+                  </Link>
+                  <div className="divider my-0.5"></div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </Layout>
+    </motion.div>
+  );
 };
 
 export default ProfilePage;

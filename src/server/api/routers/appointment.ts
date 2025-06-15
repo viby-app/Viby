@@ -31,6 +31,19 @@ export const appointmetRouter = createTRPCRouter({
             where: {
                 userId: input.userId,
             },
+            include: {
+                service: {
+                    select: {
+                        name: true
+                    }
+                },
+                business: {
+                    select: {
+                        name: true,
+                        logo: true
+                    }
+                },
+            },
             orderBy: {
                 date: "desc",
             },
