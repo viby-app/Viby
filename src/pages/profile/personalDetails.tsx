@@ -155,10 +155,11 @@ const PersonalDetailsPage = () => {
 
   return (
     <motion.div
-      initial={{ x: 100, opacity: 0 }}
+      initial={{ x: 60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -100, opacity: 0 }}
-      transition={{ duration: 0.4 }}
+      exit={{ x: -60, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 70, damping: 18 }}
+      style={{ willChange: "transform, opacity" }}
     >
       <Layout>
         <Card>
