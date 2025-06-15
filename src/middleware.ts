@@ -10,23 +10,25 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  if (
-    !token &&
-    !pathname.startsWith("/login") &&
-    !pathname.startsWith("/api/auth")
-  ) {
+  const isAuth = !!token;
+  const isProfileComplete = !!token?.phone;
+
+  const isLoginPage = pathname === "/login";
+  const isProfilePage = pathname.startsWith("/completeProfile");
+
+  if (!isAuth && !isLoginPage && !pathname.startsWith("/api/auth")) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (token && pathname === "/login") {
+  if (isAuth && isLoginPage) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  if (!token?.phone && !pathname.startsWith("/completeProfile")) {
+  if (isAuth && !isProfileComplete && !isProfilePage) {
     return NextResponse.redirect(new URL("/completeProfile", req.url));
   }
 
-  if (token?.phone && pathname.startsWith("/completeProfile")) {
+  if (isAuth && isProfileComplete && isProfilePage) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
