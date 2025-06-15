@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({
@@ -22,6 +22,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  if (!token?.phone && !pathname.startsWith("/completeProfile")) {
+    return NextResponse.redirect(new URL("/completeProfile", req.url));
+  }
+
   if (token?.phone && pathname.startsWith("/completeProfile")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
@@ -30,5 +34,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|api/trpc).*)"],
 };
