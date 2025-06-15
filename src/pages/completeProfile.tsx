@@ -41,7 +41,6 @@ export default function CompleteProfileForm() {
         role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
         name: data.name,
       });
-      await signIn("google", { redirect: false });
 
       if (data.isBusinessOwner) {
         await createBusinessMutation.mutateAsync({
@@ -54,6 +53,7 @@ export default function CompleteProfileForm() {
         toast.success(hebrewDictionary.profileUpdated);
         void router.push("/");
       }
+      await signIn("google", { redirect: false });
     } catch (error) {
       toast.error(`Error: ${String(error)}`);
     }
@@ -104,7 +104,7 @@ export default function CompleteProfileForm() {
             </p>
             <select
               defaultValue="בחר מין"
-              className="select mt-1 rounded-md shadow-md"
+              className="select mt-1 w-full rounded-md shadow-md"
             >
               <option disabled={true}>בחר מין</option>
               <option>{hebrewDictionary.male}</option>
