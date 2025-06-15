@@ -7,7 +7,7 @@ import Button from "../components/button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import router from "next/router";
-import { getSession, signIn } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { hebrewDictionary } from "~/utils/constants";
 
 const completeProfileSchema = z.object({
