@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Layout from "~/components/layout";
@@ -33,11 +35,11 @@ const PersonalDetailsPage = () => {
     const fetchImageUrl = async () => {
       setImageLoading(true);
       try {
-        if (user?.image) {
+        if (user?.image && !user.image.includes("google")) {
           const url = await getPreSignedUrlFromKey(user.image);
           setImageUrl(url);
         } else {
-          setImageUrl("");
+          setImageUrl(user?.image ?? "");
         }
       } catch (err) {
         logger.error("Failed to fetch image URL:", err);

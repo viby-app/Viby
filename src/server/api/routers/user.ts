@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Gender, Role } from "@prisma/client";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -13,7 +13,6 @@ export const userRouter = createTRPCRouter({
 
     return user;
   }),
-
   getUserFriends: protectedProcedure.query(async ({ ctx }) => {
     const linkedUsers = await ctx.db.userConnection.findMany({
       where: {
@@ -68,6 +67,7 @@ export const userRouter = createTRPCRouter({
         phone: z.string().min(6).max(15),
         role: z.enum([Role.USER, Role.BUSINESS_OWNER, Role.ADMIN]),
         name: z.string().min(2, "Name is required"),
+        gender: z.enum([Gender.FEMALE, Gender.MALE, Gender.OTHER]),
       }),
     )
     .mutation(({ ctx, input }) => {
@@ -77,6 +77,7 @@ export const userRouter = createTRPCRouter({
           phone: input.phone,
           role: input.role,
           name: input.name,
+          gender: input.gender,
         },
       });
     }),
