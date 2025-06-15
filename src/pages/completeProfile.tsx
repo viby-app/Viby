@@ -44,17 +44,13 @@ export default function CompleteProfileForm() {
       });
 
       if (data.isBusinessOwner) {
-        await createBusinessMutation.mutateAsync({
-          phone: data.phone,
-        });
-
+        await createBusinessMutation.mutateAsync({ phone: data.phone });
         toast.success(hebrewDictionary.businessCreated);
         void router.push("/profile/business");
       } else {
         toast.success(hebrewDictionary.profileUpdated);
         void router.push("/");
       }
-      await signIn("google", { redirect: false });
     } catch (error) {
       toast.error(`Error: ${String(error)}`);
     }
