@@ -12,6 +12,7 @@ export const hebrewDictionary = {
   businessSocialMedia: "רשתות חברתיות של העסק",
   hey: "היי",
   welcome: "ברוכים הבאים",
+  welcomeToViby: "ברוכים הבאים ל viby",
   myBusinesses: "העסקים שלי",
   allBusinesses: "כל העסקים",
   follow: "עקוב",
@@ -76,4 +77,8 @@ export const hebrewDictionary = {
   female: "נקבה",
   other: "אחר", 
   workingHours: "שעות פעילות",
+  chooseGender: "בחר מגדר",
+  noBusinessesToDisplay: "אין לנו עסקים להציג לך",
+  notFollowingBusinesses: "אתה לא עוקב אחרי עסקים",
+  businessesYouDontKnow: "עסקים שעוד לא הכרת"
 };

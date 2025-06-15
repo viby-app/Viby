@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../components/button";
 import { api } from "~/utils/api";
@@ -9,14 +8,10 @@ import { toast } from "react-toastify";
 import router from "next/router";
 import { getSession } from "next-auth/react";
 import { hebrewDictionary } from "~/utils/constants";
-
-const completeProfileSchema = z.object({
-  phone: z.string().min(6, "Phone number is required"),
-  isBusinessOwner: z.boolean(),
-  name: z.string().min(2, "Name is required"),
-});
-
-type CompleteProfileFormValues = z.infer<typeof completeProfileSchema>;
+import {
+  completeProfileSchema,
+  type CompleteProfileFormValues,
+} from "~/utils/types";
 
 export default function CompleteProfileForm() {
   const {
@@ -29,11 +24,11 @@ export default function CompleteProfileForm() {
       name: "",
       phone: "",
       isBusinessOwner: false,
+      gender: "OTHER",
     },
   });
 
   const updateUserMutation = api.user.firstLoginUpdateUser.useMutation();
-
   const createBusinessMutation = api.business.createBusiness.useMutation();
   const onSubmit = async (data: CompleteProfileFormValues) => {
     try {
@@ -41,6 +36,7 @@ export default function CompleteProfileForm() {
         phone: data.phone,
         role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
         name: data.name,
+        gender: data.gender,
       });
       await fetch("/api/auth/session");
       await getSession();
@@ -97,18 +93,25 @@ export default function CompleteProfileForm() {
           </div>
 
           <div>
-            <p className="block text-sm font-semibold text-[#3A3A3A]">
+            <label className="block text-sm font-semibold text-[#3A3A3A]">
               {hebrewDictionary.gender}
-            </p>
+            </label>
             <select
-              defaultValue="בחר מין"
-              className="select mt-1 w-full rounded-md shadow-md"
+              {...register("gender")}
+              className="mt-1 w-full rounded-md bg-white p-2 text-[#3A3A3A] shadow-md"
             >
-              <option disabled={true}>בחר מין</option>
-              <option>{hebrewDictionary.male}</option>
-              <option>{hebrewDictionary.female}</option>
-              <option>{hebrewDictionary.other}</option>
+              <option value="OTHER" disabled>
+                {hebrewDictionary.chooseGender}
+              </option>
+              <option value="MALE">{hebrewDictionary.male}</option>
+              <option value="FEMALE">{hebrewDictionary.female}</option>
+              <option value="OTHER">{hebrewDictionary.other}</option>
             </select>
+            {errors.gender && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.gender.message}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
