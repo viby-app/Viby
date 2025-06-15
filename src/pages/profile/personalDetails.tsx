@@ -19,9 +19,9 @@ const PersonalDetailsPage = () => {
     data: user,
     isLoading: isUserLoading,
     refetch: userRefetch,
-  } = api.profile.getUser.useQuery();
-  const updateUserMutation = api.profile.updateUser.useMutation();
-  const updateImageMutation = api.profile.updateImage.useMutation();
+  } = api.user.getUser.useQuery();
+  const updateUserMutation = api.user.updateUser.useMutation();
+  const updateImageMutation = api.user.updateImage.useMutation();
   const router = useRouter();
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");

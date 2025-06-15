@@ -164,7 +164,6 @@ const BusinessPage: NextPage = () => {
                       height={500}
                       src={`/api/image/${image.key}`}
                       alt={`Business image ${image.id}`}
-                      className=""
                     />
                   </div>
                 ))}

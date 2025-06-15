@@ -7,7 +7,7 @@ interface Props {
   alt: string;
   width: number;
   height: number;
-  className: string;
+  className?: string;
 }
 
 function ImageWithDynamicSrc({ className, src, alt, width, height }: Props) {

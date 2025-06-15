@@ -17,9 +17,10 @@ const ProfilePage = () => {
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
   const { data: user, isLoading: isUserLoading } =
-    api.profile.getUser.useQuery();
-  const { data: linkedUsers } = api.profile.getUserFriends.useQuery();
-  const { data: lastAppointment } =
+    api.user.getUser.useQuery();
+  const firstName = user?.name!.split(" ")[0];
+  const { data: linkedUsers } = api.user.getUserFriends.useQuery();
+  const { data: lastAppointment, isLoading: lastAppointmentLoading } =
     api.appointment.getLastAppointmentByUserId.useQuery(
       { userId: user?.id ?? "" },
       {
@@ -84,7 +85,7 @@ const ProfilePage = () => {
                       <MenuIcon className="h-6 w-6 text-gray-800" />
                     </Link>
                     <h1 className="text-4xl font-extrabold text-gray-800">
-                      {hebrewDictionary.hey} {user.firstName}!
+                      {hebrewDictionary.hey} {firstName}!
                     </h1>
                   </div>
 
@@ -148,6 +149,7 @@ const ProfilePage = () => {
                     serviceName={lastAppointment?.service.name ?? ""}
                     businessName={lastAppointment?.business.name ?? ""}
                     logo={lastAppointment?.business?.logo ?? ""}
+                    lastAppointmentLoading={lastAppointmentLoading}
                   />
                 </div>
                 <div className="divider my-0.5"></div>

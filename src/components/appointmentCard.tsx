@@ -1,12 +1,12 @@
 import dayjs from "../utils/dayjs";
 import { UserRoundIcon } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
 
 interface Props {
   description: string;
   date: string;
   businessName: string;
+  lastAppointmentLoading: boolean;
   logo?: string;
   serviceName?: string;
 }
@@ -17,15 +17,9 @@ const AppointmentCard = ({
   businessName,
   logo,
   serviceName,
+  lastAppointmentLoading,
 }: Props) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setIsLoaded(true), 500);
-    return () => clearTimeout(timeout);
-  }, []);
-
-  if (!isLoaded) {
+  if (lastAppointmentLoading) {
     return (
       <div className="flex h-32 w-full items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
         <div className="loading h-8 w-8"></div>

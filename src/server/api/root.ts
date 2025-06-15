@@ -4,7 +4,7 @@ import { imageRouter } from "./routers/image";
 import { workersRouter } from "./routers/workers";
 import { serviceRouter } from "./routers/service";
 import { appointmetRouter } from "./routers/appointment";
-import { profileRouter } from "./routers/user";
+import { userRouter } from "./routers/user";
 
 export const appRouter = createTRPCRouter({
   image: imageRouter,
@@ -12,7 +12,7 @@ export const appRouter = createTRPCRouter({
   workers: workersRouter,
   service: serviceRouter,
   appointment: appointmetRouter,
-  profile: profileRouter,
+  user: userRouter,
 });
 
 export type AppRouter = typeof appRouter;
