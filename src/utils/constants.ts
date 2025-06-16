@@ -80,5 +80,6 @@ export const hebrewDictionary = {
   chooseGender: "בחר מגדר",
   noBusinessesToDisplay: "אין לנו עסקים להציג לך",
   notFollowingBusinesses: "אתה לא עוקב אחרי עסקים",
-  businessesYouDontKnow: "עסקים שעוד לא הכרת"
+  businessesYouDontKnow: "עסקים שעוד לא הכרת",
+  noBookedAppointment: "אין לך עדיין תורים!",
 };

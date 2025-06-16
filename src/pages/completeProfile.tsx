@@ -29,7 +29,6 @@ export default function CompleteProfileForm() {
   });
 
   const updateUserMutation = api.user.firstLoginUpdateUser.useMutation();
-  const createBusinessMutation = api.business.createBusiness.useMutation();
   const onSubmit = async (data: CompleteProfileFormValues) => {
     try {
       await updateUserMutation.mutateAsync({
@@ -41,9 +40,8 @@ export default function CompleteProfileForm() {
       await fetch("/api/auth/session");
       await getSession();
       if (data.isBusinessOwner) {
-        await createBusinessMutation.mutateAsync({ phone: data.phone });
         toast.success(hebrewDictionary.businessCreated);
-        void router.push("/profile/business");
+        void router.push("/completeBusiness");
       } else {
         toast.success(hebrewDictionary.profileUpdated);
         void router.push("/");
@@ -54,10 +52,10 @@ export default function CompleteProfileForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F2EFE7] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#428e9d82] px-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md rounded-2xl bg-[#9ACBD0] p-8 shadow-xl"
+        className="w-full max-w-md rounded-2xl bg-[#fdf9f0] p-8 shadow-xl"
       >
         <h1 className="mb-8 text-center text-3xl font-bold text-[#3A3A3A]">
           {hebrewDictionary.completeProfile}

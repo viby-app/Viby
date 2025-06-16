@@ -132,21 +132,19 @@ const ProfilePage = () => {
                   </Link>
                   <div className="divider my-0.5" />
                 </div>
-                {lastAppointment && (
-                  <div className="flex flex-col justify-between space-y-2 px-4 py-3">
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      {hebrewDictionary.myLastVisit}
-                    </h4>
-                    <AppointmentCard
-                      date={lastAppointment?.date.toString() ?? ""}
-                      description={lastAppointment?.description ?? ""}
-                      serviceName={lastAppointment?.service.name ?? ""}
-                      businessName={lastAppointment?.business.name ?? ""}
-                      logo={lastAppointment?.business?.logo ?? ""}
-                      lastAppointmentLoading={lastAppointmentLoading}
-                    />
-                  </div>
-                )}
+                <div className="flex flex-col justify-between space-y-2 px-4 py-3">
+                  <h4 className="text-xl font-semibold text-gray-800">
+                    {hebrewDictionary.myLastVisit}
+                  </h4>
+                  <AppointmentCard
+                    date={lastAppointment?.date.toString() ?? ""}
+                    description={lastAppointment?.description ?? ""}
+                    serviceName={lastAppointment?.service.name ?? ""}
+                    businessName={lastAppointment?.business.name ?? ""}
+                    logo={lastAppointment?.business?.logo ?? ""}
+                    lastAppointmentLoading={lastAppointmentLoading}
+                  />
+                </div>
 
                 <div className="flex flex-col items-start gap-2 px-4 py-3">
                   <h4 className="text-xl font-semibold text-gray-800">
