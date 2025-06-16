@@ -16,7 +16,7 @@ export default function AuthPage() {
           </h1>
           <Button
             onClick={async () =>
-              await signIn("google", { callbackUrl: "/completeProfile" })
+              await signIn("google", { callbackUrl: "/loginFlow/completeProfile" })
             }
           >
             התחברות עם Google

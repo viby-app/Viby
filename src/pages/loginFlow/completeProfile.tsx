@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "../components/button";
+import Button from "../../components/button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import router from "next/router";
@@ -41,7 +41,7 @@ export default function CompleteProfileForm() {
       await getSession();
       if (data.isBusinessOwner) {
         toast.success(hebrewDictionary.businessCreated);
-        void router.push("/completeBusiness");
+        void router.push("/loginFlow/completeBusiness");
       } else {
         toast.success(hebrewDictionary.profileUpdated);
         void router.push("/");
