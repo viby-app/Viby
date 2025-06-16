@@ -11,12 +11,15 @@ import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import BookAppointmentModal from "~/components/bookAppointmentModal";
+import { hebrewDictionary } from "~/utils/constants";
+import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
 
 const BusinessPage: NextPage = () => {
   const [optimisticFollowing, setOptimisticFollowing] = useState<
     boolean | null
   >(null);
   const [showModal, setShowModal] = useState(false);
+  const [preSignedUrls, setPreSignedUrls] = useState<string[]>();
   const { data: session, status: userStatus } = useSession();
   const router = useRouter();
   const businessId = Number(router.query.businessId);
@@ -40,6 +43,19 @@ const BusinessPage: NextPage = () => {
     { businessId, userId: session?.user.id ?? "" },
     { enabled: !!session?.user.id && enabled },
   );
+
+  useEffect(() => {
+    const fetchUrls = async () => {
+      if (!images) return;
+
+      const urls = await Promise.all(
+        images.map((image) => getPreSignedUrlFromKey(image.key)),
+      );
+      setPreSignedUrls(urls);
+    };
+
+    void fetchUrls();
+  }, [images]);
 
   useEffect(() => {
     if (typeof isFollowing === "boolean") {
@@ -99,7 +115,7 @@ const BusinessPage: NextPage = () => {
                 className="mt-3 w-1/3 self-end"
                 onClick={() => setShowModal(!showModal)}
               >
-                לקבוע תור
+                {hebrewDictionary.bookAppointment}
               </Button>
               <Button
                 onClick={handleFollowing}
@@ -116,9 +132,9 @@ const BusinessPage: NextPage = () => {
                 handleUnfollow.isPending ? (
                   <div className="loading" />
                 ) : optimisticFollowing ? (
-                  "עוקב"
+                  hebrewDictionary.following
                 ) : (
-                  "לעקוב"
+                  hebrewDictionary.follow
                 )}
               </Button>
             </div>
@@ -153,17 +169,15 @@ const BusinessPage: NextPage = () => {
               {(isImagesLoading || isBusinessLoading) && (
                 <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
               )}
-              {!isImagesLoading && images?.length === 0 && (
-                <div className="skeleton h-48 w-48 rounded-md bg-gray-200" />
-              )}
+              {!isImagesLoading && images?.length === 0 && <></>}
               <div className="carousel rounded-box h-1/2 w-full space-x-2 px-4">
-                {images?.map((image) => (
-                  <div className="carousel-item w-full" key={image.id}>
+                {preSignedUrls?.map((image, index) => (
+                  <div className="carousel-item w-full" key={index}>
                     <ImageWithDynamicSrc
                       width={400}
                       height={500}
-                      src={`/api/image/${image.key}`}
-                      alt={`Business image ${image.id}`}
+                      src={image}
+                      alt={`Business image ${index}`}
                     />
                   </div>
                 ))}
@@ -173,7 +187,7 @@ const BusinessPage: NextPage = () => {
               {businessTimes && businessTimes.length > 0 && (
                 <>
                   <h2 className="mt-5 mb-2 text-2xl font-semibold text-[#006A71]">
-                    שעות פעילות
+                    {hebrewDictionary.workingHours}
                   </h2>
                   <div className="flex w-4/5 flex-col space-y-2 rounded-md bg-[#9ACBD0] p-4">
                     {businessTimes?.map((day) => (

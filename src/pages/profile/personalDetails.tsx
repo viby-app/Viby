@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Layout from "~/components/layout";
@@ -33,11 +35,11 @@ const PersonalDetailsPage = () => {
     const fetchImageUrl = async () => {
       setImageLoading(true);
       try {
-        if (user?.image) {
+        if (user?.image && !user.image.includes("google")) {
           const url = await getPreSignedUrlFromKey(user.image);
           setImageUrl(url);
         } else {
-          setImageUrl("");
+          setImageUrl(user?.image ?? "");
         }
       } catch (err) {
         logger.error("Failed to fetch image URL:", err);
@@ -153,10 +155,11 @@ const PersonalDetailsPage = () => {
 
   return (
     <motion.div
-      initial={{ x: 100, opacity: 0 }}
+      initial={{ x: 60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -100, opacity: 0 }}
-      transition={{ duration: 0.4 }}
+      exit={{ x: -60, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 70, damping: 18 }}
+      style={{ willChange: "transform, opacity" }}
     >
       <Layout>
         <Card>

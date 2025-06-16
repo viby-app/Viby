@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
@@ -12,12 +14,10 @@ import { motion } from "framer-motion";
 import logger from "~/lib/logger";
 
 const ProfilePage = () => {
-  const [userFriends, setUserFriends] = useState<number>(0);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
-  const { data: user, isLoading: isUserLoading } =
-    api.user.getUser.useQuery();
+  const { data: user, isLoading: isUserLoading } = api.user.getUser.useQuery();
   const firstName = user?.name!.split(" ")[0];
   const { data: linkedUsers } = api.user.getUserFriends.useQuery();
   const { data: lastAppointment, isLoading: lastAppointmentLoading } =
@@ -32,11 +32,11 @@ const ProfilePage = () => {
     const fetchImageUrl = async () => {
       setImageLoading(true);
       try {
-        if (user?.image) {
+        if (user?.image && !user?.image.includes("google")) {
           const url = await getPreSignedUrlFromKey(user.image);
           setImageUrl(url);
         } else {
-          setImageUrl("");
+          setImageUrl(user?.image ?? "");
         }
       } catch (error) {
         logger.error("Error fetching image URL: ", error);
@@ -49,16 +49,10 @@ const ProfilePage = () => {
     void fetchImageUrl();
   }, [user?.image]);
 
-  useEffect(() => {
-    if (linkedUsers) {
-      setUserFriends(linkedUsers.length);
-    }
-  }, [linkedUsers]);
-
   if (isUserLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <div className="loading loading-spinner h-16 w-16"></div>
+        <div className="loading loading-spinner h-16 w-16" />
       </div>
     );
   }
@@ -73,7 +67,7 @@ const ProfilePage = () => {
     >
       <Layout>
         <div className="flex items-center justify-center bg-[#428e9d82]">
-          <div className="m-5 flex min-h-screen w-full flex-col rounded-2xl border border-gray-300 bg-white p-3 shadow-2xl">
+          <div className="fle x m-5 h-full w-full flex-col rounded-2xl border border-gray-300 bg-white p-3 shadow-2xl">
             {user && (
               <>
                 <div>
@@ -120,13 +114,12 @@ const ProfilePage = () => {
                         {hebrewDictionary.friends}
                       </p>
                       <p className="text-2xl font-bold text-gray-800">
-                        {userFriends}
+                        {linkedUsers?.length}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="divider my-0.5"></div>
-
+                <div className="divider my-0.5" />
                 <div>
                   <Link
                     href="/profile/personalDetails"
@@ -137,7 +130,7 @@ const ProfilePage = () => {
                     </h4>
                     <ChevronLeft />
                   </Link>
-                  <div className="divider my-0.5"></div>
+                  <div className="divider my-0.5" />
                 </div>
                 <div className="flex flex-col justify-between space-y-2 px-4 py-3">
                   <h4 className="text-xl font-semibold text-gray-800">
@@ -152,7 +145,7 @@ const ProfilePage = () => {
                     lastAppointmentLoading={lastAppointmentLoading}
                   />
                 </div>
-                <div className="divider my-0.5"></div>
+
                 <div className="flex flex-col items-start gap-2 px-4 py-3">
                   <h4 className="text-xl font-semibold text-gray-800">
                     {hebrewDictionary.links}
@@ -186,7 +179,7 @@ const ProfilePage = () => {
                     <ChevronLeft />
                   </Link>
                 </div>
-                <div className="divider my-0.5"></div>
+                <div className="divider my-0.5" />
 
                 <div>
                   <Link
@@ -198,7 +191,7 @@ const ProfilePage = () => {
                     </h4>
                     <ChevronLeft />
                   </Link>
-                  <div className="divider my-0.5"></div>
+                  <div className="divider my-0.5" />
                 </div>
               </>
             )}
