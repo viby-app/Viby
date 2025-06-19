@@ -92,7 +92,7 @@ const StepImages = ({
           onChange={handleLogoChange}
         />
         <span className="px-4 text-sm text-gray-700">
-          {logoKey ? logoKey.split("/").pop() : hebrewDictionary.noFileSelected}
+          {logoPreview ? logoPreview.name : hebrewDictionary.noFileSelected}
         </span>
       </div>
 

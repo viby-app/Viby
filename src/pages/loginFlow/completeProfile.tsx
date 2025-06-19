@@ -32,18 +32,21 @@ export default function CompleteProfileForm() {
   const updateUserMutation = api.user.firstLoginUpdateUser.useMutation();
   const onSubmit = async (data: CompleteProfileFormValues) => {
     try {
-      await updateUserMutation.mutateAsync({
-        phone: data.phone,
-        role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
-        name: data.name,
-        gender: data.gender,
-      });
+      await updateUserMutation.mutateAsync(
+        {
+          phone: data.phone,
+          role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
+          name: data.name,
+          gender: data.gender,
+        },
+        { onSuccess: () => showSuccessToast(hebrewDictionary.profileUpdated) },
+      );
+
       await fetch("/api/auth/session");
       await getSession();
       if (data.isBusinessOwner) {
         void router.push("/loginFlow/completeBusiness");
       } else {
-        showSuccessToast(hebrewDictionary.profileUpdated);
         void router.push("/");
       }
     } catch (error) {

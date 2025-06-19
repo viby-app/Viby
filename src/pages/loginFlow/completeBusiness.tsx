@@ -89,6 +89,7 @@ export default function BusinessForm() {
       }
     }
 
+    let businessId: number | undefined;
     try {
       businessId = await createBusinessMutation.mutateAsync(data, {
         onSuccess: () => showSuccessToast("העסק נוצר בהצלחה!"),
@@ -109,46 +110,43 @@ export default function BusinessForm() {
       data.gallery.length === galleryImages.length &&
       data.gallery.every((key) => typeof key === "string" && key.length > 0)
     ) {
-      void (async () => {
-        try {
-          const formData = new FormData();
+      try {
+        const formData = new FormData();
 
-          Array.from(galleryImages).forEach((file, index) => {
-            const key = data.gallery![index];
-            if (!key) return;
-            formData.append("file", file);
-            formData.append("key", key);
-          });
+        Array.from(galleryImages).forEach((file, index) => {
+          const key = data.gallery![index];
+          if (!key) return;
+          formData.append("file", file);
+          formData.append("key", key);
+        });
 
-          const res = await fetch("/api/image/upload", {
-            method: "POST",
-            body: formData,
-          });
+        const res = await fetch("/api/image/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-          if (!res.ok) {
-            throw new Error("Gallery upload failed");
-          }
-          if (res.ok) {
-            uploadImageMutation.mutate(
-              {
-                images: data.gallery ?? [],
-                businessId: businessId,
-              },
-              {
-                onSuccess: () =>
-                  showSuccessToast("תמונות הגלריה הועלו בהצלחה!"),
-              },
-            );
-          }
-        } catch (error) {
-          logger.error("Gallery image upload error:", error);
+        if (!res.ok) {
+          throw new Error("Gallery upload failed");
         }
-      })();
+        await uploadImageMutation.mutateAsync(
+          {
+            images: data.gallery ?? [],
+            businessId,
+          },
+          {
+            onSuccess: () => showSuccessToast("תמונות הגלריה הועלו בהצלחה!"),
+          },
+        );
+      } catch (error) {
+        logger.error("Gallery image upload error:", error);
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     setIsSubmitting(false);
-    void router.push("/business/" + businessId);
     resetForm();
+    void router.push("/");
   };
 
   return (
@@ -193,6 +191,7 @@ export default function BusinessForm() {
                 <button
                   type="submit"
                   className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
+                  disabled={isSubmitting}
                 >
                   {step < steps.length - 1
                     ? hebrewDictionary.next
