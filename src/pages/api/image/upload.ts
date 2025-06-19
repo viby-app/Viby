@@ -22,12 +22,13 @@ export default async function handler(
     (resolve, reject) => {
       const form = new IncomingForm({ keepExtensions: true, multiples: true });
 
-      try {
-        void form.parse(req);
-        resolve({ fields, files });
-      } catch (error) {
-        reject(new Error("Form parsing failed"));
-      }
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          reject(err instanceof Error ? err : new Error(String(err)));
+        } else {
+          resolve({ fields, files });
+        }
+      });
     },
   ).catch((err) => {
     console.error("Form parse error:", err);
