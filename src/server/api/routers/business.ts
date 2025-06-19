@@ -2,6 +2,7 @@ import { z } from "zod";
 import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { completeBusinessSchema } from "~/utils/types";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinessesWithoutFollowing: protectedProcedure.query(
@@ -25,14 +26,7 @@ export const businessRouter = createTRPCRouter({
     },
   ),
   createBusiness: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().optional(),
-        description: z.string().optional(),
-        phone: z.string().min(6, "Phone number is required"),
-        address: z.string().optional(),
-      }),
-    )
+    .input(completeBusinessSchema)
     .mutation(async ({ ctx, input }) => {
       const existingBusiness = await ctx.db.business.findFirst({
         where: {
@@ -44,14 +38,17 @@ export const businessRouter = createTRPCRouter({
       }
       const business = await ctx.db.business.create({
         data: {
+          ownerId: ctx.session.user.id,
           name: input.name ?? "",
           description: input.description,
           phone: input.phone,
           address: input.address ?? "",
-          ownerId: ctx.session.user.id,
+          whatsappLink: input.whatsapp ?? "",
+          instagramLink: input.instagram ?? "",
+          logo: input.logo ?? "",
         },
       });
-      return business;
+      return business.id;
     }),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({

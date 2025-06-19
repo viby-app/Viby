@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "../../components/button";
 import { api } from "~/utils/api";
-import { toast } from "react-toastify";
 import router from "next/router";
 import { getSession } from "next-auth/react";
 import { hebrewDictionary } from "~/utils/constants";
@@ -12,6 +11,8 @@ import {
   completeProfileSchema,
   type CompleteProfileFormValues,
 } from "~/utils/types";
+import { showSuccessToast } from "~/components/successToast";
+import logger from "~/lib/logger";
 
 export default function CompleteProfileForm() {
   const {
@@ -40,14 +41,13 @@ export default function CompleteProfileForm() {
       await fetch("/api/auth/session");
       await getSession();
       if (data.isBusinessOwner) {
-        toast.success(hebrewDictionary.businessCreated);
         void router.push("/loginFlow/completeBusiness");
       } else {
-        toast.success(hebrewDictionary.profileUpdated);
+        showSuccessToast(hebrewDictionary.profileUpdated);
         void router.push("/");
       }
     } catch (error) {
-      toast.error(`Error: ${String(error)}`);
+      logger.error(`Error: ${String(error)}`);
     }
   };
 

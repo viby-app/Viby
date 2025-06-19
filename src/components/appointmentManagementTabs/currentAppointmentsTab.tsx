@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { AppointmentModalDetails } from "~/utils";
+import type { AppointmentModalDetails } from "~/utils/types";
 import dayjs from "~/utils/dayjs";
 import Image from "next/image";
 import {

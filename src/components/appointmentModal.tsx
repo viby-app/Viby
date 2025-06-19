@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import dayjs from "~/utils/dayjs";
-import { statusBadgeColors, type AppointmentModalDetails } from "~/utils";
+import { type AppointmentModalDetails } from "~/utils/types";
 import {
   Clock,
   Scissors,
@@ -13,6 +13,7 @@ import {
 import { api } from "~/utils/api";
 import { hebrewDictionary } from "~/utils/constants";
 import ConfirmDialog from "./deleteConfirmation";
+import { statusBadgeColors } from "~/utils";
 
 interface AppointmentModalProps {
   appointment: AppointmentModalDetails;

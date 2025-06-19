@@ -1,4 +1,3 @@
-import type { $Enums } from "@prisma/client";
 import { Home, User, Calendar, Users } from "lucide-react";
 
 export const pages = [
@@ -28,34 +27,6 @@ export const pages = [
   },
 ];
 
-export type AppointmentModalDetails = {
-  id: number;
-  status: $Enums.AppointmentStatus;
-  service: {
-    durationMinutes: number;
-    name: string;
-    id: number;
-    price: number;
-  };
-  worker: {
-    Worker: {
-      name: string;
-    };
-  };
-  date: Date;
-  user: {
-    name: string;
-    id: string;
-    phone: string | null;
-    email: string | null;
-    emailVerified: Date | null;
-    isPhoneVerified: boolean;
-    image: string | null;
-    role: $Enums.Role;
-    createdAt: Date;
-    updatedAt: Date | null;
-  };
-};
 
 export const statusBadgeColors: Record<string, string> = {
   BOOKED: "badge-warning",
@@ -67,4 +38,22 @@ export const statusBorderColors: Record<string, string> = {
   BOOKED: "border-yellow-400",
   CANCELLED: "border-red-600",
   COMPLETED: "border-green-600",
+};
+
+export const swipeVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 300 : -300,
+    opacity: 0,
+    position: "absolute",
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    position: "relative",
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -300 : 300,
+    opacity: 0,
+    position: "absolute",
+  }),
 };

@@ -25,11 +25,19 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isAuth && !isProfileComplete && !isProfilePage) {
-    return NextResponse.redirect(new URL("/loginFlow/completeProfile", req.url));
+    return NextResponse.redirect(
+      new URL("/loginFlow/completeProfile", req.url),
+    );
   }
 
   if (isAuth && isProfileComplete && isProfilePage) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  if (isAuth && pathname.startsWith("/loginFlow/completeBusiness")) {
+    if (!(token.role == "BUSINESS_OWNER")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
   }
 
   return NextResponse.next();
