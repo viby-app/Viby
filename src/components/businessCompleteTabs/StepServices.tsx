@@ -1,13 +1,13 @@
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import { useFieldArray, type Control, type UseFormRegister } from "react-hook-form";
+import { useFieldArray, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";
 
 type Props = {
     control: Control<CompleteBusinessForm>;
     register: UseFormRegister<CompleteBusinessForm>;
-    errors?: Record<string, any>;
+    errors: FieldErrors<CompleteBusinessForm>;
 };
 
 export function StepServices({ control, register, errors }: Props) {
@@ -40,7 +40,7 @@ export function StepServices({ control, register, errors }: Props) {
                                     {...register(`services.${index}.name` as const)}
                                     className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
                                 />
-                                {errors?.services?.[index]?.name && (
+                                {errors.services?.[index]?.name && (
                                     <p className="text-red-500 text-sm mt-1">
                                         {errors.services[index].name.message}
                                     </p>
@@ -68,7 +68,7 @@ export function StepServices({ control, register, errors }: Props) {
                                         type="number"
                                         className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
                                     />
-                                    {errors?.services?.[index]?.durationMinutes && (
+                                    {errors.services?.[index]?.durationMinutes && (
                                         <p className="text-red-500 text-sm mt-1">
                                             {errors.services[index].durationMinutes.message}
                                         </p>
@@ -83,7 +83,7 @@ export function StepServices({ control, register, errors }: Props) {
                                         type="number"
                                         className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
                                     />
-                                    {errors?.services?.[index]?.price && (
+                                    {errors.services?.[index]?.price && (
                                         <p className="text-red-500 text-sm mt-1">
                                             {errors.services[index].price.message}
                                         </p>

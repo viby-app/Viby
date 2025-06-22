@@ -41,7 +41,7 @@ export default function BusinessForm() {
     setDirection(1);
 
     if (step === 3) {
-      const currentServices = watch("services") || [];
+      const currentServices = watch("services") ?? [];
       const nonEmptyServices = currentServices.filter(
         (service) => service.name && service.name.trim() !== "" && service.durationMinutes > 0 && service.price > 0
       );
