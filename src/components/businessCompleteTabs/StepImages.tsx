@@ -37,8 +37,8 @@ const StepImages = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > env.MAX_IMAGE_SIZE_BYTES) {
-      toast.error(`גודל הלוגו חייב להיות עד ${env.MAX_IMAGE_SIZE_MB}MB`);
+    if (file.size > env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES) {
+      toast.error(`גודל הלוגו חייב להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`);
       return;
     }
 
@@ -53,9 +53,9 @@ const StepImages = ({
 
     const selected = Array.from(files).slice(0, maxImages);
 
-    const oversize = selected.find((file) => file.size > env.MAX_IMAGE_SIZE_BYTES);
+    const oversize = selected.find((file) => file.size > env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES);
     if (oversize) {
-      toast.error(`כל תמונה חייבת להיות עד ${env.MAX_IMAGE_SIZE_MB}MB`);
+      toast.error(`כל תמונה חייבת להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`);
       return;
     }
 

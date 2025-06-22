@@ -14,22 +14,22 @@ export function StepSocialLinks({ register }: Props) {
         {hebrewDictionary.links}
       </h1>
 
-      <div className="relative">
+      <div className="flex items-center justify-between gap-2 mb-4 w-full rounded-lg bg-white px-4 py-2 shadow-md">
         <input
           {...register("whatsapp")}
           placeholder={hebrewDictionary.whatsappLink}
-          className="w-full rounded-lg bg-white px-4 py-2 pr-10 shadow-md"
+          className="w-full focus:outline-none"
         />
-        <MessageCircle className="absolute top-2.5 right-3 text-green-500" />
+        <MessageCircle className=" text-green-500" />
       </div>
 
-      <div className="relative">
+      <div className="flex items-center justify-between gap-2 mb-4 w-full rounded-lg bg-white px-4 py-2 shadow-md">
         <input
           {...register("instagram")}
           placeholder={hebrewDictionary.instagramLink}
-          className="w-full rounded-lg bg-white px-4 py-2 pr-10 shadow-md"
+          className="w-full focus:outline-none"
         />
-        <Instagram className="absolute top-2.5 right-3 text-black" />
+        <Instagram className="text-black" />
       </div>
     </>
   );
