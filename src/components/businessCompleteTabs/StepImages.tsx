@@ -11,6 +11,7 @@ import { CircleChevronLeft, CircleChevronRight } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { env } from "~/env";
 
 type Props = {
   setValue: UseFormSetValue<CompleteBusinessForm>;
@@ -23,13 +24,11 @@ type Props = {
 
 const StepImages = ({
   setValue,
-  watch,
   logoPreview,
   galleryPreviews,
   setLogoPreview,
   setGalleryPreviews,
 }: Props) => {
-  const logoKey = watch("logo");
   const maxImages = 5;
 
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -38,8 +37,12 @@ const StepImages = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const key = `${uuidv4()}-${file.name}`;
+    if (file.size > env.MAX_IMAGE_SIZE_BYTES) {
+      toast.error(`גודל הלוגו חייב להיות עד ${env.MAX_IMAGE_SIZE_MB}MB`);
+      return;
+    }
 
+    const key = `${uuidv4()}-${file.name}`;
     setValue("logo", key);
     setLogoPreview(file);
   };
@@ -47,10 +50,19 @@ const StepImages = ({
   const handleGalleryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
+    const selected = Array.from(files).slice(0, maxImages);
+
+    const oversize = selected.find((file) => file.size > env.MAX_IMAGE_SIZE_BYTES);
+    if (oversize) {
+      toast.error(`כל תמונה חייבת להיות עד ${env.MAX_IMAGE_SIZE_MB}MB`);
+      return;
+    }
+
     if (files.length > maxImages) {
       toast.warning(`ניתן להעלות עד ${maxImages} תמונות בלבד.`);
     }
-    const selected = Array.from(files).slice(0, maxImages);
+
     const uploadedKeys = selected.map((file) => `${uuidv4()}-${file.name}`);
 
     setValue("gallery", uploadedKeys);
@@ -102,6 +114,8 @@ const StepImages = ({
             src={URL.createObjectURL(logoPreview)}
             alt="logo"
             className="h-full object-contain"
+            width={200}
+            height={200}
           />
         ) : (
           <p>{hebrewDictionary.preview}</p>
@@ -147,6 +161,8 @@ const StepImages = ({
                 src={URL.createObjectURL(galleryPreviews.item(galleryIndex)!)}
                 alt={`preview ${galleryIndex + 1}`}
                 className="h-full object-contain"
+                width={200}
+                height={200}
               />
             ) : (
               <p>{hebrewDictionary.preview}</p>

@@ -3,6 +3,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { r2 } from "~/lib/r2";
 import { IncomingForm, type Files, type Fields, type File } from "formidable";
 import fs from "fs";
+import { env } from "~/env";
 
 export const config = {
   api: {
@@ -20,7 +21,11 @@ export default async function handler(
 
   const data = await new Promise<{ fields: Fields; files: Files }>(
     (resolve, reject) => {
-      const form = new IncomingForm({ keepExtensions: true, multiples: true });
+      const form = new IncomingForm({
+        keepExtensions: true,
+        multiples: true,
+        maxFileSize: env.MAX_IMAGE_SIZE_BYTES,
+      });
 
       form.parse(req, (err, fields, files) => {
         if (err) {

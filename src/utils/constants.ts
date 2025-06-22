@@ -93,4 +93,11 @@ export const hebrewDictionary = {
   noFileSelected: "לא נבחר קובץ",
   whatsappLink: "קישור לווטסאפ",
   instagramLink: "קישור לאינסטגרם",
+  services: "שירותים",
+  serviceName: "שם השירות",
+  durationInMinutes: "משך בדקות",
+  price: "מחיר",
+  addService: "הוסף שירות",
+  description: "תיאור",
+  serviceDescription: "תיאור השירות",
 };

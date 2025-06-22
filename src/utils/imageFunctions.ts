@@ -13,7 +13,7 @@ export const deleteImage = async (key: string) => {
   }
 
   if (key === "") return;
-  
+
   await fetch(`/api/image/delete`, {
     method: "DELETE",
     body: JSON.stringify({ key: key }),

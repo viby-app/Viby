@@ -19,6 +19,8 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     IMAGE_TRUSTED_HOST: z.string(),
+    MAX_IMAGE_SIZE_MB: z.coerce.number().default(5),
+    MAX_IMAGE_SIZE_BYTES: z.coerce.number().default(5 * 1024 * 1024), // 5MB in bytes
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -47,6 +49,8 @@ export const env = createEnv({
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
+    MAX_IMAGE_SIZE_MB: process.env.MAX_IMAGE_SIZE_MB,
+    MAX_IMAGE_SIZE_BYTES: process.env.MAX_IMAGE_SIZE_BYTES,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

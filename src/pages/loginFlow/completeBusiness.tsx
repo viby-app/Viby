@@ -17,15 +17,17 @@ import logger from "~/lib/logger";
 import { showSuccessToast } from "~/components/successToast";
 import { useRouter } from "next/router";
 import { swipeVariants } from "~/utils";
+import { StepServices } from "~/components/businessCompleteTabs/StepServices";
 
 export default function BusinessForm() {
   const [step, setStep] = useState(0);
   const [logo, setLogo] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<FileList | null>(null);
-  const steps = ["פרטי עסק", "לינקים", "תמונות"];
+  const steps = ["פרטי עסק", "שירותים", "לינקים", "תמונות"];
   const [direction, setDirection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createBusinessMutation = api.business.createBusiness.useMutation();
+  const createServicesMutation = api.service.createMultiple.useMutation();
   const uploadImageMutation = api.image.uploadImage.useMutation();
   let businessId: number | undefined;
   const router = useRouter();
@@ -37,6 +39,15 @@ export default function BusinessForm() {
 
   const goBack = () => {
     setDirection(1);
+
+    if (step === 3) {
+      const currentServices = watch("services") || [];
+      const nonEmptyServices = currentServices.filter(
+        (service) => service.name && service.name.trim() !== "" && service.durationMinutes > 0 && service.price > 0
+      );
+      setValue("services", nonEmptyServices);
+    }
+
     setStep((s) => s - 1);
   };
 
@@ -55,6 +66,7 @@ export default function BusinessForm() {
     watch,
     setValue,
     reset,
+    control,
     formState: { errors },
   } = useForm<CompleteBusinessForm>({
     resolver: zodResolver(completeBusinessSchema),
@@ -89,7 +101,6 @@ export default function BusinessForm() {
       }
     }
 
-    let businessId: number | undefined;
     try {
       businessId = await createBusinessMutation.mutateAsync(data, {
         onSuccess: () => showSuccessToast("העסק נוצר בהצלחה!"),
@@ -102,6 +113,17 @@ export default function BusinessForm() {
       logger.error("Business creation failed:", error);
       setIsSubmitting(false);
       return;
+    }
+
+    if (data.services && businessId) {
+      try {
+        await createServicesMutation.mutateAsync({
+          businessId,
+          services: data.services,
+        });
+      } catch (error) {
+        logger.error("Services creation failed:", error);
+      }
     }
 
     if (
@@ -178,6 +200,9 @@ export default function BusinessForm() {
                   setGalleryPreviews={setGalleryImages}
                 />
               )}
+              {step === 3 && (
+                <StepServices control={control} register={register} errors={errors} />
+              )}
               <div className="mt-6 flex justify-between gap-4">
                 {step > 0 && (
                   <button
@@ -200,7 +225,6 @@ export default function BusinessForm() {
                       : hebrewDictionary.confirm}
                 </button>
               </div>
-
               <div className="mt-4 flex justify-center space-x-2">
                 {steps.map((_, i) => (
                   <span
