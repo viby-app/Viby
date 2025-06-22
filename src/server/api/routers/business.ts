@@ -50,6 +50,57 @@ export const businessRouter = createTRPCRouter({
       });
       return business.id;
     }),
+  createOpeningHours: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        workingHours: z.array(
+          z.object({
+            dayOfWeek: z.number().min(0).max(6),
+            isOpen: z.boolean(),
+            openTime: z.string().optional(),
+            closeTime: z.string().optional(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { businessId, workingHours } = input;
+
+      const validHours = workingHours
+        .filter(
+          (h) =>
+            h.isOpen &&
+            typeof h.openTime === "string" &&
+            typeof h.closeTime === "string",
+        )
+        .map((h) => {
+          const open = dayjs.tz(
+            `2000-01-01T${h.openTime}:00`,
+            "Asia/Jerusalem",
+          );
+          const close = dayjs.tz(
+            `2000-01-01T${h.closeTime}:00`,
+            "Asia/Jerusalem",
+          );
+
+          return {
+            businessId,
+            dayOfWeek: h.dayOfWeek,
+            openTime: open.toDate(),
+            closeTime: close.toDate(),
+          };
+        });
+
+      if (validHours.length === 0) return [];
+
+      await ctx.db.openingHours.createMany({
+        data: validHours,
+        skipDuplicates: true,
+      });
+
+      return validHours;
+    }),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {

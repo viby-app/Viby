@@ -19,17 +19,19 @@ import { useRouter } from "next/router";
 import { swipeVariants } from "~/utils";
 import { StepServices } from "~/components/businessCompleteTabs/StepServices";
 import { StepWorkers } from "~/components/businessCompleteTabs/StepWorkers";
+import { StepWorkingHours } from "~/components/businessCompleteTabs/StepWorkingHours";
 
 export default function BusinessForm() {
   const [step, setStep] = useState(0);
   const [logo, setLogo] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<FileList | null>(null);
-  const steps = ["פרטי עסק", "שירותים", "עובדים", "לינקים", "תמונות"];
+  const steps = ["פרטי עסק", "שירותים", "עובדים", "שעות פעילות", "לינקים", "תמונות"];
   const [direction, setDirection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createBusinessMutation = api.business.createBusiness.useMutation();
   const createServicesMutation = api.service.createMultiple.useMutation();
   const createWorkerMutation = api.workers.createWorker.useMutation();
+  const createOpeningHoursMutation = api.business.createOpeningHours.useMutation();
   const uploadImageMutation = api.image.uploadImage.useMutation();
   let businessId: number | undefined;
   const router = useRouter();
@@ -42,7 +44,7 @@ export default function BusinessForm() {
   const goBack = () => {
     setDirection(1);
 
-    if (step === 3) {
+    if (step === 4) {
       const currentServices = watch("services") ?? [];
       const nonEmptyServices = currentServices.filter(
         (service) => service.name && service.name.trim() !== "" && service.durationMinutes > 0 && service.price > 0
@@ -144,6 +146,17 @@ export default function BusinessForm() {
       }
     }
 
+    if (data.workingHours && businessId) {
+      try {
+        await createOpeningHoursMutation.mutateAsync({
+          businessId: businessId!,
+          workingHours: data.workingHours,
+        });
+      } catch (error) {
+        logger.error("Opening hours creation failed:", error);
+      }
+    }
+
     if (
       galleryImages &&
       Array.isArray(data.gallery) &&
@@ -223,6 +236,9 @@ export default function BusinessForm() {
               )}
               {step === 4 && (
                 <StepWorkers control={control} register={register} errors={errors} />
+              )}
+              {step === 5 && (
+                <StepWorkingHours control={control} register={register} />
               )}
               <div className="mt-6 flex justify-between gap-4">
                 {step > 0 && (

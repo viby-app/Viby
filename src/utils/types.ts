@@ -55,6 +55,16 @@ export const completeBusinessSchema = z.object({
       }),
     )
     .optional(),
+  workingHours: z
+    .array(
+      z.object({
+        dayOfWeek: z.number(),
+        isOpen: z.boolean(),
+        openTime: z.string().optional(),
+        closeTime: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 export type CompleteBusinessForm = z.infer<typeof completeBusinessSchema>;
