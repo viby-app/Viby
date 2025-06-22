@@ -24,7 +24,7 @@ export default async function handler(
       const form = new IncomingForm({
         keepExtensions: true,
         multiples: true,
-        maxFileSize: env.MAX_IMAGE_SIZE_BYTES,
+        maxFileSize: env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES,
       });
 
       form.parse(req, (err, fields, files) => {
