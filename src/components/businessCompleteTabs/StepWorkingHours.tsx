@@ -73,14 +73,14 @@ export function StepWorkingHours({ control, register }: Props) {
                                             {...register(`workingHours.${index}.openTime` as const)}
                                             type="time"
                                             className="rounded-lg bg-white px-3 py-2 border border-gray-300 text-sm"
-                                            defaultValue={field.openTime || "09:00"}
+                                            defaultValue={field.openTime ?? "09:00"}
                                         />
                                         <span className="text-gray-500">-</span>
                                         <input
                                             {...register(`workingHours.${index}.closeTime` as const)}
                                             type="time"
                                             className="rounded-lg bg-white px-3 py-2 border border-gray-300 text-sm"
-                                            defaultValue={field.closeTime || "18:00"}
+                                            defaultValue={field.closeTime ?? "18:00"}
                                         />
                                     </>
                                 )}

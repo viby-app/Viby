@@ -149,7 +149,7 @@ export default function BusinessForm() {
     if (data.workingHours && businessId) {
       try {
         await createOpeningHoursMutation.mutateAsync({
-          businessId: businessId!,
+          businessId,
           workingHours: data.workingHours,
         });
       } catch (error) {
