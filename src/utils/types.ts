@@ -45,6 +45,16 @@ export const completeBusinessSchema = z.object({
       }),
     )
     .optional(),
+  workers: z
+    .array(
+      z.object({
+        name: z.string(),
+        phone: z.string(),
+        userId: z.string(),
+        wage: z.number(),
+      }),
+    )
+    .optional(),
 });
 
 export type CompleteBusinessForm = z.infer<typeof completeBusinessSchema>;
@@ -77,3 +87,11 @@ export type AppointmentModalDetails = {
     updatedAt: Date | null;
   };
 };
+
+export type UserWorker = {
+  name: string;
+  phone: string | null;
+  id: string;
+  email: string | null;
+  image: string | null;
+} | null;

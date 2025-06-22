@@ -18,16 +18,18 @@ import { showSuccessToast } from "~/components/successToast";
 import { useRouter } from "next/router";
 import { swipeVariants } from "~/utils";
 import { StepServices } from "~/components/businessCompleteTabs/StepServices";
+import { StepWorkers } from "~/components/businessCompleteTabs/StepWorkers";
 
 export default function BusinessForm() {
   const [step, setStep] = useState(0);
   const [logo, setLogo] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<FileList | null>(null);
-  const steps = ["פרטי עסק", "שירותים", "לינקים", "תמונות"];
+  const steps = ["פרטי עסק", "שירותים", "עובדים", "לינקים", "תמונות"];
   const [direction, setDirection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createBusinessMutation = api.business.createBusiness.useMutation();
   const createServicesMutation = api.service.createMultiple.useMutation();
+  const createWorkerMutation = api.workers.createWorker.useMutation();
   const uploadImageMutation = api.image.uploadImage.useMutation();
   let businessId: number | undefined;
   const router = useRouter();
@@ -126,6 +128,22 @@ export default function BusinessForm() {
       }
     }
 
+    if (data.workers && businessId) {
+      try {
+        await Promise.all(
+          data.workers.map((worker) =>
+            createWorkerMutation.mutateAsync({
+              businessId: businessId!,
+              userId: worker.userId,
+              wage: worker.wage,
+            })
+          )
+        );
+      } catch (error) {
+        logger.error("Workers creation failed:", error);
+      }
+    }
+
     if (
       galleryImages &&
       Array.isArray(data.gallery) &&
@@ -202,6 +220,9 @@ export default function BusinessForm() {
               )}
               {step === 3 && (
                 <StepServices control={control} register={register} errors={errors} />
+              )}
+              {step === 4 && (
+                <StepWorkers control={control} register={register} errors={errors} />
               )}
               <div className="mt-6 flex justify-between gap-4">
                 {step > 0 && (

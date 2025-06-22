@@ -90,7 +90,7 @@ export function StepServices({ control, register, errors }: Props) {
                                     )}
                                 </div>
                                 <div className="flex items-end justify-end col-span-2">
-                                    {fields.length > 1 && (
+                                    {fields.length > 0 && (
                                         <button type="button" onClick={() => remove(index)}>
                                             <Trash2 className="text-red-500" />
                                         </button>

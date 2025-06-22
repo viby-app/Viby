@@ -12,6 +12,24 @@ export const userRouter = createTRPCRouter({
 
     return user;
   }),
+  searchUserByPhone: protectedProcedure
+    .input(z.object({ phone: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findFirst({
+        where: {
+          phone: input.phone,
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          image: true,
+        },
+      });
+
+      return user;
+    }),
   getUserFriends: protectedProcedure.query(async ({ ctx }) => {
     const linkedUsers = await ctx.db.userConnection.findMany({
       where: {
