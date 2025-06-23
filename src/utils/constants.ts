@@ -51,7 +51,8 @@ export const hebrewDictionary = {
   confirm: "אישור",
   confirmDelete: "האם אתה בטוח שברצונך למחוק את התור הזה?",
   noAvailableAppointments: "אין תורים זמינים לתאריך זה.",
-  selectWorkerToSeeTimes: "בחר עובד כדי לראות את הזמנים הזמינים",
+  selectWorkerToSeeTimesAndServices:
+    "בחר עובד ושירות כדי לראות את הזמנים הזמינים",
   selectDay: "בחר יום",
   selectService: "בחר שירות",
   selectWorker: "בחר עובד",

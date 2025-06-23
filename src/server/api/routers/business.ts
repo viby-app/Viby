@@ -320,9 +320,10 @@ export const businessRouter = createTRPCRouter({
               "minute",
             );
 
+            const aptEnd = aptTime.add(apt.service.durationMinutes, "minute");
             return (
               aptTime.isBefore(timeEndInAptDay) &&
-              aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+              aptEnd.isAfter(timeStartInAptDay)
             );
           });
 
