@@ -234,7 +234,7 @@ export default function BusinessForm() {
                     style={{ "--value": 100 / submissionSteps.length * (submissionStep + 1) } as React.CSSProperties}
                     role="progressbar"
                   >
-                    <span className="sr-only">{Math.round(100 / submissionSteps.length * (submissionStep + 1))}%</span>
+                    {Math.round(100 / submissionSteps.length * (submissionStep + 1))}%
                   </div>
                   {submissionSteps.map((label, idx) => (
                     <div key={idx} className="flex items-center gap-2 my-2">
