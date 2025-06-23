@@ -46,6 +46,8 @@ export const businessRouter = createTRPCRouter({
           whatsappLink: input.whatsapp ?? "",
           instagramLink: input.instagram ?? "",
           logo: input.logo ?? "",
+          lat: input.lat,
+          lon: input.lon,
         },
       });
       return business.id;

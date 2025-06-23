@@ -31,6 +31,8 @@ export const completeBusinessSchema = z.object({
     .max(15, "מספר הטלפון לא תקין"),
   description: z.string(),
   address: z.string().min(2, "כתובת העסק היא שדה חובה"),
+  lat: z.number().optional(),
+  lon: z.number().optional(),
   logo: z.string().optional(),
   whatsapp: z.string().optional(),
   instagram: z.string().optional(),

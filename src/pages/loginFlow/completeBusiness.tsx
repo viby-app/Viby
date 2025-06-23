@@ -69,6 +69,7 @@ export default function BusinessForm() {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     reset,
     control,
     formState: { errors },
@@ -218,7 +219,8 @@ export default function BusinessForm() {
           <div className="w-full max-w-md rounded-2xl bg-[#F2EFE7] p-6 text-right shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {step === 0 && (
-                <StepBusinessInfo register={register} errors={errors} />
+                <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues
+                } />
               )}
               {step === 1 && <StepSocialLinks register={register} />}
               {step === 2 && (

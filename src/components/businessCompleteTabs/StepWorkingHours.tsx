@@ -3,7 +3,6 @@ import {
     useFieldArray,
     type Control,
     type UseFormRegister,
-    type UseFormSetValue,
 } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";

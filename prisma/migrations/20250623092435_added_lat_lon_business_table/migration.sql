@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Business" ADD COLUMN     "lat" DOUBLE PRECISION,
+ADD COLUMN     "lon" DOUBLE PRECISION;
