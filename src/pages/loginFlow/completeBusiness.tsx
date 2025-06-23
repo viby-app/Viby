@@ -10,7 +10,7 @@ import {
 import { StepBusinessInfo } from "~/components/businessCompleteTabs/StepBusinessInfo";
 import StepImages from "~/components/businessCompleteTabs/StepImages";
 import { StepSocialLinks } from "~/components/businessCompleteTabs/StepSocialLinks";
-import { hebrewDictionary } from "~/utils/constants";
+import { hebrewDictionary, steps, submissionSteps } from "~/utils/constants";
 import { AnimatePresence, motion } from "framer-motion";
 import { api } from "~/utils/api";
 import logger from "~/lib/logger";
@@ -25,9 +25,9 @@ export default function BusinessForm() {
   const [step, setStep] = useState(0);
   const [logo, setLogo] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<FileList | null>(null);
-  const steps = ["פרטי עסק", "שירותים", "עובדים", "שעות פעילות", "לינקים", "תמונות"];
   const [direction, setDirection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStep, setSubmissionStep] = useState<number | null>(null);
   const createBusinessMutation = api.business.createBusiness.useMutation();
   const createServicesMutation = api.service.createMultiple.useMutation();
   const createWorkerMutation = api.workers.createWorker.useMutation();
@@ -38,21 +38,19 @@ export default function BusinessForm() {
 
   const goNext = () => {
     setDirection(-1);
-    setStep((s) => s + 1);
+    setStep((s) => Math.min(s + 1, steps.length - 1));
   };
 
   const goBack = () => {
     setDirection(1);
-
-    if (step === 4) {
+    if (step === 3) {
       const currentServices = watch("services") ?? [];
       const nonEmptyServices = currentServices.filter(
         (service) => service.name && service.name.trim() !== "" && service.durationMinutes > 0 && service.price > 0
       );
       setValue("services", nonEmptyServices);
     }
-
-    setStep((s) => s - 1);
+    setStep((s) => Math.max(s - 1, 0));
   };
 
   const resetForm = () => {
@@ -61,6 +59,7 @@ export default function BusinessForm() {
     setLogo(null);
     setGalleryImages(null);
     setIsSubmitting(false);
+    setSubmissionStep(null);
     reset();
   };
 
@@ -84,6 +83,7 @@ export default function BusinessForm() {
     }
 
     setIsSubmitting(true);
+    setSubmissionStep(0);
 
     if (logo && data.logo) {
       try {
@@ -102,10 +102,12 @@ export default function BusinessForm() {
       } catch (error) {
         logger.error("Logo upload failed:", error);
         setIsSubmitting(false);
+        setSubmissionStep(null);
         return;
       }
     }
 
+    setSubmissionStep(1);
     try {
       businessId = await createBusinessMutation.mutateAsync(data, {
         onSuccess: () => showSuccessToast("העסק נוצר בהצלחה!"),
@@ -117,9 +119,11 @@ export default function BusinessForm() {
     } catch (error) {
       logger.error("Business creation failed:", error);
       setIsSubmitting(false);
+      setSubmissionStep(null);
       return;
     }
 
+    setSubmissionStep(2);
     if (data.services && businessId) {
       try {
         await createServicesMutation.mutateAsync({
@@ -131,6 +135,7 @@ export default function BusinessForm() {
       }
     }
 
+    setSubmissionStep(3);
     if (data.workers && businessId) {
       try {
         await Promise.all(
@@ -147,6 +152,7 @@ export default function BusinessForm() {
       }
     }
 
+    setSubmissionStep(4);
     if (data.workingHours && businessId) {
       try {
         await createOpeningHoursMutation.mutateAsync({
@@ -158,6 +164,7 @@ export default function BusinessForm() {
       }
     }
 
+    setSubmissionStep(5);
     if (
       galleryImages &&
       Array.isArray(data.gallery) &&
@@ -194,11 +201,13 @@ export default function BusinessForm() {
       } catch (error) {
         logger.error("Gallery image upload error:", error);
         setIsSubmitting(false);
+        setSubmissionStep(null);
         return;
       }
     }
 
     setIsSubmitting(false);
+    setSubmissionStep(null);
     resetForm();
     void router.push("/");
   };
@@ -218,64 +227,83 @@ export default function BusinessForm() {
         >
           <div className="w-full max-w-md rounded-2xl bg-[#F2EFE7] p-6 text-right shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {step === 0 && (
-                <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues
-                } />
-              )}
-              {step === 1 && <StepSocialLinks register={register} />}
-              {step === 2 && (
-                <StepImages
-                  watch={watch}
-                  setValue={setValue}
-                  logoPreview={logo}
-                  galleryPreviews={galleryImages}
-                  setLogoPreview={setLogo}
-                  setGalleryPreviews={setGalleryImages}
-                />
-              )}
-              {step === 3 && (
-                <StepServices control={control} register={register} errors={errors} />
-              )}
-              {step === 4 && (
-                <StepWorkers control={control} register={register} errors={errors} />
-              )}
-              {step === 5 && (
-                <StepWorkingHours control={control} register={register} />
-              )}
-              <div className="mt-6 flex justify-between gap-4">
-                {step > 0 && (
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
+              {isSubmitting && submissionStep !== null ? (
+                <div className="flex flex-col items-center justify-center min-h-[300px]">
+                  <div
+                    className="radial-progress"
+                    style={{ "--value": 100 / submissionSteps.length * (submissionStep + 1) } as React.CSSProperties}
+                    role="progressbar"
                   >
-                    {hebrewDictionary.previous}
-                  </button>
-                )}
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
-                  disabled={isSubmitting}
-                >
-                  {step < steps.length - 1
-                    ? hebrewDictionary.next
-                    : isSubmitting
-                      ? hebrewDictionary.submittingBusiness
-                      : hebrewDictionary.confirm}
-                </button>
-              </div>
-              <div className="mt-4 flex justify-center space-x-2">
-                {steps.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-2 w-2 rounded-full ${step === i ? "bg-[#1C857A]" : "bg-[#D9D9D9]"}`}
-                  />
-                ))}
-              </div>
+                    <span className="sr-only">{Math.round(100 / submissionSteps.length * (submissionStep + 1))}%</span>
+                  </div>
+                  {submissionSteps.map((label, idx) => (
+                    <div key={idx} className="flex items-center gap-2 my-2">
+                      <span className={submissionStep === idx ? "font-bold text-primary" : "hidden"}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {step === 0 && (
+                    <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues
+                    } />
+                  )}
+                  {step === 1 && <StepSocialLinks register={register} />}
+                  {step === 2 && (
+                    <StepImages
+                      watch={watch}
+                      setValue={setValue}
+                      logoPreview={logo}
+                      galleryPreviews={galleryImages}
+                      setLogoPreview={setLogo}
+                      setGalleryPreviews={setGalleryImages}
+                    />
+                  )}
+                  {step === 3 && (
+                    <StepServices control={control} register={register} errors={errors} />
+                  )}
+                  {step === 4 && (
+                    <StepWorkers control={control} register={register} errors={errors} />
+                  )}
+                  {step === 5 && (
+                    <StepWorkingHours control={control} register={register} />
+                  )}
+                  <div className="mt-6 flex justify-between gap-4">
+                    {step > 0 && (
+                      <button
+                        type="button"
+                        onClick={goBack}
+                        className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
+                      >
+                        {hebrewDictionary.previous}
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
+                      disabled={isSubmitting}
+                    >
+                      {step < steps.length - 1
+                        ? hebrewDictionary.next
+                        : isSubmitting
+                          ? hebrewDictionary.submittingBusiness
+                          : hebrewDictionary.confirm}
+                    </button>
+                  </div>
+                  <div className="mt-4 flex justify-center space-x-2">
+                    {steps.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-2 w-2 rounded-full ${step === i ? "bg-[#1C857A]" : "bg-[#D9D9D9]"}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </form>
           </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
+        </motion.div >
+      </AnimatePresence >
+    </div >
   );
 }

@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-
-export interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
-}
+import type { NominatimResult } from "~/utils/types";
 
 export const useAddressSearch = (query: string, debounceMs = 500) => {
   const [results, setResults] = useState<NominatimResult[]>([]);

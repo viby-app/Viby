@@ -107,3 +107,21 @@ export type UserWorker = {
   email: string | null;
   image: string | null;
 } | null;
+
+export interface NominatimResult {
+  display_name: string;
+  lat: string;
+  lon: string;
+  address: NominatimAddress;
+  boundingbox: [string, string, string, string];
+}
+
+export interface NominatimAddress {
+  road?: string;
+  pedestrian?: string;
+  footway?: string;
+  house_number?: string;
+  city?: string;
+  town?: string;
+  village?: string;
+}
