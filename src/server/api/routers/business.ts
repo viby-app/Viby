@@ -209,7 +209,7 @@ export const businessRouter = createTRPCRouter({
       z.object({
         businessId: z.number(),
         date: z.date(),
-        serviceId: z.number().optional(),
+        serviceId: z.number(),
         workerId: z.number(),
       }),
     )
@@ -242,7 +242,12 @@ export const businessRouter = createTRPCRouter({
               },
             }),
             ctx.db.businessService.findMany({
-              where: { businessId: input.businessId },
+              where: {
+                businessId: input.businessId,
+                service: {
+                  id: input.serviceId,
+                },
+              },
               include: { service: true },
             }),
             ctx.db.appointment.findMany({
@@ -278,9 +283,7 @@ export const businessRouter = createTRPCRouter({
           return [];
         }
 
-        const shortestDuration = services.length
-          ? Math.min(...services.map((bs) => bs.service.durationMinutes))
-          : 30;
+        const shortestDuration = services[0]?.service.durationMinutes ?? 30;
 
         const intervals: string[] = [];
 

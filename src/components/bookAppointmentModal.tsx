@@ -45,8 +45,9 @@ export default function BookingModal({
       workerId: selectedWorker ?? 0,
       businessId,
       date: dayjs(bookingDate).tz("Asia/Jerusalem").toDate(),
+      serviceId: selectedService ?? 0,
     },
-    { enabled: !!businessId && !!selectedWorker },
+    { enabled: !!businessId && !!selectedWorker && !!selectedService },
   );
 
   useEffect(() => {

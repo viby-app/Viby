@@ -106,9 +106,11 @@ const BusinessPage: NextPage = () => {
               </div>
             </div>
 
-            <p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
-              {business.description ?? "אין תיאור"}
-            </p>
+            {
+              business.description && (<p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
+                {business.description}
+              </p>)
+            }
 
             <div className="flex space-x-2">
               <Button
@@ -127,9 +129,9 @@ const BusinessPage: NextPage = () => {
                 className="mt-3 w-1/3 self-end"
               >
                 {userStatus === "loading" ||
-                isFollowingLoading ||
-                handleFollow.isPending ||
-                handleUnfollow.isPending ? (
+                  isFollowingLoading ||
+                  handleFollow.isPending ||
+                  handleUnfollow.isPending ? (
                   <div className="loading" />
                 ) : optimisticFollowing ? (
                   hebrewDictionary.following
