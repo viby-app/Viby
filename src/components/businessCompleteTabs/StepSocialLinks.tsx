@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MessageCircle, Instagram } from "lucide-react";
 import type { UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
@@ -8,11 +8,10 @@ import { normalizePhoneNumber } from "~/utils/helperFunctions";
 type Props = {
   register: UseFormRegister<CompleteBusinessForm>;
   setValue: UseFormSetValue<CompleteBusinessForm>;
-  phoneNumber: string; // e.g., "501234567"
+  phoneNumber: string;
 };
 
 export function StepSocialLinks({ register, setValue, phoneNumber }: Props) {
-  const [instagramLink, setInstagramLink] = useState("");
   useEffect(() => {
     if (phoneNumber) {
       const normalized = normalizePhoneNumber(phoneNumber);
@@ -40,17 +39,10 @@ export function StepSocialLinks({ register, setValue, phoneNumber }: Props) {
         <input
           placeholder={hebrewDictionary.instagramLink}
           className="w-full focus:outline-none"
-          onChange={(e) => setInstagramLink(e.target.value)
-          }
+          onChange={(e) => setValue("instagram", `https://instagram.com/${e.target.value}`)}
         />
         <Instagram className="text-black" />
       </div>
-      <input
-        {...register("instagram")}
-        placeholder={hebrewDictionary.instagramLink}
-        className="w-full focus:outline-none hidden"
-        value={`https://instagram.com/${instagramLink}`}
-      />
     </>
   );
 }
