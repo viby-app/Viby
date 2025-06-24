@@ -1,4 +1,5 @@
 import { Home, User, Calendar, Users } from "lucide-react";
+import { hebrewDictionary } from "./constants";
 
 export const pages = [
   {
@@ -57,3 +58,13 @@ export const swipeVariants = {
     position: "absolute",
   }),
 };
+
+export const daysOfWeek = [
+    { value: 0, label: hebrewDictionary.sunday },
+    { value: 1, label: hebrewDictionary.monday },
+    { value: 2, label: hebrewDictionary.tuesday },
+    { value: 3, label: hebrewDictionary.wednesday },
+    { value: 4, label: hebrewDictionary.thursday },
+    { value: 5, label: hebrewDictionary.friday },
+    { value: 6, label: hebrewDictionary.saturday },
+];

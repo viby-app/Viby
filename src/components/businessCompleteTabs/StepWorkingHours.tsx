@@ -4,6 +4,7 @@ import {
     type Control,
     type UseFormRegister,
 } from "react-hook-form";
+import { daysOfWeek } from "~/utils";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";
 
@@ -11,16 +12,6 @@ type Props = {
     control: Control<CompleteBusinessForm>;
     register: UseFormRegister<CompleteBusinessForm>;
 };
-
-const daysOfWeek = [
-    { value: 0, label: hebrewDictionary.sunday },
-    { value: 1, label: hebrewDictionary.monday },
-    { value: 2, label: hebrewDictionary.tuesday },
-    { value: 3, label: hebrewDictionary.wednesday },
-    { value: 4, label: hebrewDictionary.thursday },
-    { value: 5, label: hebrewDictionary.friday },
-    { value: 6, label: hebrewDictionary.saturday },
-];
 
 export function StepWorkingHours({ control, register }: Props) {
     const { fields, replace, update } = useFieldArray({
