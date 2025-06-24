@@ -27,7 +27,7 @@ export const completeBusinessSchema = z.object({
   name: z.string().min(2, "שם העסק הוא שדה חובה"),
   phone: z
     .string()
-    .min(6, "מספר הטלפון הוא שדה חובה")
+    .min(10, "מספר הטלפון הוא שדה חובה")
     .max(15, "מספר הטלפון לא תקין"),
   description: z.string(),
   address: z.string().min(2, "כתובת העסק היא שדה חובה"),

@@ -248,7 +248,7 @@ export default function BusinessForm() {
                     <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues
                     } />
                   )}
-                  {step === 1 && <StepSocialLinks register={register} />}
+                  {step === 1 && <StepSocialLinks register={register} setValue={setValue} phoneNumber={watch("phone")} />}
                   {step === 2 && (
                     <StepImages
                       watch={watch}

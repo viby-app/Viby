@@ -9,3 +9,10 @@ export function formatShortAddress(address: NominatimAddress): string {
     (city ? `, ${city.replaceAll("-", " ")}` : "")
   );
 }
+
+export function normalizePhoneNumber(number: string): string {
+  const digits = number.replace(/\D/g, "");
+  if (digits.startsWith("+972")) return digits;
+  if (digits.startsWith("0")) return `+972${digits.slice(1)}`;
+  return `+972${digits}`;
+}

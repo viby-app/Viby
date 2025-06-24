@@ -61,9 +61,9 @@ export function StepWorkingHours({ control, register }: Props) {
                     return (
                         <div
                             key={field.id}
-                            className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
+                            className="flex items-center w-full justify-between p-3 rounded-lg border border-gray-200"
                         >
-                            <span className="font-medium text-black ml-1">{dayLabel}</span>
+                            <span className="font-medium w-[25px] text-black ml-1">{dayLabel}</span>
 
                             <div className="flex items-center gap-2">
                                 {field.isOpen && (

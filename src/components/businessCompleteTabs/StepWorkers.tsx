@@ -86,6 +86,7 @@ export function StepWorkers({ control, register, errors }: Props) {
                         value={searchPhone}
                         onChange={(e) => setSearchPhone(e.target.value)}
                         placeholder={hebrewDictionary.searchByPhone}
+                        dir="rtl"
                         className="flex-1 rounded-lg bg-white px-4 py-2 shadow-md"
                     />
                     <button

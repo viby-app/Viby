@@ -50,6 +50,13 @@ export const businessRouter = createTRPCRouter({
           lon: input.lon,
         },
       });
+      await ctx.db.workers.create({
+        data: {
+          userId: ctx.session.user.id,
+          businessId: business.id,
+          wage: 0,
+        },
+      });
       return business.id;
     }),
   createOpeningHours: protectedProcedure

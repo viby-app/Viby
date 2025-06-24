@@ -101,7 +101,7 @@ export default function CompleteProfileForm() {
               {...register("gender")}
               className="mt-1 w-full rounded-md bg-white p-2 text-[#3A3A3A] shadow-md"
             >
-              <option value="OTHER" disabled>
+              <option disabled>
                 {hebrewDictionary.chooseGender}
               </option>
               <option value="MALE">{hebrewDictionary.male}</option>
