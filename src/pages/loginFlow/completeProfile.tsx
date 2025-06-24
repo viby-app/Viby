@@ -113,14 +113,14 @@ export default function CompleteProfileForm() {
           </div>
 
           <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-[#3A3A3A]">
+              {hebrewDictionary.isBusinessOwner}
+            </label>
             <input
               {...register("isBusinessOwner")}
               type="checkbox"
               className="toggle border-gray-300 bg-white text-gray-400 checked:bg-white checked:text-gray-800 focus:ring-[#3A3A3A]"
             />
-            <label className="text-sm font-semibold text-[#3A3A3A]">
-              {hebrewDictionary.isBusinessOwner}
-            </label>
           </div>
         </div>
 
