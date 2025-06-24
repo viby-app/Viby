@@ -35,14 +35,27 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isAuth && pathname.startsWith("/loginFlow/completeBusiness")) {
-    if (!(token.role == "BUSINESS_OWNER")) {
+    if (!(token.role == "BUSINESS_OWNER") || token.hasBusiness) {
       return NextResponse.redirect(new URL("/", req.url));
     }
+  }
+
+  if (
+    isAuth &&
+    !token.hasBusiness &&
+    token.role == "BUSINESS_OWNER" &&
+    !pathname.startsWith("/loginFlow/completeBusiness")
+  ) {
+    return NextResponse.redirect(
+      new URL("/loginFlow/completeBusiness", req.url),
+    );
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|api/trpc).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/).*)", 
+  ],
 };

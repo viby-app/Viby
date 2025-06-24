@@ -3,7 +3,7 @@ import { MessageCircle, Instagram } from "lucide-react";
 import type { UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";
-import { normalizePhoneNumber } from "~/utils/helperFunctions";
+import { normalizePhoneNumber } from "~/utils/functions/helperFunctions";
 
 type Props = {
   register: UseFormRegister<CompleteBusinessForm>;

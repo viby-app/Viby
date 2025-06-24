@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { UseFormRegister, FieldErrors, UseFormSetValue, UseFormGetValues } from "react-hook-form";
 import { type NominatimResult } from "~/utils/types";
 import { hebrewDictionary } from "~/utils/constants";
-import { formatShortAddress } from "~/utils/helperFunctions";
+import { formatShortAddress } from "~/utils/functions/helperFunctions";
 import type { CompleteBusinessForm } from "~/utils/types";
 import { useAddressSearch } from "~/hooks/useAddressSearch";
 

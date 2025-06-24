@@ -125,3 +125,10 @@ export interface NominatimAddress {
   town?: string;
   village?: string;
 }
+
+export type Services = {
+  name: string;
+  durationMinutes: number;
+  price: number;
+  description?: string | undefined;
+}[];

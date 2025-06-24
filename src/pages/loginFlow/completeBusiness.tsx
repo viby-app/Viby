@@ -20,13 +20,15 @@ import { swipeVariants } from "~/utils";
 import { StepServices } from "~/components/businessCompleteTabs/StepServices";
 import { StepWorkers } from "~/components/businessCompleteTabs/StepWorkers";
 import { StepWorkingHours } from "~/components/businessCompleteTabs/StepWorkingHours";
+import { getSession } from "next-auth/react";
+import { removeEmptyServices } from "~/utils/functions/helperFunctions";
+import { uploadGallery, uploadImage } from "~/utils/functions/imageFunctions";
 
 export default function BusinessForm() {
   const [step, setStep] = useState(0);
   const [logo, setLogo] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<FileList | null>(null);
   const [direction, setDirection] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStep, setSubmissionStep] = useState<number | null>(null);
   const createBusinessMutation = api.business.createBusiness.useMutation();
   const createServicesMutation = api.service.createMultiple.useMutation();
@@ -45,9 +47,7 @@ export default function BusinessForm() {
     setDirection(1);
     if (step === 3) {
       const currentServices = watch("services") ?? [];
-      const nonEmptyServices = currentServices.filter(
-        (service) => service.name && service.name.trim() !== "" && service.durationMinutes > 0 && service.price > 0
-      );
+      const nonEmptyServices = removeEmptyServices(currentServices);
       setValue("services", nonEmptyServices);
     }
     setStep((s) => Math.max(s - 1, 0));
@@ -58,7 +58,6 @@ export default function BusinessForm() {
     setDirection(-1);
     setLogo(null);
     setGalleryImages(null);
-    setIsSubmitting(false);
     setSubmissionStep(null);
     reset();
   };
@@ -82,29 +81,10 @@ export default function BusinessForm() {
       return;
     }
 
-    setIsSubmitting(true);
     setSubmissionStep(0);
 
     if (logo && data.logo) {
-      try {
-        const formData = new FormData();
-        formData.append("file", logo);
-        formData.append("key", data.logo);
-
-        const res = await fetch("/api/image/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to upload logo");
-        }
-      } catch (error) {
-        logger.error("Logo upload failed:", error);
-        setIsSubmitting(false);
-        setSubmissionStep(null);
-        return;
-      }
+      await uploadImage(logo, data.logo);
     }
 
     setSubmissionStep(1);
@@ -118,7 +98,6 @@ export default function BusinessForm() {
       });
     } catch (error) {
       logger.error("Business creation failed:", error);
-      setIsSubmitting(false);
       setSubmissionStep(null);
       return;
     }
@@ -172,23 +151,7 @@ export default function BusinessForm() {
       data.gallery.every((key) => typeof key === "string" && key.length > 0)
     ) {
       try {
-        const formData = new FormData();
-
-        Array.from(galleryImages).forEach((file, index) => {
-          const key = data.gallery![index];
-          if (!key) return;
-          formData.append("file", file);
-          formData.append("key", key);
-        });
-
-        const res = await fetch("/api/image/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) {
-          throw new Error("Gallery upload failed");
-        }
+        await uploadGallery(galleryImages, data.gallery);
         await uploadImageMutation.mutateAsync(
           {
             images: data.gallery ?? [],
@@ -200,16 +163,16 @@ export default function BusinessForm() {
         );
       } catch (error) {
         logger.error("Gallery image upload error:", error);
-        setIsSubmitting(false);
         setSubmissionStep(null);
         return;
       }
     }
 
-    setIsSubmitting(false);
     setSubmissionStep(null);
     resetForm();
-    void router.push("/");
+    await fetch("/api/auth/session");
+    await getSession();
+    void router.push("/business/" + businessId);
   };
 
   return (
@@ -227,7 +190,7 @@ export default function BusinessForm() {
         >
           <div className="w-full max-w-md rounded-2xl bg-[#F2EFE7] p-6 text-right shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {isSubmitting && submissionStep !== null ? (
+              {submissionStep !== null ? (
                 <div className="flex flex-col items-center justify-center min-h-[300px]">
                   <div
                     className="radial-progress"
@@ -281,11 +244,11 @@ export default function BusinessForm() {
                     <button
                       type="submit"
                       className="w-full rounded-full bg-[#A3C8C8] px-4 py-2 font-semibold text-black shadow-md hover:bg-[#88b6b6]"
-                      disabled={isSubmitting}
+                      disabled={submissionStep !== null}
                     >
                       {step < steps.length - 1
                         ? hebrewDictionary.next
-                        : isSubmitting
+                        : submissionStep !== null
                           ? hebrewDictionary.submittingBusiness
                           : hebrewDictionary.confirm}
                     </button>

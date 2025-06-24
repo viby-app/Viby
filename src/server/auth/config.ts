@@ -10,6 +10,7 @@ declare module "next-auth" {
       id: string;
       phone: string;
       role?: string;
+      hasBusiness?: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -20,6 +21,7 @@ declare module "next-auth/jwt" {
     phone?: string;
     name?: string;
     role?: string;
+    hasBusiness?: boolean;
   }
 }
 
@@ -53,6 +55,11 @@ export const authOptions: NextAuthOptions = {
             phone: true,
             name: true,
             role: true,
+            businessOwner: {
+              select: {
+                id: true,
+              },
+            },
           },
         });
 
@@ -60,6 +67,7 @@ export const authOptions: NextAuthOptions = {
           token.phone = dbUser.phone ?? "";
           token.name = dbUser.name;
           token.role = dbUser.role;
+          token.hasBusiness = !!dbUser.businessOwner[0]?.id;
         }
       }
 
@@ -71,6 +79,7 @@ export const authOptions: NextAuthOptions = {
         session.user.phone = token.phone!;
         session.user.name = token.name!;
         session.user.role = token.role!;
+        session.user.hasBusiness = token.hasBusiness!;
       }
       return session;
     },

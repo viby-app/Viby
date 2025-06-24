@@ -1,4 +1,4 @@
-import type { NominatimAddress } from "./types";
+import type { NominatimAddress, Services } from "../types";
 
 export function formatShortAddress(address: NominatimAddress): string {
   const street = address.road ?? address.pedestrian ?? address.footway ?? "";
@@ -15,4 +15,14 @@ export function normalizePhoneNumber(number: string): string {
   if (digits.startsWith("+972")) return digits;
   if (digits.startsWith("0")) return `+972${digits.slice(1)}`;
   return `+972${digits}`;
+}
+
+export function removeEmptyServices(services: Services) {
+  return services.filter(
+    (service) =>
+      service.name &&
+      service.name.trim() !== "" &&
+      service.durationMinutes > 0 &&
+      service.price > 0,
+  );
 }

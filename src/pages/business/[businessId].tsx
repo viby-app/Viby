@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import BookAppointmentModal from "~/components/bookAppointmentModal";
 import { hebrewDictionary } from "~/utils/constants";
-import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 
 const BusinessPage: NextPage = () => {
   const [optimisticFollowing, setOptimisticFollowing] = useState<

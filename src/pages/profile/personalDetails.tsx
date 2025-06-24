@@ -10,7 +10,7 @@ import Image from "next/image";
 import { ArrowLeft, CircleUserIcon, Save } from "lucide-react";
 import { useRouter } from "next/router";
 import type { UserDataForm } from "../../utils/types";
-import { deleteImage, getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { deleteImage, getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 import ImageConfirmModal from "~/components/imageConfirmModal";
 import logger from "~/lib/logger";
 import { v4 as uuidv4 } from "uuid";
