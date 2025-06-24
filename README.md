@@ -9,4 +9,4 @@ relevent linkgs:
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 - [cloudflare](https://cloudflare.com)
-- [nominatim](https://nominatim.org/)
+- [geoapify](https://myprojects.geoapify.com/)

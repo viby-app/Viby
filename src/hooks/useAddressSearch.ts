@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import type { NominatimResult } from "~/utils/types";
+import { env } from "~/env";
+import type { GeoapifyResult } from "~/utils/types";
 
-export const useAddressSearch = (query: string, debounceMs = 500) => {
-  const [results, setResults] = useState<NominatimResult[]>([]);
+interface GeoapifySearchResponse {
+  results: GeoapifyResult[];
+}
+
+export const useGeoapifySearch = (query: string, debounceMs = 500) => {
+  const [results, setResults] = useState<GeoapifyResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -15,15 +20,15 @@ export const useAddressSearch = (query: string, debounceMs = 500) => {
       const fetchAddresses = async () => {
         setLoading(true);
         try {
-          const res = await fetch(
-            `/api/proxy/searchAddress?q=${encodeURIComponent(query)}`,
-          );
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            setResults(data.slice(0, 5));
-          }
-        } catch (err) {
-          console.error("Address search error:", err);
+          const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
+            query,
+          )}ישראל&lang=he&format=json&apiKey=${env.NEXT_PUBLIC_MAPS_API_KEY}`;
+
+          const res = await fetch(url);
+          const data: GeoapifySearchResponse = await res.json();
+          setResults(data.results);
+        } catch (error) {
+          console.error("Geoapify error:", error);
           setResults([]);
         } finally {
           setLoading(false);

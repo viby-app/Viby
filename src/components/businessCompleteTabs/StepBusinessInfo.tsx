@@ -1,10 +1,9 @@
 import { useState } from "react";
 import type { UseFormRegister, FieldErrors, UseFormSetValue, UseFormGetValues } from "react-hook-form";
-import { type NominatimResult } from "~/utils/types";
 import { hebrewDictionary } from "~/utils/constants";
 import { formatShortAddress } from "~/utils/functions/helperFunctions";
-import type { CompleteBusinessForm } from "~/utils/types";
-import { useAddressSearch } from "~/hooks/useAddressSearch";
+import type { CompleteBusinessForm, GeoapifyResult } from "~/utils/types";
+import { useGeoapifySearch } from "~/hooks/useAddressSearch";
 
 type Props = {
   register: UseFormRegister<CompleteBusinessForm>;
@@ -15,14 +14,14 @@ type Props = {
 
 export function StepBusinessInfo({ register, errors, setValue, getValues }: Props) {
   const [input, setInput] = useState(getValues("address") ?? "");
-  const { results, loading } = useAddressSearch(input);
+  const { results, loading } = useGeoapifySearch(input);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const handleSelect = (address: NominatimResult) => {
-    setInput(address.display_name);
-    setValue("address", formatShortAddress(address.address));
-    setValue("lat", parseFloat(address.lat));
-    setValue("lon", parseFloat(address.lon));
+  const handleSelect = (address: GeoapifyResult) => {
+    setInput(formatShortAddress(address));
+    setValue("address", formatShortAddress(address));
+    setValue("lat", address.lat);
+    setValue("lon", address.lon);
     setShowDropdown(false);
   };
 
@@ -81,7 +80,7 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
                 className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
                 onClick={() => handleSelect(res)}
               >
-                {res.display_name}
+                {formatShortAddress(res)}
               </li>
             ))}
           </ul>

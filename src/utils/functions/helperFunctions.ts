@@ -1,14 +1,12 @@
-import type { NominatimAddress, Services } from "../types";
+import type { GeoapifyResult, Services } from "../types";
 
-export function formatShortAddress(address: NominatimAddress): string {
-  const street = address.road ?? address.pedestrian ?? address.footway ?? "";
-  const number = address.house_number ?? "";
-  const city = address.city ?? address.town ?? address.village ?? "";
-  return (
-    [street, number].filter(Boolean).join(" ") +
-    (city ? `, ${city.replaceAll("-", " ")}` : "")
-  );
-}
+export const formatShortAddress = (res: GeoapifyResult) => {
+  const parts = [
+    `${res.street ?? ""} ${res.housenumber ?? ""}`.trim(),
+    res.city ?? res.suburb ?? "",
+  ];
+  return parts.filter(Boolean).join(", ");
+};
 
 export function normalizePhoneNumber(number: string): string {
   const digits = number.replace(/\D/g, "");

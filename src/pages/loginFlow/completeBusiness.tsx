@@ -172,7 +172,7 @@ export default function BusinessForm() {
     resetForm();
     await fetch("/api/auth/session");
     await getSession();
-    void router.push("/business/" + businessId);
+    await router.push("/business/" + businessId);
   };
 
   return (

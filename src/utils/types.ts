@@ -108,22 +108,46 @@ export type UserWorker = {
   image: string | null;
 } | null;
 
-export interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
-  address: NominatimAddress;
-  boundingbox: [string, string, string, string];
-}
+export interface GeoapifyResult {
+  place_id: string;
+  lat: number;
+  lon: number;
+  formatted: string;
 
-export interface NominatimAddress {
-  road?: string;
-  pedestrian?: string;
-  footway?: string;
-  house_number?: string;
+  address_line1?: string;
+  address_line2?: string;
+
   city?: string;
-  town?: string;
-  village?: string;
+  suburb?: string;
+  street?: string;
+  housenumber?: string;
+  postcode?: string;
+  state?: string;
+  state_code?: string;
+  country?: string;
+  country_code?: string;
+  county?: string;
+  county_code?: string;
+
+  result_type?: string;
+  plus_code?: string;
+  iso3166_2?: string;
+
+  datasource?: {
+    sourcename: string;
+    attribution: string;
+    license: string;
+    url: string;
+  };
+
+  rank?: {
+    popularity?: number;
+    confidence?: number;
+    confidence_city_level?: number;
+    confidence_street_level?: number;
+    confidence_building_level?: number;
+    match_type?: string;
+  };
 }
 
 export type Services = {
