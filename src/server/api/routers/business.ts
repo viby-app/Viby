@@ -19,12 +19,13 @@ export const businessRouter = createTRPCRouter({
         return businesses;
       }
       return businesses.filter((business) =>
-        followedBusinesses.some(
+        followedBusinesses.every(
           (followed) => followed.businessId !== business.id,
         ),
       );
     },
   ),
+
   createBusiness: protectedProcedure
     .input(completeBusinessSchema)
     .mutation(async ({ ctx, input }) => {
@@ -59,6 +60,7 @@ export const businessRouter = createTRPCRouter({
       });
       return business.id;
     }),
+
   createOpeningHours: protectedProcedure
     .input(
       z.object({
@@ -110,6 +112,7 @@ export const businessRouter = createTRPCRouter({
 
       return validHours;
     }),
+
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {
@@ -130,6 +133,7 @@ export const businessRouter = createTRPCRouter({
 
     return businesses;
   }),
+
   getBusinessById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -140,6 +144,7 @@ export const businessRouter = createTRPCRouter({
       });
       return business;
     }),
+
   getBusinessTimesById: protectedProcedure
     .input(z.object({ businessId: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -153,6 +158,7 @@ export const businessRouter = createTRPCRouter({
       });
       return businessTimes;
     }),
+
   addFollowerBusiness: protectedProcedure
     .input(
       z.object({
@@ -178,6 +184,7 @@ export const businessRouter = createTRPCRouter({
       });
       return business;
     }),
+
   isUserFollowingBusiness: protectedProcedure
     .input(
       z.object({
@@ -194,6 +201,7 @@ export const businessRouter = createTRPCRouter({
       });
       return follow !== null;
     }),
+
   removeFollowerBusiness: protectedProcedure
     .input(
       z.object({
@@ -211,6 +219,7 @@ export const businessRouter = createTRPCRouter({
         },
       });
     }),
+
   getAvailableAppointments: protectedProcedure
     .input(
       z.object({
@@ -317,8 +326,6 @@ export const businessRouter = createTRPCRouter({
               .clone()
               .hour(time.hour())
               .minute(time.minute())
-              .hour(time.hour())
-              .minute(time.minute())
               .second(0)
               .millisecond(0);
 
@@ -350,6 +357,7 @@ export const businessRouter = createTRPCRouter({
         );
       }
     }),
+
   isWorkerOrOwnerByUserId: protectedProcedure.query(async ({ ctx }) => {
     const business = await ctx.db.business.findFirst({
       where: {
@@ -370,6 +378,7 @@ export const businessRouter = createTRPCRouter({
 
     return business ? true : false;
   }),
+
   deleteBusiness: protectedProcedure
     .input(
       z.object({
@@ -394,5 +403,35 @@ export const businessRouter = createTRPCRouter({
         },
       });
       return { success: true };
+    }),
+
+  getFollowersCountByBusinessId: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const count = await ctx.db.businessFollowing.count({
+        where: {
+          businessId: input.businessId,
+        },
+      });
+      return count;
+    }),
+
+  getBusinessRatingsByBusinessId: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const ratings = await ctx.db.review.findMany({
+        where: {
+          businessId: input.businessId,
+        },
+        select: {
+          rating: true,
+        },
+      });
+
+      const averageRating =
+        ratings
+          .map((review) => review.rating)
+          .reduce((acc, rating) => acc + rating, 0) / ratings.length || 0;
+      return averageRating.toFixed(1);
     }),
 });

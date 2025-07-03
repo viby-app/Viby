@@ -129,6 +129,14 @@ export const hebrewDictionary = {
   open: "פתוח",
   setWorkingHours: "קבע שעות פעילות",
   numberTypeError: "שדה זה חייב להיות מספר",
+  followers: "עוקבים",
+  userHasNoBusinesses: "אין לך עדיין עסק אצלנו!",
+  theBusinessOf: "העסק של",
+  reviews: "ביקורות",
+  myCustomers : "הלקוחות שלי",
+  statistics: "סטטיסטיקות",
+  viewingAsCustomer: "צפייה כלקוח",
+  myBusiness: "העסק שלי",
 };
 
 export const submissionSteps = [

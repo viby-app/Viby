@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
@@ -14,7 +12,8 @@ import Card from "~/components/cardComponent";
 import ProfileHeadPage from "~/components/profileComponents/profileHeadPage";
 import ImageAndNameComponent from "~/components/profileComponents/imageAndNameComponent";
 
-const ProfilePage = () => {
+const UserProfilePage = () => {
+  const [userFriends, setUserFriends] = useState<number>(0);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
@@ -32,6 +31,12 @@ const ProfilePage = () => {
   useEffect(() => {
     void fetchImageUrl(setImageLoading, user?.image, setImageUrl);
   }, [user?.image]);
+
+  useEffect(() => {
+    if (linkedUsers) {
+      setUserFriends(linkedUsers.length);
+    }
+  }, [linkedUsers]);
 
   if (isUserLoading) {
     return LoadingSpinner();
@@ -150,4 +155,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default UserProfilePage;

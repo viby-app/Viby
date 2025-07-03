@@ -22,29 +22,27 @@ const AppointmentCard = ({
 }: Props) => {
   if (lastAppointmentLoading) {
     return (
-      <div className="flex h-32 w-full items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
+      <div className="flex h-32 w-full items-center justify-center rounded-lg border border-gray-300 bg-[#F2EFE7] shadow-md">
         <div className="loading h-8 w-8"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full min-h-32 w-full min-w-2xs flex-row items-center justify-start gap-4 rounded-lg border border-gray-300 bg-[#ffffffb0] p-4 shadow-md">
-      {date ? (
-        <>
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 shadow-sm">
-            {logo ? (
-              <Image
-                src={`/api/image/${logo}`}
-                alt={`Business image ${logo}`}
-                width={64}
-                height={64}
-                className="h-16 w-16 rounded-full object-cover"
-              />
-            ) : (
-              <UserRoundIcon size={28} />
-            )}
-          </div>
+    <div className="flex h-full min-h-32 w-full min-w-2xs flex-row items-center justify-start gap-4 rounded-lg border border-gray-300 bg-[#ffffff41] p-4 shadow-md">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-gray-600 shadow-sm">
+        {logo ? (
+          <Image
+            src={`/api/image/${logo}`}
+            alt={`Business image ${logo}`}
+            width={64}
+            height={64}
+            className="h-16 w-16 rounded-full object-cover"
+          />
+        ) : (
+          <UserRoundIcon size={28} />
+        )}
+      </div>
 
           <div>
             <h2 className="text-2xl font-bold text-gray-800">{businessName}</h2>

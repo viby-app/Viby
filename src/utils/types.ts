@@ -165,3 +165,20 @@ export type Services = {
   price: number;
   description?: string | undefined;
 }[];
+export type OpeningHours =
+  | {
+      businessId: number;
+      id: number;
+      dayOfWeek: number;
+      openTime: Date;
+      closeTime: Date;
+    }[]
+  | undefined;
+
+export type Images =
+  | {
+      id: number;
+      key: string;
+      businessId: number;
+    }[]
+  | undefined;

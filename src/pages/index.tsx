@@ -1,4 +1,4 @@
-import BusinessCard from "~/components/businessCard";
+import BusinessCard from "~/components/profileComponents/businessCard";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
 import { hebrewDictionary } from "~/utils/constants";
@@ -26,12 +26,7 @@ export default function HomePage() {
           ) : (
             <div className="flex w-full snap-x snap-mandatory space-x-4 overflow-x-auto p-2 lg:max-w-none">
               {myBusinesses.data.map((followedBusiness) => (
-                <BusinessCard
-                  id={followedBusiness.business.id}
-                  key={followedBusiness.business.id}
-                  name={followedBusiness.business.name}
-                  description={followedBusiness.business.description}
-                />
+                <BusinessCard businessId={followedBusiness.business.id} />
               ))}
             </div>
           )}
@@ -49,14 +44,9 @@ export default function HomePage() {
                 {hebrewDictionary.noBusinessesToDisplay}
               </p>
             ) : (
-              <div className="flex max-h-full w-full flex-col justify-center space-y-4 overflow-x-scroll p-2 lg:max-w-none">
+              <div>
                 {allBusinesses.data.map((business) => (
-                  <BusinessCard
-                    key={business.id}
-                    id={business.id}
-                    name={business.name}
-                    description={business.description}
-                  />
+                  <BusinessCard businessId={business.id} />
                 ))}
               </div>
             )}
