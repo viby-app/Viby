@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type FC } from "react";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
 import { ChevronLeft } from "lucide-react";
@@ -11,13 +11,13 @@ import { fetchImageUrl } from "~/utils/profileUtils";
 import Card from "~/components/cardComponent";
 import ProfileHeadPage from "~/components/profileComponents/profileHeadPage";
 import ImageAndNameComponent from "~/components/profileComponents/imageAndNameComponent";
+import type { ProfileProps } from "~/utils/types";
 
-const UserProfilePage = () => {
+const UserProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const [userFriends, setUserFriends] = useState<number>(0);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
-  const { data: user, isLoading: isUserLoading } = api.user.getUser.useQuery();
   const firstName = user?.name!.split(" ")[0];
   const { data: linkedUsers } = api.user.getUserFriends.useQuery();
   const { data: lastAppointment, isLoading: lastAppointmentLoading } =
@@ -77,7 +77,7 @@ const UserProfilePage = () => {
               <div>
                 <Link
                   href="/profile/personalDetails"
-                  className="flex items-center justify-between rounded-lg  px-4 py-3 transition duration-200 hover:bg-gray-300"
+                  className="flex items-center justify-between rounded-lg px-4 py-3 transition duration-200 hover:bg-gray-300"
                 >
                   <h4 className="text-xl font-semibold text-gray-800">
                     {hebrewDictionary.personalDetails}
@@ -138,7 +138,7 @@ const UserProfilePage = () => {
               <div>
                 <Link
                   href="/profile/"
-                  className="flex items-center justify-between rounded-lg  px-4 py-3 transition duration-200 hover:bg-gray-300"
+                  className="flex items-center justify-between rounded-lg px-4 py-3 transition duration-200 hover:bg-gray-300"
                 >
                   <h4 className="text-xl font-semibold text-gray-800">
                     {hebrewDictionary.paymentAddress}

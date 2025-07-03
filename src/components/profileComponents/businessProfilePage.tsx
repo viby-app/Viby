@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type FC } from "react";
 import Layout from "~/components/layout";
 import { motion } from "framer-motion";
 import { api } from "~/utils/api";
@@ -17,11 +17,11 @@ import {
   EyeIcon,
   PencilIcon,
 } from "lucide-react";
+import type { ProfileProps } from "~/utils/types";
 
-const BusinessProfilePage = () => {
+const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const { data: businesses, isLoading: isBusinessLoading } =
     api.user.getUserBusinesses.useQuery();
-  const { data: user, isLoading: isUserLoading } = api.user.getUser.useQuery();
 
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
@@ -108,19 +108,27 @@ const BusinessProfilePage = () => {
 
               <div className="mt-4 space-y-2 border-t-4 border-[#48a5a748] pt-2 text-right text-sm font-medium text-gray-800">
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-gray-800 text-lg font-semibold">{hebrewDictionary.myCustomers}</span>
+                  <span className="text-lg font-semibold text-gray-800">
+                    {hebrewDictionary.myCustomers}
+                  </span>
                   <UsersRoundIcon className="h-5 w-5 text-gray-800" />
                 </div>
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-gray-800 text-lg font-semibold">{hebrewDictionary.reviews}</span>
-                  <MessageCircleIcon className="h-6 w-6 text-gray-800 font-semibold" />
+                  <span className="text-lg font-semibold text-gray-800">
+                    {hebrewDictionary.reviews}
+                  </span>
+                  <MessageCircleIcon className="h-6 w-6 font-semibold text-gray-800" />
                 </div>
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-gray-800 text-lg font-semibold">{hebrewDictionary.statistics}</span>
-                  <ChartNoAxesCombinedIcon className="h-6 w-6 text-gray-800]" />
+                  <span className="text-lg font-semibold text-gray-800">
+                    {hebrewDictionary.statistics}
+                  </span>
+                  <ChartNoAxesCombinedIcon className="text-gray-800] h-6 w-6" />
                 </div>
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-gray-800 text-lg font-semibold">{hebrewDictionary.viewingAsCustomer}</span>
+                  <span className="text-lg font-semibold text-gray-800">
+                    {hebrewDictionary.viewingAsCustomer}
+                  </span>
                   <EyeIcon className="h-5 w-5 text-gray-800" />
                 </div>
               </div>
