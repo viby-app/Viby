@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import {
     useFieldArray,
@@ -57,7 +59,7 @@ export function StepWorkingHours({ control, register }: Props) {
                             <span className="font-medium w-[25px] text-black ml-1">{dayLabel}</span>
 
                             <div className="flex items-center gap-2">
-                                {field.isOpen && (
+                                {field.isOpen ? (
                                     <>
                                         <input
                                             {...register(`workingHours.${index}.openTime` as const)}
@@ -73,7 +75,7 @@ export function StepWorkingHours({ control, register }: Props) {
                                             defaultValue={field.closeTime ?? "18:00"}
                                         />
                                     </>
-                                )}
+                                ) : <p>{hebrewDictionary.close}</p>}
 
                             </div>
                             <label className="flex items-center gap-2 cursor-pointer">

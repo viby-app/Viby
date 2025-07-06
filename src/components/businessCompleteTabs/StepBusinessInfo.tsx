@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import type { UseFormRegister, FieldErrors, UseFormSetValue, UseFormGetValues } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";

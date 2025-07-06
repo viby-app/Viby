@@ -1,5 +1,6 @@
 import { type $Enums, Gender } from "@prisma/client";
 import { z } from "zod";
+import { hebrewDictionary } from "./constants";
 
 export type UserDataForm = {
   name: string;
@@ -30,7 +31,9 @@ export const completeBusinessSchema = z.object({
     .min(10, "מספר הטלפון הוא שדה חובה")
     .max(15, "מספר הטלפון לא תקין"),
   description: z.string(),
-  address: z.string().min(2, "כתובת העסק היא שדה חובה"),
+  address: z
+    .string({ description: "שדה חובה" })
+    .min(2, "כתובת העסק היא שדה חובה"),
   lat: z.number().optional(),
   lon: z.number().optional(),
   logo: z.string().optional(),
@@ -41,8 +44,12 @@ export const completeBusinessSchema = z.object({
     .array(
       z.object({
         name: z.string().min(2, "שירות הוא שדה חובה"),
-        durationMinutes: z.number().min(1, "משך השירות הוא שדה חובה"),
-        price: z.number().min(1, "מחיר הוא שדה חובה"),
+        durationMinutes: z
+          .number({ invalid_type_error: hebrewDictionary.numberTypeError })
+          .min(1, "משך השירות הוא שדה חובה"),
+        price: z
+          .number({ invalid_type_error: hebrewDictionary.numberTypeError })
+          .min(1, "מחיר הוא שדה חובה"),
         description: z.string().optional(),
       }),
     )
@@ -53,7 +60,9 @@ export const completeBusinessSchema = z.object({
         name: z.string(),
         phone: z.string(),
         userId: z.string(),
-        wage: z.number(),
+        wage: z.number({
+          invalid_type_error: hebrewDictionary.numberTypeError,
+        }),
       }),
     )
     .optional(),

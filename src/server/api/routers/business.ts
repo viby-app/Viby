@@ -370,4 +370,29 @@ export const businessRouter = createTRPCRouter({
 
     return business ? true : false;
   }),
+  deleteBusiness: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const business = await ctx.db.business.findFirst({
+        where: {
+          id: input.businessId,
+        },
+      });
+      if (!business) {
+        throw new Error("Business not found");
+      }
+      if (business?.ownerId !== ctx.session.user.id) {
+        throw new Error("you are not allowed to delete this business");
+      }
+      await ctx.db.business.delete({
+        where: {
+          id: business.id,
+        },
+      });
+      return { success: true };
+    }),
 });

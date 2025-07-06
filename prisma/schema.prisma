@@ -61,7 +61,7 @@ model Workers {
     id   Int   @id @default(autoincrement())
     wage Float
 
-    business   Business @relation("BusinessWorker", fields: [businessId], references: [id])
+    business   Business @relation("BusinessWorker", fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
 
     Worker User   @relation("userWorker", fields: [userId], references: [id])
@@ -72,9 +72,9 @@ model Workers {
 
 model BusinessFollowing {
     id         Int      @id @default(autoincrement())
-    follower   User     @relation("BusinessFollower", fields: [followerId], references: [id])
+    follower   User     @relation("BusinessFollower", fields: [followerId], references: [id], onDelete: Cascade)
     followerId String
-    business   Business @relation("FollowedBussines", fields: [businessId], references: [id])
+    business   Business @relation("FollowedBussines", fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
 
     @@unique([followerId, businessId])
@@ -144,7 +144,7 @@ model Review {
     rating  Int
     comment String?
 
-    business   Business @relation(fields: [businessId], references: [id])
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
 
     user   User   @relation(fields: [userId], references: [id])
@@ -156,7 +156,7 @@ model Review {
 model Image {
     id         Int      @id @default(autoincrement())
     key        String
-    business   Business @relation(fields: [businessId], references: [id])
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
 }
 
@@ -179,13 +179,13 @@ model Appointment {
     date        DateTime          @db.Timestamptz()
     status      AppointmentStatus
 
-    business   Business @relation(fields: [businessId], references: [id])
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
 
     service   Service @relation(fields: [serviceId], references: [id])
     serviceId Int
 
-    user   User   @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String
 
     worker   Workers @relation(fields: [workerId], references: [id])
@@ -197,9 +197,9 @@ model Appointment {
 
 model BusinessService {
     id         Int      @id @default(autoincrement())
-    business   Business @relation(fields: [businessId], references: [id])
+    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int
-    service    Service  @relation(fields: [serviceId], references: [id])
+    service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
     serviceId  Int
 
     @@unique([businessId, serviceId])

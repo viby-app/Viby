@@ -23,6 +23,7 @@ import { StepWorkingHours } from "~/components/businessCompleteTabs/StepWorkingH
 import { getSession } from "next-auth/react";
 import { removeEmptyServices } from "~/utils/functions/helperFunctions";
 import { uploadGallery, uploadImage } from "~/utils/functions/imageFunctions";
+import { businessRoute } from "~/helpers/routes";
 
 export default function BusinessForm() {
   const [step, setStep] = useState(0);
@@ -172,7 +173,7 @@ export default function BusinessForm() {
     resetForm();
     await fetch("/api/auth/session");
     await getSession();
-    await router.push("/business/" + businessId);
+    await router.push(businessRoute(businessId));
   };
 
   return (
@@ -208,10 +209,9 @@ export default function BusinessForm() {
               ) : (
                 <>
                   {step === 0 && (
-                    <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues
-                    } />
+                    <StepBusinessInfo register={register} errors={errors} setValue={setValue} getValues={getValues} />
                   )}
-                  {step === 1 && <StepSocialLinks register={register} setValue={setValue} phoneNumber={watch("phone")} />}
+                  {step === 1 && <StepSocialLinks register={register} setValue={setValue} phoneNumber={watch("phone")} getValues={getValues} />}
                   {step === 2 && (
                     <StepImages
                       watch={watch}

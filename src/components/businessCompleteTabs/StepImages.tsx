@@ -1,3 +1,5 @@
+"use cilent";
+
 import {
   useState,
   type ChangeEvent,
@@ -85,7 +87,7 @@ const StepImages = ({
   };
 
   return (
-    <>
+    <div className="h-full">
       <h1 className="mb-6 text-center text-2xl font-bold text-black">
         {hebrewDictionary.images}
       </h1>
@@ -108,12 +110,12 @@ const StepImages = ({
         </span>
       </div>
 
-      <div className="flex h-32 w-full items-center justify-center rounded-lg bg-[#D9D9D9] text-gray-600">
+      <div className="min-h-40 flex items-center justify-center">
         {logoPreview ? (
           <Image
             src={URL.createObjectURL(logoPreview)}
             alt="logo"
-            className="h-full object-contain"
+            className="max-h-52 m-1 object-contain"
             width={200}
             height={200}
           />
@@ -155,12 +157,12 @@ const StepImages = ({
           >
             <CircleChevronRight />
           </button>
-          <div className="mx-2 flex h-32 w-full items-center justify-center rounded-lg bg-[#D9D9D9] text-gray-600">
+          <div className="min-h-40 text-center flex items-center">
             {galleryPreviews?.item(galleryIndex) ? (
               <Image
                 src={URL.createObjectURL(galleryPreviews.item(galleryIndex)!)}
                 alt={`preview ${galleryIndex + 1}`}
-                className="h-full object-contain"
+                className="max-h-52 m-1 object-contain"
                 width={200}
                 height={200}
               />
@@ -184,7 +186,7 @@ const StepImages = ({
             : "0/0"}
         </p>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { MessageCircle, Instagram } from "lucide-react";
-import type { UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type { UseFormGetValues, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";
 import { normalizePhoneNumber } from "~/utils/functions/helperFunctions";
@@ -9,16 +11,26 @@ type Props = {
   register: UseFormRegister<CompleteBusinessForm>;
   setValue: UseFormSetValue<CompleteBusinessForm>;
   phoneNumber: string;
+  getValues: UseFormGetValues<CompleteBusinessForm>
 };
 
-export function StepSocialLinks({ register, setValue, phoneNumber }: Props) {
+export function StepSocialLinks({ register, setValue, getValues, phoneNumber }: Props) {
+  const [instagramInput, setInstagramInput] = useState<string | undefined>(undefined)
   useEffect(() => {
     if (phoneNumber) {
       const normalized = normalizePhoneNumber(phoneNumber);
       const link = `https://wa.me/${normalized}`;
       setValue("whatsapp", link);
     }
-  }, [phoneNumber, setValue]);
+  }, [phoneNumber, setValue, instagramInput]);
+
+  useEffect(() => {
+    if (instagramInput !== undefined) {
+      setValue("instagram", `https://instagram.com/${instagramInput}`)
+    } else {
+      setInstagramInput(getValues("instagram")?.replaceAll("https://instagram.com/", ""))
+    }
+  }, [instagramInput])
 
   return (
     <>
@@ -39,7 +51,8 @@ export function StepSocialLinks({ register, setValue, phoneNumber }: Props) {
         <input
           placeholder={hebrewDictionary.instagramLink}
           className="w-full focus:outline-none"
-          onChange={(e) => setValue("instagram", `https://instagram.com/${e.target.value}`)}
+          value={instagramInput}
+          onChange={(e) => setInstagramInput(e.target.value)}
         />
         <Instagram className="text-black" />
       </div>

@@ -105,7 +105,7 @@ export const hebrewDictionary = {
   addWorker: "הוסף עובד",
   searchWorker: "חפש עובד",
   workerPhone: "מספר טלפון של העובד",
-  workerWage: "משכורת",
+  workerWage: "משכורת לפי שעה",
   workerFound: "עובד נמצא",
   workerNotFound: "עובד לא נמצא",
   searchByPhone: "חפש לפי מספר טלפון",
@@ -127,6 +127,7 @@ export const hebrewDictionary = {
   closed: "סגור",
   open: "פתוח",
   setWorkingHours: "קבע שעות פעילות",
+  numberTypeError: "שדה זה חייב להיות מספר",
 };
 
 export const submissionSteps = [

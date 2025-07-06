@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useFieldArray, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
@@ -5,6 +7,7 @@ import type { CompleteBusinessForm, UserWorker } from "~/utils/types";
 import { Trash2, Search, User } from "lucide-react";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
+import ImageWithDynamicSrc from "../image";
 
 type Props = {
     control: Control<CompleteBusinessForm>;
@@ -102,7 +105,8 @@ export function StepWorkers({ control, register, errors }: Props) {
                 {foundUser && (
                     <div className="rounded-lg bg-green-50 p-4 border border-green-200">
                         <div className="flex items-center gap-3">
-                            <User className="h-8 w-8 text-green-600" />
+                            {foundUser.image ? <ImageWithDynamicSrc src={`/api/image/${foundUser.image}`} alt="image" height={200} width={200} />
+                                : <User className="h-8 w-8 text-green-600" />}
                             <div className="flex-1">
                                 <p className="font-semibold text-green-800">{foundUser.name}</p>
                                 <p className="text-sm text-green-600">{foundUser.phone}</p>
