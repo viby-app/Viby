@@ -170,7 +170,7 @@ const BusinessPage: NextPage = () => {
                 <div className="min-w-[300px] max-w-[500px] aspect-square animate-pulse rounded-xl bg-gray-200" />
               )}
               {!isImagesLoading && images?.length === 0 && <></>}
-              <div className="carousel-item flex space-x-4">
+              <div className="carousel flex space-x-4">
                 {preSignedUrls?.map((image, index) => (
                   <div
                     key={index}
