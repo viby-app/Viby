@@ -17,10 +17,7 @@ function ImageWithDynamicSrc({ className, src, alt, width, height }: Props) {
         width={width}
         height={height}
         src={src}
-        className={cn(
-          "rounded-box w-full",
-          className,
-        )}
+        className={cn(className)}
         alt={alt}
       />
     );

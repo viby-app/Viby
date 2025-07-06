@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import AppointmentCard from "~/components/appointmentCard";
 
-import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 import { motion } from "framer-motion";
 import logger from "~/lib/logger";
 

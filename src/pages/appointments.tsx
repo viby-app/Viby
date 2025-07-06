@@ -7,7 +7,7 @@ import Layout from "~/components/layout";
 import { api } from "~/utils/api";
 import "react-day-picker/dist/style.css";
 import { useRouter } from "next/router";
-import type { AppointmentModalDetails } from "~/utils";
+import type { AppointmentModalDetails } from "~/utils/types";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
 import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsTab";
 import { hebrewDictionary } from "~/utils/constants";

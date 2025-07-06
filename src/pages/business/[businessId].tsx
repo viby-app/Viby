@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import BookAppointmentModal from "~/components/bookAppointmentModal";
 import { hebrewDictionary } from "~/utils/constants";
-import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 
 const BusinessPage: NextPage = () => {
   const [optimisticFollowing, setOptimisticFollowing] = useState<
@@ -105,11 +105,11 @@ const BusinessPage: NextPage = () => {
                 <p className="text-md">{business.address ?? "אין כתובת"}</p>
               </div>
             </div>
-
-            <p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
-              {business.description ?? "אין תיאור"}
-            </p>
-
+            {
+              business.description && (<p className="rounded-xl bg-[#9ACBD0] p-3 text-right text-sm text-gray-800">
+                {business.description}
+              </p>)
+            }
             <div className="flex space-x-2">
               <Button
                 className="mt-3 w-1/3 self-end"
@@ -127,9 +127,9 @@ const BusinessPage: NextPage = () => {
                 className="mt-3 w-1/3 self-end"
               >
                 {userStatus === "loading" ||
-                isFollowingLoading ||
-                handleFollow.isPending ||
-                handleUnfollow.isPending ? (
+                  isFollowingLoading ||
+                  handleFollow.isPending ||
+                  handleUnfollow.isPending ? (
                   <div className="loading" />
                 ) : optimisticFollowing ? (
                   hebrewDictionary.following
@@ -165,18 +165,22 @@ const BusinessPage: NextPage = () => {
                 <Instagram className="h-5 w-5" aria-label="instagram" />
               </a>
             </div>
-            <div className="flex flex-row justify-center space-x-2 overflow-x-auto">
-              {(isImagesLoading || isBusinessLoading) && (
-                <div className="skeleton h-48 w-48 animate-pulse rounded-md bg-gray-200" />
+            <div className="w-full overflow-x-auto py-2">
+              {(isImagesLoading || isBusinessLoading || !preSignedUrls) && (
+                <div className="min-w-[300px] max-w-[500px] aspect-square animate-pulse rounded-xl bg-gray-200" />
               )}
               {!isImagesLoading && images?.length === 0 && <></>}
-              <div className="carousel rounded-box h-1/2 w-full space-x-2 px-4">
+              <div className="carousel flex space-x-4">
                 {preSignedUrls?.map((image, index) => (
-                  <div className="carousel-item w-full" key={index}>
+                  <div
+                    key={index}
+                    className="carousel-item min-w-[300px] max-w-[500px] w-[60vw] aspect-square"
+                  >
                     <ImageWithDynamicSrc
-                      width={400}
-                      height={500}
+                      width={600}
+                      height={600}
                       src={image}
+                      className="h-full w-full rounded-xl object-cover"
                       alt={`Business image ${index}`}
                     />
                   </div>

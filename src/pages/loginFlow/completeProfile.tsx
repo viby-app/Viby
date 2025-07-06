@@ -2,9 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "../components/button";
+import Button from "../../components/button";
 import { api } from "~/utils/api";
-import { toast } from "react-toastify";
 import router from "next/router";
 import { getSession } from "next-auth/react";
 import { hebrewDictionary } from "~/utils/constants";
@@ -12,6 +11,8 @@ import {
   completeProfileSchema,
   type CompleteProfileFormValues,
 } from "~/utils/types";
+import { showSuccessToast } from "~/components/successToast";
+import logger from "~/lib/logger";
 
 export default function CompleteProfileForm() {
   const {
@@ -31,23 +32,25 @@ export default function CompleteProfileForm() {
   const updateUserMutation = api.user.firstLoginUpdateUser.useMutation();
   const onSubmit = async (data: CompleteProfileFormValues) => {
     try {
-      await updateUserMutation.mutateAsync({
-        phone: data.phone,
-        role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
-        name: data.name,
-        gender: data.gender,
-      });
+      await updateUserMutation.mutateAsync(
+        {
+          phone: data.phone,
+          role: data.isBusinessOwner ? "BUSINESS_OWNER" : "USER",
+          name: data.name,
+          gender: data.gender,
+        },
+        { onSuccess: () => showSuccessToast(hebrewDictionary.profileUpdated) },
+      );
+
       await fetch("/api/auth/session");
       await getSession();
       if (data.isBusinessOwner) {
-        toast.success(hebrewDictionary.businessCreated);
-        void router.push("/completeBusiness");
+        void router.push("/loginFlow/completeBusiness");
       } else {
-        toast.success(hebrewDictionary.profileUpdated);
         void router.push("/");
       }
     } catch (error) {
-      toast.error(`Error: ${String(error)}`);
+      logger.error(`Error: ${String(error)}`);
     }
   };
 
@@ -98,9 +101,6 @@ export default function CompleteProfileForm() {
               {...register("gender")}
               className="mt-1 w-full rounded-md bg-white p-2 text-[#3A3A3A] shadow-md"
             >
-              <option value="OTHER" disabled>
-                {hebrewDictionary.chooseGender}
-              </option>
               <option value="MALE">{hebrewDictionary.male}</option>
               <option value="FEMALE">{hebrewDictionary.female}</option>
               <option value="OTHER">{hebrewDictionary.other}</option>
@@ -113,14 +113,14 @@ export default function CompleteProfileForm() {
           </div>
 
           <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-[#3A3A3A]">
+              {hebrewDictionary.isBusinessOwner}
+            </label>
             <input
               {...register("isBusinessOwner")}
               type="checkbox"
               className="toggle border-gray-300 bg-white text-gray-400 checked:bg-white checked:text-gray-800 focus:ring-[#3A3A3A]"
             />
-            <label className="text-sm font-semibold text-[#3A3A3A]">
-              {hebrewDictionary.isBusinessOwner}
-            </label>
           </div>
         </div>
 

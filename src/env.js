@@ -30,6 +30,11 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_MAPS_API_KEY: z.string(),
+    NEXT_PUBLIC_MAX_IMAGE_SIZE_MB: z.coerce.number().default(5),
+    NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES: z.coerce
+      .number()
+      .default(5 * 1024 * 1024), // 5MB in bytes
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
@@ -47,6 +52,10 @@ export const env = createEnv({
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
+    NEXT_PUBLIC_MAX_IMAGE_SIZE_MB: process.env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB,
+    NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES:
+      process.env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES,
+    NEXT_PUBLIC_MAPS_API_KEY: process.env.NEXT_PUBLIC_MAPS_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

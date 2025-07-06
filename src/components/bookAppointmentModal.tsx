@@ -45,8 +45,9 @@ export default function BookingModal({
       workerId: selectedWorker ?? 0,
       businessId,
       date: dayjs(bookingDate).tz("Asia/Jerusalem").toDate(),
+      serviceId: selectedService ?? 0,
     },
-    { enabled: !!businessId && !!selectedWorker },
+    { enabled: !!businessId && !!selectedWorker && !!selectedService },
   );
 
   useEffect(() => {
@@ -181,8 +182,8 @@ export default function BookingModal({
               <div className="loading" />
             ) : times?.length === 0 ? (
               <p>{hebrewDictionary.noAvailableAppointments}</p>
-            ) : !selectedWorker ? (
-              <h1>{hebrewDictionary.selectWorkerToSeeTimes}</h1>
+            ) : !selectedWorker || !selectedService ? (
+              <h1>{hebrewDictionary.selectWorkerToSeeTimesAndServices}</h1>
             ) : (
               <ScrollTimePicker
                 times={times ?? []}

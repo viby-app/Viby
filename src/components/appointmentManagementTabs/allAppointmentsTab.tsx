@@ -2,7 +2,8 @@ import dayjs from "~/utils/dayjs";
 import { DayPicker } from "react-day-picker";
 import { he } from "react-day-picker/locale";
 import AppointmentModal from "../appointmentModal";
-import { statusBorderColors, type AppointmentModalDetails } from "~/utils";
+import { type AppointmentModalDetails } from "~/utils/types";
+import { statusBorderColors } from "~/utils";
 import { hebrewDictionary } from "~/utils/constants";
 import { useState } from "react";
 

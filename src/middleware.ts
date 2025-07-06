@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
   const isProfileComplete = !!token?.phone;
 
   const isLoginPage = pathname === "/login";
-  const isProfilePage = pathname.startsWith("/completeProfile");
+  const isProfilePage = pathname.startsWith("/loginFlow/completeProfile");
 
   if (!isAuth && !isLoginPage && !pathname.startsWith("/api/auth")) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -25,16 +25,37 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isAuth && !isProfileComplete && !isProfilePage) {
-    return NextResponse.redirect(new URL("/completeProfile", req.url));
+    return NextResponse.redirect(
+      new URL("/loginFlow/completeProfile", req.url),
+    );
   }
 
   if (isAuth && isProfileComplete && isProfilePage) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  if (isAuth && pathname.startsWith("/loginFlow/completeBusiness")) {
+    if (!(token.role == "BUSINESS_OWNER") || token.hasBusiness) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
+  if (
+    isAuth &&
+    !token.hasBusiness &&
+    token.role == "BUSINESS_OWNER" &&
+    !pathname.startsWith("/loginFlow/completeBusiness")
+  ) {
+    return NextResponse.redirect(
+      new URL("/loginFlow/completeBusiness", req.url),
+    );
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth|api/trpc).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/).*)", 
+  ],
 };

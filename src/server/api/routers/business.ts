@@ -2,6 +2,7 @@ import { z } from "zod";
 import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { completeBusinessSchema } from "~/utils/types";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinessesWithoutFollowing: protectedProcedure.query(
@@ -25,14 +26,7 @@ export const businessRouter = createTRPCRouter({
     },
   ),
   createBusiness: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().optional(),
-        description: z.string().optional(),
-        phone: z.string().min(6, "Phone number is required"),
-        address: z.string().optional(),
-      }),
-    )
+    .input(completeBusinessSchema)
     .mutation(async ({ ctx, input }) => {
       const existingBusiness = await ctx.db.business.findFirst({
         where: {
@@ -44,14 +38,77 @@ export const businessRouter = createTRPCRouter({
       }
       const business = await ctx.db.business.create({
         data: {
+          ownerId: ctx.session.user.id,
           name: input.name ?? "",
           description: input.description,
           phone: input.phone,
           address: input.address ?? "",
-          ownerId: ctx.session.user.id,
+          whatsappLink: input.whatsapp ?? "",
+          instagramLink: input.instagram ?? "",
+          logo: input.logo ?? "",
+          lat: input.lat,
+          lon: input.lon,
         },
       });
-      return business;
+      await ctx.db.workers.create({
+        data: {
+          userId: ctx.session.user.id,
+          businessId: business.id,
+          wage: 0,
+        },
+      });
+      return business.id;
+    }),
+  createOpeningHours: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+        workingHours: z.array(
+          z.object({
+            dayOfWeek: z.number().min(0).max(6),
+            isOpen: z.boolean(),
+            openTime: z.string().optional(),
+            closeTime: z.string().optional(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { businessId, workingHours } = input;
+
+      const validHours = workingHours
+        .filter(
+          (h) =>
+            h.isOpen &&
+            typeof h.openTime === "string" &&
+            typeof h.closeTime === "string",
+        )
+        .map((h) => {
+          const open = dayjs.tz(
+            `2000-01-01T${h.openTime}:00`,
+            "Asia/Jerusalem",
+          );
+          const close = dayjs.tz(
+            `2000-01-01T${h.closeTime}:00`,
+            "Asia/Jerusalem",
+          );
+
+          return {
+            businessId,
+            dayOfWeek: h.dayOfWeek,
+            openTime: open.toDate(),
+            closeTime: close.toDate(),
+          };
+        });
+
+      if (validHours.length === 0) return [];
+
+      await ctx.db.openingHours.createMany({
+        data: validHours,
+        skipDuplicates: true,
+      });
+
+      return validHours;
     }),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
@@ -159,7 +216,7 @@ export const businessRouter = createTRPCRouter({
       z.object({
         businessId: z.number(),
         date: z.date(),
-        serviceId: z.number().optional(),
+        serviceId: z.number(),
         workerId: z.number(),
       }),
     )
@@ -192,7 +249,12 @@ export const businessRouter = createTRPCRouter({
               },
             }),
             ctx.db.businessService.findMany({
-              where: { businessId: input.businessId },
+              where: {
+                businessId: input.businessId,
+                service: {
+                  id: input.serviceId,
+                },
+              },
               include: { service: true },
             }),
             ctx.db.appointment.findMany({
@@ -228,9 +290,7 @@ export const businessRouter = createTRPCRouter({
           return [];
         }
 
-        const shortestDuration = services.length
-          ? Math.min(...services.map((bs) => bs.service.durationMinutes))
-          : 30;
+        const shortestDuration = services[0]?.service.durationMinutes ?? 30;
 
         const intervals: string[] = [];
 
@@ -267,9 +327,10 @@ export const businessRouter = createTRPCRouter({
               "minute",
             );
 
+            const aptEnd = aptTime.add(apt.service.durationMinutes, "minute");
             return (
               aptTime.isBefore(timeEndInAptDay) &&
-              aptTime.add(shortestDuration, "minute").isAfter(timeStartInAptDay)
+              aptEnd.isAfter(timeStartInAptDay)
             );
           });
 
@@ -309,4 +370,29 @@ export const businessRouter = createTRPCRouter({
 
     return business ? true : false;
   }),
+  deleteBusiness: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const business = await ctx.db.business.findFirst({
+        where: {
+          id: input.businessId,
+        },
+      });
+      if (!business) {
+        throw new Error("Business not found");
+      }
+      if (business?.ownerId !== ctx.session.user.id) {
+        throw new Error("you are not allowed to delete this business");
+      }
+      await ctx.db.business.delete({
+        where: {
+          id: business.id,
+        },
+      });
+      return { success: true };
+    }),
 });
