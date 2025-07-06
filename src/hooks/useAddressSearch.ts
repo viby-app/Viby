@@ -22,7 +22,7 @@ export const useGeoapifySearch = (query: string, debounceMs = 500) => {
         try {
           const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
             query,
-          )}ישראל&lang=he&format=json&apiKey=${env.NEXT_PUBLIC_MAPS_API_KEY}`;
+          )} ישראל&lang=he&format=json&apiKey=${env.NEXT_PUBLIC_MAPS_API_KEY}`;
 
           const res = await fetch(url);
           const data: GeoapifySearchResponse = await res.json();

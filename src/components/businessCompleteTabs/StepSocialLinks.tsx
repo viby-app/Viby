@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { MessageCircle, Instagram } from "lucide-react";
-import type { UseFormGetValues, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type {
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm } from "~/utils/types";
 import { normalizePhoneNumber } from "~/utils/functions/helperFunctions";
@@ -11,26 +15,33 @@ type Props = {
   register: UseFormRegister<CompleteBusinessForm>;
   setValue: UseFormSetValue<CompleteBusinessForm>;
   phoneNumber: string;
-  getValues: UseFormGetValues<CompleteBusinessForm>
+  getValues: UseFormGetValues<CompleteBusinessForm>;
 };
 
-export function StepSocialLinks({ register, setValue, getValues, phoneNumber }: Props) {
-  const [instagramInput, setInstagramInput] = useState<string | undefined>(undefined)
+export function StepSocialLinks({
+  register,
+  setValue,
+  getValues,
+  phoneNumber,
+}: Props) {
+  const [instagramInput, setInstagramInput] = useState("");
+
+  useEffect(() => {
+    const current = getValues("instagram")?.replace("https://instagram.com/", "");
+    if (current) setInstagramInput(current);
+  }, [getValues]);
+
   useEffect(() => {
     if (phoneNumber) {
       const normalized = normalizePhoneNumber(phoneNumber);
       const link = `https://wa.me/${normalized}`;
       setValue("whatsapp", link);
     }
-  }, [phoneNumber, setValue, instagramInput]);
+  }, [phoneNumber, setValue]);
 
   useEffect(() => {
-    if (instagramInput !== undefined) {
-      setValue("instagram", `https://instagram.com/${instagramInput}`)
-    } else {
-      setInstagramInput(getValues("instagram")?.replaceAll("https://instagram.com/", ""))
-    }
-  }, [instagramInput])
+    setValue("instagram", instagramInput ? `https://instagram.com/${instagramInput}` : "");
+  }, [instagramInput, setValue]);
 
   return (
     <>
@@ -38,7 +49,7 @@ export function StepSocialLinks({ register, setValue, getValues, phoneNumber }: 
         {hebrewDictionary.links}
       </h1>
 
-      <div className="flex items-center justify-between gap-2 mb-4 w-full rounded-lg bg-white px-4 py-2 shadow-md">
+      <div className="mb-4 flex w-full items-center justify-between gap-2 rounded-lg bg-white px-4 py-2 shadow-md">
         <input
           {...register("whatsapp")}
           placeholder={hebrewDictionary.whatsappLink}
@@ -47,7 +58,7 @@ export function StepSocialLinks({ register, setValue, getValues, phoneNumber }: 
         <MessageCircle className="text-green-500" />
       </div>
 
-      <div className="flex items-center justify-between gap-2 mb-4 w-full rounded-lg bg-white px-4 py-2 shadow-md">
+      <div className="mb-4 flex w-full items-center justify-between gap-2 rounded-lg bg-white px-4 py-2 shadow-md">
         <input
           placeholder={hebrewDictionary.instagramLink}
           className="w-full focus:outline-none"

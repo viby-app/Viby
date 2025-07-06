@@ -169,11 +169,11 @@ export default function BusinessForm() {
       }
     }
 
-    setSubmissionStep(null);
-    resetForm();
     await fetch("/api/auth/session");
     await getSession();
     await router.push(businessRoute(businessId));
+    resetForm();
+    setSubmissionStep(null);
   };
 
   return (

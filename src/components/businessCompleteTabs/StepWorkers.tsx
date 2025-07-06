@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
 import type { CompleteBusinessForm, UserWorker } from "~/utils/types";
@@ -8,6 +8,8 @@ import { Trash2, Search, User } from "lucide-react";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import ImageWithDynamicSrc from "../image";
+import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
+import logger from "~/lib/logger";
 
 type Props = {
     control: Control<CompleteBusinessForm>;
@@ -24,6 +26,7 @@ export function StepWorkers({ control, register, errors }: Props) {
     const [searchPhone, setSearchPhone] = useState("");
     const [searching, setSearching] = useState(false);
     const [foundUser, setFoundUser] = useState<UserWorker | null>(null);
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null)
 
     const searchUserMutation = api.user.searchUserByPhone.useMutation();
 
@@ -72,6 +75,23 @@ export function StepWorkers({ control, register, errors }: Props) {
         setSearchPhone("");
     };
 
+    useEffect(() => {
+        const fetchImageUrl = async () => {
+            try {
+                if (foundUser?.image && !foundUser.image.includes("google")) {
+                    const url = await getPreSignedUrlFromKey(foundUser.image);
+                    setProfileImageUrl(url);
+                } else {
+                    setProfileImageUrl(foundUser?.image ?? "");
+                }
+            } catch (err) {
+                logger.error("Failed to fetch image URL:", err);
+                setProfileImageUrl("");
+            }
+        };
+        void fetchImageUrl()
+    }, [foundUser])
+
     return (
         <>
             <h1 className="mb-6 text-center text-2xl font-bold text-black">
@@ -105,7 +125,7 @@ export function StepWorkers({ control, register, errors }: Props) {
                 {foundUser && (
                     <div className="rounded-lg bg-green-50 p-4 border border-green-200">
                         <div className="flex items-center gap-3">
-                            {foundUser.image ? <ImageWithDynamicSrc src={`/api/image/${foundUser.image}`} alt="image" height={200} width={200} />
+                            {profileImageUrl ? <ImageWithDynamicSrc className="h-16 w-16 rounded-full" src={profileImageUrl} alt="image" height={200} width={200} />
                                 : <User className="h-8 w-8 text-green-600" />}
                             <div className="flex-1">
                                 <p className="font-semibold text-green-800">{foundUser.name}</p>
