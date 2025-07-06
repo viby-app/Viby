@@ -34,12 +34,12 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
       </h1>
 
       <div>
-        <label className="mb-1 block font-medium">
+        <label className="block font-medium">
           {hebrewDictionary.businessName}
         </label>
         <input
           {...register("name")}
-          className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
+          className="w-full my-1 rounded-lg bg-white px-4 py-2 shadow-md"
         />
         {errors.name && (
           <p className="text-sm text-red-500">{errors.name.message}</p>
@@ -47,13 +47,13 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">
+        <label className="block font-medium">
           {hebrewDictionary.businessDescription}
         </label>
         <textarea
           {...register("description")}
           rows={3}
-          className="w-full resize-none rounded-lg bg-white px-4 py-2 shadow-md"
+          className="w-full my-1 resize-none rounded-lg bg-white px-4 py-2 shadow-md"
         />
         {errors.description && (
           <p className="text-sm text-red-500">{errors.description.message}</p>
@@ -61,7 +61,7 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
       </div>
 
       <div className="relative">
-        <label className="mb-1 block font-medium">
+        <label className="block font-medium">
           {hebrewDictionary.businessAddress}
         </label>
         <input
@@ -71,7 +71,7 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
             setShowDropdown(true);
           }}
           autoComplete="off"
-          className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
+          className="w-full my-1 rounded-lg bg-white px-4 py-2 shadow-md"
         />
         {loading && <div className="loading loading-dots" />}
         {showDropdown && results.length > 0 && (
@@ -93,12 +93,12 @@ export function StepBusinessInfo({ register, errors, setValue, getValues }: Prop
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">
-          {hebrewDictionary.phone}
+        <label className="block font-medium">
+          {hebrewDictionary.businessPhone}
         </label>
         <input
           {...register("phone")}
-          className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
+          className="w-full my-1 rounded-lg bg-white px-4 py-2 shadow-md"
         />
         {errors.phone && (
           <p className="text-sm text-red-500">{errors.phone.message}</p>

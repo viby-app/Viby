@@ -187,9 +187,9 @@ export default function BusinessForm() {
           animate="center"
           exit="exit"
           transition={{ duration: 0.3 }}
-          className="flex w-full items-center justify-center"
+          className="flex w-full items-center justify-center h-full"
         >
-          <div className="w-full max-w-md rounded-2xl bg-[#F2EFE7] p-6 text-right shadow-lg">
+          <div className="w-full max-w-md rounded-2xl bg-[#F2EFE7] p-6 text-right shadow-lg overflow-y-scroll max-h-5/6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {submissionStep !== null ? (
                 <div className="flex flex-col items-center justify-center min-h-[300px]">

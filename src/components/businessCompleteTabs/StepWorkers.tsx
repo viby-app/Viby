@@ -94,11 +94,11 @@ export function StepWorkers({ control, register, errors }: Props) {
 
     return (
         <>
-            <h1 className="mb-6 text-center text-2xl font-bold text-black">
+            <h1 className="mb-2 text-center text-2xl font-bold text-black">
                 {hebrewDictionary.workers}
             </h1>
 
-            <div className="mb-6 space-y-4 rounded-lg border border-gray-200 p-4">
+            <div className="mb-4 space-y-4 rounded-lg border border-gray-200 p-4">
                 <h3 className="text-lg font-semibold text-black">
                     {hebrewDictionary.searchWorker}
                 </h3>
@@ -123,8 +123,8 @@ export function StepWorkers({ control, register, errors }: Props) {
                 </div>
 
                 {foundUser && (
-                    <div className="rounded-lg bg-green-50 p-4 border border-green-200">
-                        <div className="flex items-center gap-3">
+                    <div className="flex flex-col rounded-lg bg-green-50 p-4 border border-green-200">
+                        <div className="flex gap-3">
                             {profileImageUrl ? <ImageWithDynamicSrc className="h-16 w-16 rounded-full" src={profileImageUrl} alt="image" height={200} width={200} />
                                 : <User className="h-8 w-8 text-green-600" />}
                             <div className="flex-1">
@@ -134,14 +134,14 @@ export function StepWorkers({ control, register, errors }: Props) {
                                     <p className="text-sm text-green-600">{foundUser.email}</p>
                                 )}
                             </div>
-                            <button
-                                type="button"
-                                onClick={handleAddWorker}
-                                className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                            >
-                                {hebrewDictionary.addWorker}
-                            </button>
                         </div>
+                        <button
+                            type="button"
+                            onClick={handleAddWorker}
+                            className="rounded-lg self-end mt-2 bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                        >
+                            {hebrewDictionary.addWorker}
+                        </button>
                     </div>
                 )}
             </div>
