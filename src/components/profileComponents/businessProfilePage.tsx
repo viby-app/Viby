@@ -29,7 +29,7 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const business = businesses ? businesses[1] : null;
 
   const businessId: number = business?.id ?? 0;
-  const enabled: boolean = !!businessId;
+  const enabled = !!businessId;
   const firstName = user?.name?.split(" ")[0] ?? "";
 
   const { data: followersCount } =

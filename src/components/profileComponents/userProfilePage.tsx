@@ -18,7 +18,7 @@ const UserProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
-  const firstName = user?.name!.split(" ")[0];
+  const firstName = user?.name?.split(" ")[0];
   const { data: linkedUsers } = api.user.getUserFriends.useQuery();
   const { data: lastAppointment, isLoading: lastAppointmentLoading } =
     api.appointment.getLastAppointmentByUserId.useQuery(

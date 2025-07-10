@@ -26,7 +26,10 @@ export default function HomePage() {
           ) : (
             <div className="flex w-full snap-x snap-mandatory space-x-4 overflow-x-auto p-2 lg:max-w-none">
               {myBusinesses.data.map((followedBusiness) => (
-                <BusinessCard businessId={followedBusiness.business.id} />
+                <BusinessCard
+                  key={followedBusiness.business.id}
+                  businessId={followedBusiness.business.id}
+                />
               ))}
             </div>
           )}
@@ -46,7 +49,7 @@ export default function HomePage() {
             ) : (
               <div>
                 {allBusinesses.data.map((business) => (
-                  <BusinessCard businessId={business.id} />
+                  <BusinessCard key={business.id} businessId={business.id} />
                 ))}
               </div>
             )}
