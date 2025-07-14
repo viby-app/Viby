@@ -1,4 +1,4 @@
-import BusinessCard from "~/components/profileComponents/businessCard";
+import BusinessCard from "~/components/businessCard";
 import Layout from "~/components/layout";
 import { api } from "~/utils/api";
 import { hebrewDictionary } from "~/utils/constants";

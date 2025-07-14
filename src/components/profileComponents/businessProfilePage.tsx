@@ -9,7 +9,7 @@ import Card from "~/components/cardComponent";
 import ProfileHeadPage from "~/components/profileComponents/profileHeadPage";
 import ImageAndNameComponent from "~/components/profileComponents/imageAndNameComponent";
 import Link from "next/link";
-import BusinessCard from "~/components/profileComponents/businessCard";
+import BusinessCard from "~/components/businessCard";
 import {
   UsersRoundIcon,
   MessageCircleIcon,
