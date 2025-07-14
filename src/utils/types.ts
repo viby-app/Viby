@@ -1,4 +1,4 @@
-import { type $Enums, Gender, User } from "@prisma/client";
+import { type $Enums, Gender, type User } from "@prisma/client";
 import { z } from "zod";
 import { hebrewDictionary } from "./constants";
 

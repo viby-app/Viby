@@ -2,7 +2,7 @@ import Image from "next/image";
 import ImagesComponent from "../imagesComponent";
 import { api } from "~/utils/api";
 import { useEffect, useState } from "react";
-import { getPreSignedUrlFromKey } from "~/utils/imageFunctions";
+import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 import { fetchImageUrl } from "~/utils/profileUtils";
 import Stars from "../ratingStars";
 

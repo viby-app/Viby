@@ -1,5 +1,5 @@
 import logger from "~/lib/logger";
-import { getPreSignedUrlFromKey } from "./imageFunctions";
+import { getPreSignedUrlFromKey } from "./functions/imageFunctions";
 
 export const fetchImageUrl = async (
   setImageLoading: React.Dispatch<React.SetStateAction<boolean>>,
