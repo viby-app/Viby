@@ -26,7 +26,7 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(true);
 
-  const business = businesses ? businesses[1] : null;
+  const business = businesses ? businesses[0] : null;
 
   const businessId: number = business?.id ?? 0;
   const enabled = !!businessId;
