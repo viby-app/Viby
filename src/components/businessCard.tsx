@@ -52,7 +52,7 @@ const BusinessCard: React.FC<Props> = ({ businessId }) => {
 
   return (
     <Link href={businessRoute(businessId)}>
-      <div className="flex h-[400px] w-full max-w-sm flex-col rounded-2xl border-4 border-[#48a5a748]">
+      <div className="flex h-full w-full min-w-3xs flex-col rounded-2xl border-4 border-[#48a5a748]">
         <div className="rounded-t-xl px-4 py-2 text-center">
           <div className="flex flex-row items-center justify-start gap-2">
             {logoLoading ? (

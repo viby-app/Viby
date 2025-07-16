@@ -47,7 +47,7 @@ export default function HomePage() {
                 {hebrewDictionary.noBusinessesToDisplay}
               </p>
             ) : (
-              <div>
+              <div className="flex max-h-full w-full flex-col justify-center space-y-4 overflow-x-scroll p-2 lg:max-w-none">
                 {allBusinesses.data.map((business) => (
                   <BusinessCard key={business.id} businessId={business.id} />
                 ))}

@@ -18,7 +18,7 @@ const ProfilePage = () => {
   ) : user?.role === "BUSINESS_OWNER" ? (
     <BusinessProfilePage isUserLoading={isUserLoading} user={user} />
   ) : (
-    <div></div>
+    <></>
   );
 };
 

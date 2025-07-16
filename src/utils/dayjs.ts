@@ -11,6 +11,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localeData);
 dayjs.extend(updateLocale);
+dayjs.tz.setDefault("Asia/Jerusalem");
 
 dayjs.locale("he");
 
