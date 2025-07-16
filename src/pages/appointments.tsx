@@ -36,7 +36,7 @@ const AppointmentsManagementPage: NextPage = () => {
   }, [status, isWorker.data]);
 
   const userId = user?.user?.id;
-  const date = dayjs.utc(selectedDate)?.toISOString()!;
+  const date = dayjs.utc(selectedDate).toISOString();
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
