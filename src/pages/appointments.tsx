@@ -34,16 +34,29 @@ const AppointmentsManagementPage: NextPage = () => {
     }
   }, [status, isWorker.data]);
 
+  const getUtcDayRange = (date: Date) => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return {
+      startUtc: start.toISOString(),
+      endUtc: end.toISOString(),
+    };
+  };
+
   const userId = user?.user?.id;
-  const date = selectedDate?.toISOString();
+  const utcRange = selectedDate ? getUtcDayRange(selectedDate) : undefined;
+
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: date!,
+        startUtc: utcRange?.startUtc!,
+        endUtc: utcRange?.endUtc!,
       },
       {
-        enabled: !!userId && !!date,
+        enabled: !!userId && !!utcRange,
       },
     );
 
