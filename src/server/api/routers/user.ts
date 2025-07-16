@@ -42,6 +42,15 @@ export const userRouter = createTRPCRouter({
 
     return linkedUsers;
   }),
+  getUserBusinesses: protectedProcedure.query(async ({ ctx }) => {
+    const businesses = await ctx.db.business.findMany({
+      where: {
+        ownerId: ctx.session.user.id,
+      },
+    });
+
+    return businesses;
+  }),
   updateUser: protectedProcedure
     .input(
       z.object({

@@ -1,4 +1,4 @@
-import { type $Enums, Gender } from "@prisma/client";
+import { type $Enums, Gender, type User } from "@prisma/client";
 import { z } from "zod";
 import { hebrewDictionary } from "./constants";
 
@@ -165,3 +165,25 @@ export type Services = {
   price: number;
   description?: string | undefined;
 }[];
+export type OpeningHours =
+  | {
+      businessId: number;
+      id: number;
+      dayOfWeek: number;
+      openTime: Date;
+      closeTime: Date;
+    }[]
+  | undefined;
+
+export type Images =
+  | {
+      id: number;
+      key: string;
+      businessId: number;
+    }[]
+  | undefined;
+
+  export interface ProfileProps {
+    user: User;
+    isUserLoading: boolean;
+  }

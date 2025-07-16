@@ -11,6 +11,7 @@ import type { AppointmentModalDetails } from "~/utils/types";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
 import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsTab";
 import { hebrewDictionary } from "~/utils/constants";
+import dayjs from "~/utils/dayjs";
 
 const AppointmentsManagementPage: NextPage = () => {
   const { data: user, status } = useSession();
@@ -35,12 +36,12 @@ const AppointmentsManagementPage: NextPage = () => {
   }, [status, isWorker.data]);
 
   const userId = user?.user?.id;
-  const date = selectedDate?.toISOString();
+  const date = dayjs.utc(selectedDate).toISOString();
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: date!,
+        date: date,
       },
       {
         enabled: !!userId && !!date,
