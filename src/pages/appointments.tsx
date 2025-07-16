@@ -11,6 +11,7 @@ import type { AppointmentModalDetails } from "~/utils/types";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
 import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsTab";
 import { hebrewDictionary } from "~/utils/constants";
+import dayjs from "~/utils/dayjs";
 
 const AppointmentsManagementPage: NextPage = () => {
   const { data: user, status } = useSession();
@@ -34,29 +35,16 @@ const AppointmentsManagementPage: NextPage = () => {
     }
   }, [status, isWorker.data]);
 
-  const getUtcDayRange = (date: Date) => {
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
-    return {
-      startUtc: start.toISOString(),
-      endUtc: end.toISOString(),
-    };
-  };
-
   const userId = user?.user?.id;
-  const utcRange = selectedDate ? getUtcDayRange(selectedDate) : undefined;
-
+  const date = dayjs.utc(selectedDate)?.toISOString()!;
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        startUtc: utcRange?.startUtc!,
-        endUtc: utcRange?.endUtc!,
+        date: date,
       },
       {
-        enabled: !!userId && !!utcRange,
+        enabled: !!userId && !!date,
       },
     );
 

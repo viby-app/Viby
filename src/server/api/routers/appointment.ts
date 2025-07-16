@@ -55,8 +55,7 @@ export const appointmetRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string(),
-        startUtc: z.string(),
-        endUtc: z.string(),
+        date: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -81,6 +80,15 @@ export const appointmetRouter = createTRPCRouter({
         throw new Error("Business not found for the given owner ID");
       }
 
+      const startOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .startOf("day")
+        .toDate();
+      const endOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .endOf("day")
+        .toDate();
+
       const appointments = await ctx.db.appointment.findMany({
         orderBy: {
           date: "asc",
@@ -88,8 +96,8 @@ export const appointmetRouter = createTRPCRouter({
         where: {
           businessId: business.id,
           date: {
-            gte: new Date(input.startUtc),
-            lte: new Date(input.endUtc),
+            gte: startOfDay,
+            lte: endOfDay,
           },
         },
         include: {
