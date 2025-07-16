@@ -8,14 +8,13 @@ import { fetchImageUrl } from "~/utils/profileUtils";
 import Card from "~/components/cardComponent";
 import ProfileHeadPage from "~/components/profileComponents/profileHeadPage";
 import ImageAndNameComponent from "~/components/profileComponents/imageAndNameComponent";
-import Link from "next/link";
 import BusinessCard from "~/components/businessCard";
 import {
   UsersRoundIcon,
   MessageCircleIcon,
   ChartNoAxesCombinedIcon,
-  EyeIcon,
   PencilIcon,
+  BriefcaseBusinessIcon,
 } from "lucide-react";
 import type { ProfileProps } from "~/utils/types";
 
@@ -92,21 +91,22 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
 
               <div className="mb-2 border-t-4 border-[#48a5a748] pt-2 text-gray-800">
                 <div className="flex justify-center">
-                  <Link
-                    href="/profile"
-                    className="rounded-full px-4 py-1 text-sm hover:bg-gray-100"
-                  >
-                    <span className="text-xl font-semibold">
-                      {hebrewDictionary.myBusiness}
-                      <PencilIcon className="inline h-6 w-6" />
-                    </span>
-                  </Link>
+                  <span className="rounded-full text-2xl font-semibold">
+                    {hebrewDictionary.myBusiness}
+                    <BriefcaseBusinessIcon className="inline h-6 w-6" />
+                  </span>
                 </div>
               </div>
 
               <BusinessCard businessId={businessId} />
 
               <div className="mt-4 space-y-2 border-t-4 border-[#48a5a748] pt-2 text-right text-sm font-medium text-gray-800">
+                <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
+                  <span className="text-lg font-semibold text-gray-800">
+                    {hebrewDictionary.editBusiness}
+                  </span>
+                  <PencilIcon className="h-5 w-5 text-gray-800" />
+                </div>
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
                   <span className="text-lg font-semibold text-gray-800">
                     {hebrewDictionary.myCustomers}
@@ -124,12 +124,6 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
                     {hebrewDictionary.statistics}
                   </span>
                   <ChartNoAxesCombinedIcon className="text-gray-800] h-6 w-6" />
-                </div>
-                <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-lg font-semibold text-gray-800">
-                    {hebrewDictionary.viewingAsCustomer}
-                  </span>
-                  <EyeIcon className="h-5 w-5 text-gray-800" />
                 </div>
               </div>
             </>

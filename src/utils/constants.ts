@@ -135,8 +135,8 @@ export const hebrewDictionary = {
   reviews: "ביקורות",
   myCustomers : "הלקוחות שלי",
   statistics: "סטטיסטיקות",
-  viewingAsCustomer: "צפייה כלקוח",
-  myBusiness: "העסק שלי",
+  editBusiness:"פרטי העסק",
+  myBusiness: "  העסק שלי  ",
 };
 
 export const submissionSteps = [

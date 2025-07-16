@@ -1,10 +1,12 @@
 import Image from "next/image";
-import ImagesComponent from "./imagesComponent";
+import ImagesCarsoule from "./imagesCarsoule";
 import { api } from "~/utils/api";
 import { useEffect, useState } from "react";
 import { getPreSignedUrlFromKey } from "~/utils/functions/imageFunctions";
 import { fetchImageUrl } from "~/utils/profileUtils";
 import Stars from "./ratingStars";
+import Link from "next/link";
+import { businessRoute } from "~/helpers/routes";
 
 interface Props {
   businessId: number;
@@ -49,46 +51,48 @@ const BusinessCard: React.FC<Props> = ({ businessId }) => {
   }, [business?.logo]);
 
   return (
-    <div className="flex h-[400px] w-full max-w-sm flex-col rounded-2xl border-4 border-[#48a5a748]">
-      <div className="rounded-t-xl px-4 py-2 text-center">
-        <div className="flex flex-row items-center justify-start gap-2">
-          {logoLoading ? (
-            <div className="flex h-16 w-16 items-center justify-center">
+    <Link href={businessRoute(businessId)}>
+      <div className="flex h-[400px] w-full max-w-sm flex-col rounded-2xl border-4 border-[#48a5a748]">
+        <div className="rounded-t-xl px-4 py-2 text-center">
+          <div className="flex flex-row items-center justify-start gap-2">
+            {logoLoading ? (
+              <div className="flex h-16 w-16 items-center justify-center">
+                <div className="loading loading-spinner" />
+              </div>
+            ) : (
+              <Image
+                src={logoUrl ?? ""}
+                alt="business logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 rounded-full border object-cover"
+              />
+            )}
+            <div className="text-right">
+              <h2 className="truncate text-lg font-bold">{business?.name}</h2>
+              <p className="truncate text-sm text-gray-700">
+                {business?.address}
+              </p>
+              <Stars rating={parseFloat(ratings ?? "0")} />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative h-full w-full overflow-hidden">
+          {!preSignedUrls ? (
+            <div className="flex h-full w-full items-center justify-center">
               <div className="loading loading-spinner" />
             </div>
           ) : (
-            <Image
-              src={logoUrl ?? ""}
-              alt="business logo"
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-full border object-cover"
+            <ImagesCarsoule
+              images={preSignedUrls}
+              isBusinessLoading={isBusinessLoading}
+              isImagesLoading={isImagesLoading}
             />
           )}
-          <div className="text-right">
-            <h2 className="truncate text-lg font-bold">{business?.name}</h2>
-            <p className="truncate text-sm text-gray-700">
-              {business?.address}
-            </p>
-            <Stars rating={parseFloat(ratings ?? "0")} />
-          </div>
         </div>
       </div>
-
-      <div className="relative h-full w-full overflow-hidden">
-        {!preSignedUrls ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <div className="loading loading-spinner" />
-          </div>
-        ) : (
-          <ImagesComponent
-            images={preSignedUrls}
-            isBusinessLoading={isBusinessLoading}
-            isImagesLoading={isImagesLoading}
-          />
-        )}
-      </div>
-    </div>
+    </Link>
   );
 };
 
