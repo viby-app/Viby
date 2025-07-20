@@ -42,7 +42,7 @@ const AppointmentsManagementPage: NextPage = () => {
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: localDate,
+        date: localDate!,
       },
       {
         enabled: !!userId && !!localDate,

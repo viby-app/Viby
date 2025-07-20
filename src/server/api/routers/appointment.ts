@@ -82,13 +82,13 @@ export const appointmetRouter = createTRPCRouter({
         throw new Error("Business not found for the given owner ID");
       }
 
-      const startOfDay = dayjs
-        .tz(`${input.date}T00:00:00`, "Asia/Jerusalem")
-        .utc()
+      const startOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .startOf("day")
         .toDate();
-      const endOfDay = dayjs
-        .tz(`${input.date}T23:59:59`, "Asia/Jerusalem")
-        .utc()
+      const endOfDay = dayjs(input.date)
+        .tz("Asia/Jerusalem")
+        .endOf("day")
         .toDate();
 
       console.log("Requested Date:", input.date);
