@@ -159,6 +159,11 @@ export interface GeoapifyResult {
   };
 }
 
+export type LinkedWorker = {
+  userId: string;
+  wage: number;
+};
+
 export type Services = {
   name: string;
   durationMinutes: number;
@@ -187,3 +192,32 @@ export type Images =
     user: User;
     isUserLoading: boolean;
   }
+
+export type ServiceWithWorkers = {
+  name: string;
+  durationMinutes: number;
+  price: number;
+  description?: string;
+  workers: LinkedWorker[];
+};
+
+export type ServicesWithWorkers = ServiceWithWorkers[];
+
+export const servicesWithWorkersSchema = z.array(
+  z.object({
+    name: z.string(),
+    durationMinutes: z.number(),
+    price: z.number(),
+    description: z.string().optional(),
+    workers: z.array(
+      z.object({
+        userId: z.string(),
+        wage: z.number(),
+      }),
+    ),
+  }),
+);
+
+export type ServicesWithWorkersInput = z.infer<
+  typeof servicesWithWorkersSchema
+>;

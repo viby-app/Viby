@@ -257,9 +257,9 @@ export const businessRouter = createTRPCRouter({
                 },
               },
             }),
-            ctx.db.businessService.findMany({
+            ctx.db.workerService.findMany({
               where: {
-                businessId: input.businessId,
+                workerId: input.workerId,
                 service: {
                   id: input.serviceId,
                 },

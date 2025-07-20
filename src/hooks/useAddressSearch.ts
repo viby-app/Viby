@@ -6,7 +6,7 @@ interface GeoapifySearchResponse {
   results: GeoapifyResult[];
 }
 
-export const useGeoapifySearch = (query: string, debounceMs = 500) => {
+export const useGeoapifySearch = (query: string, debounceMs = 400) => {
   const [results, setResults] = useState<GeoapifyResult[]>([]);
   const [loading, setLoading] = useState(false);
 

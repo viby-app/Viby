@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useFieldArray, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { hebrewDictionary } from "~/utils/constants";
-import type { CompleteBusinessForm, UserWorker } from "~/utils/types";
+import type { CompleteBusinessForm, ServicesWithWorkers, ServiceWithWorkers, UserWorker } from "~/utils/types";
 import { Trash2, Search, User } from "lucide-react";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
@@ -15,9 +15,11 @@ type Props = {
     control: Control<CompleteBusinessForm>;
     register: UseFormRegister<CompleteBusinessForm>;
     errors: FieldErrors<CompleteBusinessForm>;
+    servicesWorkers: ServiceWithWorkers[];
+    setServicesWorkers: Dispatch<SetStateAction<ServicesWithWorkers>>;
 };
 
-export function StepWorkers({ control, register, errors }: Props) {
+export function StepWorkers({ control, register, errors, servicesWorkers, setServicesWorkers }: Props) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "workers",
@@ -73,6 +75,38 @@ export function StepWorkers({ control, register, errors }: Props) {
 
         setFoundUser(null);
         setSearchPhone("");
+    };
+
+    const handleToggleWorkerService = (
+        serviceIndex: number,
+        worker: { userId: string; name: string; phone: string; wage: number },
+        checked: boolean
+    ) => {
+        setServicesWorkers((prev) =>
+            prev.map((service, idx) =>
+                idx === serviceIndex
+                    ? {
+                        ...service,
+                        workers: checked
+                            ? [...service.workers, worker]
+                            : service.workers.filter((w) => w.userId !== worker.userId),
+                    }
+                    : service
+            )
+        );
+    };
+
+    const handleRemoveWorker = (index: number) => {
+        const userId = fields[index]?.userId;
+        if (userId !== undefined) {
+            remove(index);
+            setServicesWorkers(prev =>
+                prev.map(service => ({
+                    ...service,
+                    workers: service.workers.filter(w => w.userId !== userId)
+                }))
+            );
+        }
     };
 
     useEffect(() => {
@@ -163,7 +197,7 @@ export function StepWorkers({ control, register, errors }: Props) {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => remove(index)}
+                                onClick={() => handleRemoveWorker(index)}
                                 className="text-red-500 hover:text-red-700"
                             >
                                 <Trash2 className="h-5 w-5" />
@@ -180,6 +214,37 @@ export function StepWorkers({ control, register, errors }: Props) {
                                 placeholder={hebrewDictionary.workerWage}
                                 className="w-full rounded-lg bg-white px-4 py-2 shadow-md"
                             />
+                            {
+                                servicesWorkers.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 text-sm text-gray-500 mt-1">
+                                        {servicesWorkers
+                                            .map((service, serviceIdx) => {
+                                                const isChecked = service.workers.some(w => w.userId === field.userId);
+                                                return (
+                                                    <label key={serviceIdx} className="flex items-center gap-1 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="checkbox checkbox-sm"
+                                                            checked={isChecked}
+                                                            onChange={e => handleToggleWorkerService(
+                                                                serviceIdx,
+                                                                {
+                                                                    userId: field.userId,
+                                                                    name: field.name,
+                                                                    phone: field.phone,
+                                                                    wage: field.wage ?? 0,
+                                                                },
+                                                                e.target.checked
+                                                            )}
+                                                        />
+                                                        <span>{service.name}</span>
+                                                    </label>
+                                                );
+                                            })
+                                        }
+                                    </div>
+                                )
+                            }
                             {errors.workers?.[index]?.wage && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.workers[index].wage.message}
