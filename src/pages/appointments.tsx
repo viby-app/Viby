@@ -36,20 +36,19 @@ const AppointmentsManagementPage: NextPage = () => {
   }, [status, isWorker.data]);
 
   const userId = user?.user?.id;
-  const date = dayjs.utc(selectedDate).toISOString();
+  const date = selectedDate?.toISOString();
 
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: localDate!,
+        date: date!,
       },
       {
-        enabled: !!userId && !!localDate,
+        enabled: !!userId && !!date,
       },
     );
 
-  console.log("Business Appointments Data:", businessAppointments.data);
   return (
     <Layout>
       <div className="flex flex-col items-center p-4">
