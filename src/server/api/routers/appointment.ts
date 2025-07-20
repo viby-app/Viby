@@ -127,7 +127,7 @@ export const appointmetRouter = createTRPCRouter({
           user: true,
         },
       });
-
+      console.log("Appointments found:", appointments);
       return appointments;
     }),
   deleteAppointment: protectedProcedure

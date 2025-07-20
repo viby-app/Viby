@@ -37,8 +37,8 @@ const AppointmentsManagementPage: NextPage = () => {
 
   const userId = user?.user?.id;
   const date = dayjs.utc(selectedDate).toISOString();
-  const businessAppointments =
 
+  const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
@@ -49,7 +49,7 @@ const AppointmentsManagementPage: NextPage = () => {
       },
     );
 
-
+  console.log("Business Appointments Data:", businessAppointments.data);
   return (
     <Layout>
       <div className="flex flex-col items-center p-4">
