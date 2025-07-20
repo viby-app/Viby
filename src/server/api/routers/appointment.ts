@@ -57,8 +57,7 @@ export const appointmetRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string(),
-        date: z.string(), // e.g. "2025-07-20"
-        timezone: z.string(), // e.g. "Asia/Jerusalem"
+        date: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -84,11 +83,11 @@ export const appointmetRouter = createTRPCRouter({
       }
 
       const startOfDay = dayjs
-        .tz(`${input.date}T00:00:00`, input.timezone)
+        .tz(`${input.date}T00:00:00`, "Asia/Jerusalem")
         .utc()
         .toDate();
       const endOfDay = dayjs
-        .tz(`${input.date}T23:59:59`, input.timezone)
+        .tz(`${input.date}T23:59:59`, "Asia/Jerusalem")
         .utc()
         .toDate();
 

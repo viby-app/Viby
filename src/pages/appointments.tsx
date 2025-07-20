@@ -43,7 +43,6 @@ const AppointmentsManagementPage: NextPage = () => {
       {
         userId: userId!,
         date: localDate,
-        timezone,
       },
       {
         enabled: !!userId && !!localDate,
