@@ -24,38 +24,41 @@ export const appointmetRouter = createTRPCRouter({
         },
       });
 
-            return appointment;
-        }),
-    getLastAppointmentByUserId: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
-        const appointment = await ctx.db.appointment.findFirst({
-            where: {
-                userId: input.userId,
+      return appointment;
+    }),
+  getLastAppointmentByUserId: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const appointment = await ctx.db.appointment.findFirst({
+        where: {
+          userId: input.userId,
+        },
+        include: {
+          service: {
+            select: {
+              name: true,
             },
-            include: {
-                service: {
-                    select: {
-                        name: true
-                    }
-                },
-                business: {
-                    select: {
-                        name: true,
-                        logo: true
-                    }
-                },
+          },
+          business: {
+            select: {
+              name: true,
+              logo: true,
             },
-            orderBy: {
-                date: "desc",
-            },
-        });
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
 
-        return appointment;
+      return appointment;
     }),
   getAppointmentsByOwnerOrWorkerId: protectedProcedure
     .input(
       z.object({
         userId: z.string(),
-        date: z.string(),
+        date: z.string(), // e.g. "2025-07-20"
+        timezone: z.string(), // e.g. "Asia/Jerusalem"
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -80,13 +83,13 @@ export const appointmetRouter = createTRPCRouter({
         throw new Error("Business not found for the given owner ID");
       }
 
-      const startOfDay = dayjs(input.date)
-        .tz("Asia/Jerusalem")
-        .startOf("day")
+      const startOfDay = dayjs
+        .tz(`${input.date}T00:00:00`, input.timezone)
+        .utc()
         .toDate();
-      const endOfDay = dayjs(input.date)
-        .tz("Asia/Jerusalem")
-        .endOf("day")
+      const endOfDay = dayjs
+        .tz(`${input.date}T23:59:59`, input.timezone)
+        .utc()
         .toDate();
 
       const appointments = await ctx.db.appointment.findMany({

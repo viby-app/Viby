@@ -41,20 +41,14 @@ const AppointmentsManagementPage: NextPage = () => {
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: date,
+        date: localDate,
+        timezone,
       },
       {
-        enabled: !!userId && !!date,
+        enabled: !!userId && !!localDate,
       },
     );
 
-  if (status === "loading" || !isWorker.data) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="loading-dots loading" />
-      </div>
-    );
-  }
 
   return (
     <Layout>
