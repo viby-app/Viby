@@ -91,6 +91,10 @@ export const appointmetRouter = createTRPCRouter({
         .utc()
         .toDate();
 
+      console.log("Requested Date:", input.date);
+      console.log("Start (UTC):", startOfDay);
+      console.log("End (UTC):", endOfDay);
+
       const appointments = await ctx.db.appointment.findMany({
         orderBy: {
           date: "asc",
