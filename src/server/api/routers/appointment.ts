@@ -84,10 +84,12 @@ export const appointmetRouter = createTRPCRouter({
 
       const startOfDay = dayjs(input.date)
         .tz("Asia/Jerusalem")
+        .utc()
         .startOf("day")
         .toDate();
       const endOfDay = dayjs(input.date)
         .tz("Asia/Jerusalem")
+        .utc()
         .endOf("day")
         .toDate();
 
