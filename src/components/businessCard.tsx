@@ -7,6 +7,7 @@ import { fetchImageUrl } from "~/utils/profileUtils";
 import Stars from "./ratingStars";
 import Link from "next/link";
 import { businessRoute } from "~/helpers/routes";
+import { BriefcaseBusinessIcon } from "lucide-react";
 
 interface Props {
   businessId: number;
@@ -15,7 +16,7 @@ interface Props {
 const BusinessCard: React.FC<Props> = ({ businessId }) => {
   const [preSignedUrls, setPreSignedUrls] = useState<string[]>();
   const [logoUrl, setLogoUrl] = useState<string>("");
-  const [logoLoading, setLogoLoading] = useState<boolean>(true);
+  const [logoLoading, setLogoLoading] = useState<boolean>(false);
   const { data: business, isLoading: isBusinessLoading } =
     api.business.getBusinessById.useQuery({
       id: businessId,
@@ -47,6 +48,8 @@ const BusinessCard: React.FC<Props> = ({ businessId }) => {
   useEffect(() => {
     if (business?.logo) {
       void fetchImageUrl(setLogoLoading, business.logo, setLogoUrl);
+    } else {
+      setLogoLoading(false);
     }
   }, [business?.logo]);
 
@@ -59,15 +62,15 @@ const BusinessCard: React.FC<Props> = ({ businessId }) => {
               <div className="flex h-16 w-16 items-center justify-center">
                 <div className="loading loading-spinner" />
               </div>
-            ) : (
+            ) : logoUrl ? (
               <Image
-                src={logoUrl ?? ""}
+                src={logoUrl}
                 alt="business logo"
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-full border object-cover"
               />
-            )}
+            ) : (<BriefcaseBusinessIcon />)}
             <div className="text-right">
               <h2 className="truncate text-lg font-bold">{business?.name}</h2>
               <p className="truncate text-sm text-gray-700">
