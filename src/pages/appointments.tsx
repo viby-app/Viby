@@ -48,6 +48,14 @@ const AppointmentsManagementPage: NextPage = () => {
         enabled: !!userId && !!date,
       },
     );
+    
+    if (status === "loading" || !isWorker.data) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="loading-dots loading" />
+      </div>
+    );
+  }
 
   return (
     <Layout>
