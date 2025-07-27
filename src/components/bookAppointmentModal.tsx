@@ -34,7 +34,7 @@ export default function BookingModal({
   });
 
   const { data: businessService } =
-    api.service.getServicesByBusinessId.useQuery({ businessId });
+    api.service.getServicesByWorkerId.useQuery({ workerId: selectedWorker ?? 0 }, { enabled: !!selectedWorker });
 
   const {
     data: times,
@@ -134,17 +134,20 @@ export default function BookingModal({
 
         <div>
           <p>{hebrewDictionary.selectService}</p>
-          <div className="mb-5 grid grid-cols-1 gap-2">
-            {businessService?.map(({ service }) => (
-              <Button
-                key={service.id}
-                onClick={() => setSelectedService(service.id)}
-                className={`w-full ${selectedService === service.id ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
-              >
-                {service.name} - ₪{service.price}
-              </Button>
-            ))}
-          </div>
+          {
+            businessService ? (<div className="mb-5 grid grid-cols-1 gap-2">
+              {businessService?.map(({ service }) => (
+                <Button
+                  key={service.id}
+                  onClick={() => setSelectedService(service.id)}
+                  className={`w-full ${selectedService === service.id ? "bg-[#028a93]" : "bg-[#48A6A7]"}`}
+                >
+                  {service.name} - ₪{service.price}
+                </Button>
+              ))}
+            </div>) : (<p className="text-center">{hebrewDictionary.chooseWorkerToSeeServices}</p>)
+          }
+
         </div>
 
         <div>

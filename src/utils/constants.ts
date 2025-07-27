@@ -137,6 +137,7 @@ export const hebrewDictionary = {
   statistics: "סטטיסטיקות",
   editBusiness:"פרטי העסק",
   myBusiness: "  העסק שלי  ",
+  chooseWorkerToSeeServices: "בחר עובד על מנת לראות שירותים"
 };
 
 export const submissionSteps = [

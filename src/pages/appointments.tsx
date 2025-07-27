@@ -36,19 +36,20 @@ const AppointmentsManagementPage: NextPage = () => {
   }, [status, isWorker.data]);
 
   const userId = user?.user?.id;
-  const date = dayjs.utc(selectedDate).toISOString();
+  const date = selectedDate?.toISOString();
+
   const businessAppointments =
     api.appointment.getAppointmentsByOwnerOrWorkerId.useQuery(
       {
         userId: userId!,
-        date: date,
+        date: date!,
       },
       {
         enabled: !!userId && !!date,
       },
     );
-
-  if (status === "loading" || !isWorker.data) {
+    
+    if (status === "loading" || !isWorker.data) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="loading-dots loading" />

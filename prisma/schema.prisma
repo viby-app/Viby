@@ -67,7 +67,8 @@ model Workers {
     Worker User   @relation("userWorker", fields: [userId], references: [id])
     userId String
 
-    Appointment Appointment[]
+    Appointment   Appointment[]
+    WorkerService WorkerService[]
 }
 
 model BusinessFollowing {
@@ -106,7 +107,6 @@ model Business {
     owner         User       @relation("BusinessOwner", fields: [ownerId], references: [id])
     ownerId       String
 
-    services         BusinessService[]
     appointments     Appointment[]
     reviews          Review[]
     images           Image[]
@@ -169,8 +169,8 @@ model Service {
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
 
-    businessServices BusinessService[]
-    appointments     Appointment[]
+    workerServices WorkerService[]
+    appointments   Appointment[]
 }
 
 model Appointment {
@@ -195,14 +195,14 @@ model Appointment {
     updatedAt DateTime @updatedAt
 }
 
-model BusinessService {
-    id         Int      @id @default(autoincrement())
-    business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-    businessId Int
-    service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-    serviceId  Int
+model WorkerService {
+    id        Int     @id @default(autoincrement())
+    worker    Workers @relation(fields: [workerId], references: [id], onDelete: Cascade)
+    workerId  Int
+    service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+    serviceId Int
 
-    @@unique([businessId, serviceId])
+    @@unique([workerId, serviceId])
 }
 
 model VerificationToken {

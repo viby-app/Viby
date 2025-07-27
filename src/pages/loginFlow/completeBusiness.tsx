@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   completeBusinessSchema,
   type CompleteBusinessForm,
+  type ServicesWithWorkers,
 } from "~/utils/types";
 import { StepBusinessInfo } from "~/components/businessCompleteTabs/StepBusinessInfo";
 import StepImages from "~/components/businessCompleteTabs/StepImages";
@@ -32,16 +33,26 @@ export default function BusinessForm() {
   const [direction, setDirection] = useState(0);
   const [submissionStep, setSubmissionStep] = useState<number | null>(null);
   const createBusinessMutation = api.business.createBusiness.useMutation();
-  const createServicesMutation = api.service.createMultiple.useMutation();
-  const createWorkerMutation = api.workers.createWorker.useMutation();
+  const createServicesWorkersAndLinkMutation = api.service.createServicesWorkersAndLink.useMutation();
   const createOpeningHoursMutation = api.business.createOpeningHours.useMutation();
   const uploadImageMutation = api.image.uploadImage.useMutation();
   let businessId: number | undefined;
   const router = useRouter();
 
+  const [servicesWorkers, setServicesWorkers] = useState<ServicesWithWorkers>([]);
+
   const goNext = () => {
     setDirection(-1);
     setStep((s) => Math.min(s + 1, steps.length - 1));
+    if (step === 3) {
+      const currentServices = watch("services") ?? [];
+      const newServicesWorkers = [
+        ...servicesWorkers,
+        ...currentServices.map((service) => ({ ...service, workers: [] })),
+      ];
+      setServicesWorkers(newServicesWorkers);
+      setValue("services", newServicesWorkers);
+    }
   };
 
   const goBack = () => {
@@ -49,7 +60,11 @@ export default function BusinessForm() {
     if (step === 3) {
       const currentServices = watch("services") ?? [];
       const nonEmptyServices = removeEmptyServices(currentServices);
-      setValue("services", nonEmptyServices);
+      if (Array.isArray(nonEmptyServices)) {
+        setValue("services", nonEmptyServices);
+      } else {
+        setValue("services", []);
+      }
     }
     setStep((s) => Math.max(s - 1, 0));
   };
@@ -98,37 +113,20 @@ export default function BusinessForm() {
         },
       });
     } catch (error) {
-      logger.error("Business creation failed:", error);
+      logger.error("Business creation failed:", error instanceof Error ? error.message : String(error));
       setSubmissionStep(null);
       return;
     }
 
     setSubmissionStep(2);
-    if (data.services && businessId) {
+    if (businessId && servicesWorkers.length > 0) {
       try {
-        await createServicesMutation.mutateAsync({
-          businessId,
-          services: data.services,
+        await createServicesWorkersAndLinkMutation.mutateAsync({
+          businessId: businessId,
+          services: servicesWorkers,
         });
       } catch (error) {
-        logger.error("Services creation failed:", error);
-      }
-    }
-
-    setSubmissionStep(3);
-    if (data.workers && businessId) {
-      try {
-        await Promise.all(
-          data.workers.map((worker) =>
-            createWorkerMutation.mutateAsync({
-              businessId: businessId!,
-              userId: worker.userId,
-              wage: worker.wage,
-            })
-          )
-        );
-      } catch (error) {
-        logger.error("Workers creation failed:", error);
+        logger.error("Services and workers creation/linking failed:", error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -140,7 +138,7 @@ export default function BusinessForm() {
           workingHours: data.workingHours,
         });
       } catch (error) {
-        logger.error("Opening hours creation failed:", error);
+        logger.error("Opening hours creation failed:", error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -163,7 +161,7 @@ export default function BusinessForm() {
           },
         );
       } catch (error) {
-        logger.error("Gallery image upload error:", error);
+        logger.error("Gallery image upload error:", error instanceof Error ? error.message : String(error));
         setSubmissionStep(null);
         return;
       }
@@ -226,7 +224,7 @@ export default function BusinessForm() {
                     <StepServices control={control} register={register} errors={errors} />
                   )}
                   {step === 4 && (
-                    <StepWorkers control={control} register={register} errors={errors} />
+                    <StepWorkers control={control} register={register} errors={errors} servicesWorkers={servicesWorkers} setServicesWorkers={setServicesWorkers} />
                   )}
                   {step === 5 && (
                     <StepWorkingHours control={control} register={register} />

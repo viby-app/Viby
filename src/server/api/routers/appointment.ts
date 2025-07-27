@@ -24,32 +24,34 @@ export const appointmetRouter = createTRPCRouter({
         },
       });
 
-            return appointment;
-        }),
-    getLastAppointmentByUserId: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
-        const appointment = await ctx.db.appointment.findFirst({
-            where: {
-                userId: input.userId,
+      return appointment;
+    }),
+  getLastAppointmentByUserId: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const appointment = await ctx.db.appointment.findFirst({
+        where: {
+          userId: input.userId,
+        },
+        include: {
+          service: {
+            select: {
+              name: true,
             },
-            include: {
-                service: {
-                    select: {
-                        name: true
-                    }
-                },
-                business: {
-                    select: {
-                        name: true,
-                        logo: true
-                    }
-                },
+          },
+          business: {
+            select: {
+              name: true,
+              logo: true,
             },
-            orderBy: {
-                date: "desc",
-            },
-        });
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
 
-        return appointment;
+      return appointment;
     }),
   getAppointmentsByOwnerOrWorkerId: protectedProcedure
     .input(
