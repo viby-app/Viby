@@ -1,4 +1,5 @@
-import type { GeoapifyResult, Services } from "../types";
+import type { Business } from "@prisma/client";
+import type { CompleteBusinessForm, GeoapifyResult, Services } from "../types";
 
 export const formatShortAddress = (res: GeoapifyResult) => {
   const parts = [
@@ -24,3 +25,25 @@ export function removeEmptyServices(services: Services) {
       service.price > 0,
   );
 }
+
+export const mapBusinessToForm = (
+  business: Business,
+  images?: { id: number; businessId: number; key: string }[] | undefined,
+): CompleteBusinessForm & { businessId: number } => {
+  return {
+    businessId: business.id,
+    name: business.name,
+    phone: business.phone,
+    description: business.description ?? "",
+    address: business.address,
+    lat: business.lat ?? undefined,
+    lon: business.lon ?? undefined,
+    logo: business.logo ?? undefined,
+    whatsapp: business.whatsappLink ?? undefined,
+    instagram: business.instagramLink ?? undefined,
+    gallery: images?.map((image) => image.key) ?? [],
+    services: [],
+    workers: [],
+    workingHours: [],
+  };
+};

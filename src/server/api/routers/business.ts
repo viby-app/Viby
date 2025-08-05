@@ -113,6 +113,40 @@ export const businessRouter = createTRPCRouter({
       return validHours;
     }),
 
+  updateBusiness: protectedProcedure
+    .input(
+      completeBusinessSchema.extend({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existingBusiness = await ctx.db.business.findFirst({
+        where: {
+          id: input.id,
+          ownerId: ctx.session.user.id,
+        },
+      });
+
+      if (!existingBusiness) {
+        throw new Error("Business not found or you are not the owner");
+      }
+
+      const updated = await ctx.db.business.update({
+        where: { id: input.id },
+        data: {
+          name: input.name ?? "",
+          description: input.description,
+          phone: input.phone,
+          address: input.address ?? "",
+          whatsappLink: input.whatsapp ?? "",
+          instagramLink: input.instagram ?? "",
+          logo: input.logo ?? "",
+          lat: input.lat,
+          lon: input.lon,
+          updatedAt: new Date(),
+        },
+      });
+    }),
   getFollowedBusinessesByUser: protectedProcedure.query(async ({ ctx }) => {
     const businesses = await ctx.db.businessFollowing.findMany({
       where: {

@@ -1,3 +1,4 @@
+import logger from "~/lib/logger";
 import type { ImageUrlResponse } from "../types";
 
 export const getPreSignedUrlFromKey = async (key: string): Promise<string> => {
@@ -7,6 +8,17 @@ export const getPreSignedUrlFromKey = async (key: string): Promise<string> => {
   return data.url;
 };
 
+export const fetchImageUrlFromKey = async (
+  key: string,
+): Promise<string | null> => {
+  try {
+    logger.info("Fetching image with key:", key);
+    return await getPreSignedUrlFromKey(key);
+  } catch (error) {
+    logger.error("Error fetching image:", error);
+    return null;
+  }
+};
 export const deleteImage = async (key: string) => {
   if (!key || typeof key !== "string") {
     throw new Error("Invalid key provided for image deletion");
@@ -35,10 +47,7 @@ export async function uploadImage(file: File, key: string) {
   }
 }
 
-export async function uploadGallery(
-  images: FileList,
-  keys: string[],
-) {
+export async function uploadGallery(images: FileList, keys: string[]) {
   const formData = new FormData();
 
   Array.from(images).forEach((file, index) => {

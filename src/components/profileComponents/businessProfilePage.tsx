@@ -9,14 +9,15 @@ import Card from "~/components/cardComponent";
 import ProfileHeadPage from "~/components/profileComponents/profileHeadPage";
 import ImageAndNameComponent from "~/components/profileComponents/imageAndNameComponent";
 import BusinessCard from "~/components/businessCard";
+import { mapBusinessToForm } from "~/utils/functions/helperFunctions";
 import {
   UsersRoundIcon,
   MessageCircleIcon,
   ChartNoAxesCombinedIcon,
-  PencilIcon,
   BriefcaseBusinessIcon,
 } from "lucide-react";
 import type { ProfileProps } from "~/utils/types";
+import EditBusinessDialog from "../editBusinessDialog";
 
 const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const { data: businesses, isLoading: isBusinessLoading } =
@@ -28,6 +29,13 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
   const business = businesses ? businesses[0] : null;
 
   const businessId: number = business?.id ?? 0;
+
+  const { data: images, isLoading: isImagesLoading } =
+    api.image.getImagesByBusinessId.useQuery(
+      { businessId: businessId ?? 0 },
+      { enabled: !!businessId },
+    );
+
   const enabled = !!businessId;
   const firstName = user?.name?.split(" ")[0] ?? "";
 
@@ -101,12 +109,9 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
               <BusinessCard businessId={businessId} />
 
               <div className="mt-4 space-y-2 border-t-4 border-[#48a5a748] pt-2 text-right text-sm font-medium text-gray-800">
-                <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
-                  <span className="text-lg font-semibold text-gray-800">
-                    {hebrewDictionary.editBusiness}
-                  </span>
-                  <PencilIcon className="h-5 w-5 text-gray-800" />
-                </div>
+                <EditBusinessDialog
+                  initialValues={mapBusinessToForm(business, images)}
+                />
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
                   <span className="text-lg font-semibold text-gray-800">
                     {hebrewDictionary.myCustomers}

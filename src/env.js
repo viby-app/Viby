@@ -36,6 +36,7 @@ export const env = createEnv({
       .number()
       .default(5 * 1024 * 1024), // 5MB in bytes
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_MAX_IMAGES: z.coerce.number().default(5),
   },
 
   /**
@@ -57,6 +58,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES,
     NEXT_PUBLIC_MAPS_API_KEY: process.env.NEXT_PUBLIC_MAPS_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_MAX_IMAGES: process.env.MAX_IMAGES
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

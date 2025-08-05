@@ -22,6 +22,8 @@ type Props = {
   galleryPreviews: FileList | null;
   setLogoPreview: Dispatch<SetStateAction<File | null>>;
   setGalleryPreviews: Dispatch<SetStateAction<FileList | null>>;
+  logoUrl?: string | null;
+  galleryUrls?: string[];
 };
 
 const StepImages = ({
@@ -30,17 +32,24 @@ const StepImages = ({
   galleryPreviews,
   setLogoPreview,
   setGalleryPreviews,
+  logoUrl,
+  galleryUrls = [],
 }: Props) => {
-  const maxImages = 5;
+  const maxImages = process.env.NEXT_PUBLIC_MAX_IMAGES
+    ? parseInt(process.env.NEXT_PUBLIC_MAX_IMAGES, 10)
+    : 5;
 
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const currentGalleryUrl = galleryUrls[galleryIndex];
 
   const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES) {
-      toast.error(`גודל הלוגו חייב להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`);
+      toast.error(
+        `גודל הלוגו חייב להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`,
+      );
       return;
     }
 
@@ -55,9 +64,13 @@ const StepImages = ({
 
     const selected = Array.from(files).slice(0, maxImages);
 
-    const oversize = selected.find((file) => file.size > env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES);
+    const oversize = selected.find(
+      (file) => file.size > env.NEXT_PUBLIC_MAX_IMAGE_SIZE_BYTES,
+    );
     if (oversize) {
-      toast.error(`כל תמונה חייבת להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`);
+      toast.error(
+        `כל תמונה חייבת להיות עד ${env.NEXT_PUBLIC_MAX_IMAGE_SIZE_MB}MB`,
+      );
       return;
     }
 
@@ -73,16 +86,16 @@ const StepImages = ({
   };
 
   const next = () => {
-    if (galleryPreviews) {
-      setGalleryIndex((prev) => (prev + 1) % galleryPreviews.length);
+    const total = galleryPreviews?.length ?? galleryUrls.length;
+    if (total > 0) {
+      setGalleryIndex((prev) => (prev + 1) % total);
     }
   };
 
   const prev = () => {
-    if (galleryPreviews) {
-      setGalleryIndex(
-        (prev) => (prev - 1 + galleryPreviews.length) % galleryPreviews.length,
-      );
+    const total = galleryPreviews?.length ?? galleryUrls.length;
+    if (total > 0) {
+      setGalleryIndex((prev) => (prev - 1 + total) % total);
     }
   };
 
@@ -110,12 +123,14 @@ const StepImages = ({
         </span>
       </div>
 
-      <div className="min-h-40 flex items-center justify-center">
-        {logoPreview ? (
+      <div className="flex min-h-40 items-center justify-center">
+        {logoPreview || logoUrl ? (
           <Image
-            src={URL.createObjectURL(logoPreview)}
+            src={
+              logoPreview ? URL.createObjectURL(logoPreview) : (logoUrl ?? "")
+            }
             alt="logo"
-            className="max-h-52 m-1 object-contain"
+            className="m-1 max-h-52 object-contain"
             width={200}
             height={200}
           />
@@ -157,12 +172,20 @@ const StepImages = ({
           >
             <CircleChevronRight />
           </button>
-          <div className="min-h-40 text-center flex items-center">
+          <div className="flex min-h-40 items-center text-center">
             {galleryPreviews?.item(galleryIndex) ? (
               <Image
                 src={URL.createObjectURL(galleryPreviews.item(galleryIndex)!)}
                 alt={`preview ${galleryIndex + 1}`}
-                className="max-h-52 m-1 object-contain"
+                className="m-1 max-h-52 object-contain"
+                width={200}
+                height={200}
+              />
+            ) : currentGalleryUrl ? (
+              <Image
+                src={currentGalleryUrl}
+                alt={`gallery image ${galleryIndex + 1}`}
+                className="m-1 max-h-52 object-contain"
                 width={200}
                 height={200}
               />
@@ -181,8 +204,8 @@ const StepImages = ({
           </button>
         </div>
         <p className="mt-2 text-center text-sm font-medium text-gray-700">
-          {galleryPreviews?.length
-            ? `${galleryIndex + 1}/${galleryPreviews.length}`
+          {galleryPreviews?.length || galleryUrls.length
+            ? `${galleryIndex + 1}/${galleryPreviews?.length ?? galleryUrls.length}`
             : "0/0"}
         </p>
       </div>
