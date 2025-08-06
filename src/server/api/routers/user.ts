@@ -107,4 +107,71 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
+  getRecommendedUsers: protectedProcedure.query(async ({ ctx }) => {
+    const userFriends = await ctx.db.userConnection.findMany({
+      where: {
+        OR: [
+          { userConnectionA: ctx.session.user.id },
+          { userConnectionB: ctx.session.user.id },
+        ],
+      },
+      select: {
+        userConnectionA: true,
+        userConnectionB: true,
+      },
+    });
+
+    const friendsIds = userFriends.flatMap((connection) => [
+      connection.userConnectionA,
+      connection.userConnectionB,
+    ]);
+
+    const recommendedUsers = await ctx.db.user.findMany({
+      where: {
+        id: {
+          notIn: [ctx.session.user.id, ...friendsIds],
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        image: true,
+      },
+    });
+
+    return recommendedUsers;
+  }),
+  createUserConnection: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const existingConnection = await ctx.db.userConnection.findFirst({
+        where: {
+          OR: [
+            {
+              userConnectionA: ctx.session.user.id,
+              userConnectionB: input.userId,
+            },
+            {
+              userConnectionA: input.userId,
+              userConnectionB: ctx.session.user.id,
+            },
+          ],
+        },
+      });
+
+      if (existingConnection) {
+        throw new Error("Connection already exists");
+      }
+
+      const newConnection = await ctx.db.userConnection.create({
+        data: {
+          userConnectionA: ctx.session.user.id,
+          userConnectionB: input.userId,
+        },
+      });
+
+      return newConnection;
+    }),
 });

@@ -133,11 +133,17 @@ export const hebrewDictionary = {
   userHasNoBusinesses: "אין לך עדיין עסק אצלנו!",
   theBusinessOf: "העסק של",
   reviews: "ביקורות",
-  myCustomers : "הלקוחות שלי",
+  myCustomers: "הלקוחות שלי",
   statistics: "סטטיסטיקות",
-  editBusiness:"פרטי העסק",
+  editBusiness: "פרטי העסק",
   myBusiness: "  העסק שלי  ",
-  chooseWorkerToSeeServices: "בחר עובד על מנת לראות שירותים"
+  chooseWorkerToSeeServices: "בחר עובד על מנת לראות שירותים",
+  suggestedBusinesses: "הצעות לבתי עסק",
+  suggestedFriends: "הצעות לחברים",
+  connect: "התחבר",
+  connectionRequestSent: "בקשת החיבור נשלחה בהצלחה",
+  noResults: "תחזור כשיהיו לך חברים 😂",
+  connected: "מחובר",
 };
 
 export const submissionSteps = [

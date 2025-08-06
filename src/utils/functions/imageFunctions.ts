@@ -1,7 +1,13 @@
 import type { ImageUrlResponse } from "../types";
 
 export const getPreSignedUrlFromKey = async (key: string): Promise<string> => {
-  const res = await fetch(`/api/image/${key}`);
+  if (key.includes("lh3.googleusercontent.com")) {
+    return key;
+  }
+  
+  const res = await fetch(`/api/image/${key}`, {
+    credentials: "include",
+  });
   const data: ImageUrlResponse = await res.json();
 
   return data.url;
@@ -35,10 +41,7 @@ export async function uploadImage(file: File, key: string) {
   }
 }
 
-export async function uploadGallery(
-  images: FileList,
-  keys: string[],
-) {
+export async function uploadGallery(images: FileList, keys: string[]) {
   const formData = new FormData();
 
   Array.from(images).forEach((file, index) => {

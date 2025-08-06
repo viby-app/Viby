@@ -3,6 +3,7 @@ import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { completeBusinessSchema } from "~/utils/types";
+import type { Business } from "@prisma/client";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinessesWithoutFollowing: protectedProcedure.query(
@@ -433,5 +434,100 @@ export const businessRouter = createTRPCRouter({
           .map((review) => review.rating)
           .reduce((acc, rating) => acc + rating, 0) / ratings.length || 0;
       return averageRating.toFixed(1);
+    }),
+  getRecommendedBusinesses: protectedProcedure
+    .input(
+      z.object({
+        location: z
+          .object({
+            lat: z.number(),
+            lng: z.number(),
+          })
+          .nullable(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      // businesses the user is following
+      const businessesIFollow = await ctx.db.businessFollowing.findMany({
+        where: {
+          followerId: ctx.session.user.id,
+        },
+        select: {
+          businessId: true,
+        },
+      });
+
+      const followedBusinessIds = new Set(
+        businessesIFollow.map((b) => b.businessId),
+      );
+
+      // Fetch the nearest 5 businesses based on creation date
+      let nearbyBusinesses: Business[] = [];
+      if (input.location) {
+        nearbyBusinesses = await ctx.db.business.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          where: {
+            lat: {
+              gte: input.location.lat - 0.1,
+              lte: input.location.lat + 0.1,
+            },
+            lon: {
+              gte: input.location.lng - 0.1,
+              lte: input.location.lng + 0.1,
+            },
+          },
+        });
+      }
+
+      //Fetch busienesses who are followed by the users friends
+      //get the ids of the users friends
+      const friends = await ctx.db.userConnection.findMany({
+        where: {
+          OR: [
+            { userConnectionA: ctx.session.user.id },
+            { userConnectionB: ctx.session.user.id },
+          ],
+        },
+      });
+
+      const friendIds = friends
+        .flatMap((friend) => [friend.userConnectionA, friend.userConnectionB])
+        .filter((id) => id !== ctx.session.user.id); // remove self
+
+      const businessesFollowedByFriends =
+        await ctx.db.businessFollowing.findMany({
+          where: {
+            followerId: { in: friendIds },
+          },
+          select: {
+            business: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                logo: true,
+              },
+            },
+          },
+        });
+
+      const friendBusinesses = businessesFollowedByFriends.map(
+        (b) => b.business,
+      );
+
+      const allBusinesses = [...nearbyBusinesses, ...friendBusinesses];
+
+      // Deduplicate by business ID
+      const uniqueBusinesses = Array.from(
+        new Map(allBusinesses.map((b) => [b.id, b])).values(),
+      );
+
+      // Filter out businesses that the user is already following
+      const filteredBusinesses = uniqueBusinesses.filter(
+        (b) => !followedBusinessIds.has(b.id),
+      );
+
+      return filteredBusinesses;
     }),
 });
