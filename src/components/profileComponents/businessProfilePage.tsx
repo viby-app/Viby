@@ -16,7 +16,7 @@ import {
   ChartNoAxesCombinedIcon,
   BriefcaseBusinessIcon,
 } from "lucide-react";
-import type { ProfileProps } from "~/utils/types";
+import type { DBService, DBWorker, ProfileProps } from "~/utils/types";
 import EditBusinessDialog from "../editBusinessDialog";
 
 const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
@@ -30,11 +30,36 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
 
   const businessId: number = business?.id ?? 0;
 
-  const { data: images, isLoading: isImagesLoading } =
-    api.image.getImagesByBusinessId.useQuery(
-      { businessId: businessId ?? 0 },
-      { enabled: !!businessId },
-    );
+  const { data: images } = api.image.getImagesByBusinessId.useQuery(
+    { businessId: businessId ?? 0 },
+    { enabled: !!businessId },
+  );
+  const { data: workers } = api.workers.getBusinessWorkersWithUserInfo.useQuery(
+    {
+      businessId,
+    },
+  );
+
+  const { data: services } = api.service.getServicesByBusinessId.useQuery({
+    businessId,
+  });
+
+  const { data: workingHours } = api.business.getBusinessTimesById.useQuery(
+    { businessId },
+    { enabled: !isNaN(businessId) },
+  );
+
+  const flatServices: DBService[] | undefined = services?.map((s) => ({
+    id: s.service.id,
+    name: s.service.name,
+    createdAt: s.service.createdAt,
+    updatedAt: s.service.updatedAt,
+    description: s.service.description,
+    durationMinutes: s.service.durationMinutes,
+    price: s.service.price,
+    businessId: s.businessId,
+    serviceId: s.serviceId,
+  }));
 
   const enabled = !!businessId;
   const firstName = user?.name?.split(" ")[0] ?? "";
@@ -110,7 +135,13 @@ const BusinessProfilePage: FC<ProfileProps> = ({ user, isUserLoading }) => {
 
               <div className="mt-4 space-y-2 border-t-4 border-[#48a5a748] pt-2 text-right text-sm font-medium text-gray-800">
                 <EditBusinessDialog
-                  initialValues={mapBusinessToForm(business, images)}
+                  initialValues={mapBusinessToForm({
+                    business,
+                    images,
+                    services: flatServices,
+                    workers,
+                    workingHours,
+                  })}
                 />
                 <div className="flex items-center justify-between px-2 py-1 hover:bg-gray-100">
                   <span className="text-lg font-semibold text-gray-800">

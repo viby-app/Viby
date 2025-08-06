@@ -47,4 +47,38 @@ export const workersRouter = createTRPCRouter({
         };
       });
     }),
+
+  getBusinessWorkersWithUserInfo: protectedProcedure
+    .input(z.object({ businessId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const workers = await ctx.db.workers.findMany({
+        where: {
+          businessId: input.businessId,
+        },
+        include: {
+          Worker: {
+            select: {
+              id: true, // userId
+              name: true,
+              phone: true,
+            },
+          },
+        },
+      });
+
+      return workers.map((worker) => {
+        if (!worker.Worker.phone) {
+          throw new Error(`Missing phone for worker ${worker.Worker.name}`);
+        }
+
+        return {
+          id: worker.id,
+          name: worker.Worker.name,
+          phone: worker.Worker.phone,
+          userId: worker.Worker.id,
+          wage: worker.wage,
+          businessId: worker.businessId,
+        };
+      });
+    }),
 });

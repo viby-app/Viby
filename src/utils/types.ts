@@ -221,3 +221,42 @@ export const servicesWithWorkersSchema = z.array(
 export type ServicesWithWorkersInput = z.infer<
   typeof servicesWithWorkersSchema
 >;
+export interface ProfileProps {
+  user: User;
+  isUserLoading: boolean;
+}
+
+export type DBService = {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string | null;
+  durationMinutes: number;
+  price: number;
+  businessId: number;
+  serviceId: number;
+};
+
+export type DBWorker = {
+  id: number;
+  name: string;
+  phone: string;
+  userId: string;
+  wage: number;
+  businessId: number;
+};
+
+export type DBWorkingHour = {
+  id: number;
+  dayOfWeek: number;
+  openTime: Date;
+  closeTime: Date;
+  businessId: number;
+};
+
+export type DBImage = {
+  id: number;
+  businessId: number;
+  key: string;
+};

@@ -1,5 +1,13 @@
 import type { Business } from "@prisma/client";
-import type { CompleteBusinessForm, GeoapifyResult, Services } from "../types";
+import type {
+  CompleteBusinessForm,
+  DBImage,
+  DBService,
+  DBWorker,
+  DBWorkingHour,
+  GeoapifyResult,
+  Services,
+} from "../types";
 
 export const formatShortAddress = (res: GeoapifyResult) => {
   const parts = [
@@ -26,10 +34,21 @@ export function removeEmptyServices(services: Services) {
   );
 }
 
-export const mapBusinessToForm = (
-  business: Business,
-  images?: { id: number; businessId: number; key: string }[] | undefined,
-): CompleteBusinessForm & { businessId: number } => {
+type BusinessFormData = {
+  business: Business;
+  images?: DBImage[];
+  services?: DBService[];
+  workers?: DBWorker[];
+  workingHours?: DBWorkingHour[];
+};
+
+export const mapBusinessToForm = ({
+  business,
+  images,
+  services,
+  workers,
+  workingHours,
+}: BusinessFormData): CompleteBusinessForm & { businessId: number } => {
   return {
     businessId: business.id,
     name: business.name,
@@ -42,8 +61,26 @@ export const mapBusinessToForm = (
     whatsapp: business.whatsappLink ?? undefined,
     instagram: business.instagramLink ?? undefined,
     gallery: images?.map((image) => image.key) ?? [],
-    services: [],
-    workers: [],
-    workingHours: [],
+    services:
+      services?.map((service) => ({
+        name: service.name,
+        durationMinutes: service.durationMinutes,
+        price: service.price,
+        description: service.description ?? undefined,
+      })) ?? [],
+    workers:
+      workers?.map((worker) => ({
+        name: worker.name,
+        phone: worker.phone,
+        userId: worker.userId,
+        wage: worker.wage,
+      })) ?? [],
+    workingHours:
+      workingHours?.map((hour) => ({
+        dayOfWeek: hour.dayOfWeek,
+        isOpen: true,
+        openTime: hour.openTime.toISOString().slice(11, 16),
+        closeTime: hour.closeTime.toISOString().slice(11, 16),
+      })) ?? [],
   };
 };
