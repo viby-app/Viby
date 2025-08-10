@@ -11,7 +11,6 @@ import type { AppointmentModalDetails } from "~/utils/types";
 import AllAppointmentsTab from "~/components/appointmentManagementTabs/allAppointmentsTab";
 import CurrentAppointmentsView from "~/components/appointmentManagementTabs/currentAppointmentsTab";
 import { hebrewDictionary } from "~/utils/constants";
-import dayjs from "~/utils/dayjs";
 
 const AppointmentsManagementPage: NextPage = () => {
   const { data: user, status } = useSession();

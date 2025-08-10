@@ -3,7 +3,6 @@ import dayjs from "~/utils/dayjs";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { completeBusinessSchema } from "~/utils/types";
-import type { Business } from "@prisma/client";
 
 export const businessRouter = createTRPCRouter({
   getAllBusinessesWithoutFollowing: protectedProcedure.query(

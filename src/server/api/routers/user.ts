@@ -107,42 +107,69 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  getRecommendedUsers: protectedProcedure.query(async ({ ctx }) => {
-    const userFriends = await ctx.db.userConnection.findMany({
-      where: {
-        OR: [
-          { userConnectionA: ctx.session.user.id },
-          { userConnectionB: ctx.session.user.id },
-        ],
-      },
-      select: {
-        userConnectionA: true,
-        userConnectionB: true,
-      },
-    });
+  getRecommendedUsers: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.string().optional(),
+        limit: z.number().min(1).max(50).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { cursor, limit } = input;
 
-    const friendsIds = userFriends.flatMap((connection) => [
-      connection.userConnectionA,
-      connection.userConnectionB,
-    ]);
-
-    const recommendedUsers = await ctx.db.user.findMany({
-      where: {
-        id: {
-          notIn: [ctx.session.user.id, ...friendsIds],
+      const userFriends = await ctx.db.userConnection.findMany({
+        where: {
+          OR: [
+            { userConnectionA: ctx.session.user.id },
+            { userConnectionB: ctx.session.user.id },
+          ],
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        email: true,
-        image: true,
-      },
-    });
+        select: {
+          userConnectionA: true,
+          userConnectionB: true,
+        },
+      });
 
-    return recommendedUsers;
-  }),
+      const friendsIds = userFriends.flatMap((connection) => [
+        connection.userConnectionA,
+        connection.userConnectionB,
+      ]);
+
+      const recommendedUsers = await ctx.db.user.findMany({
+        where: {
+          id: {
+            notIn: [ctx.session.user.id, ...friendsIds],
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          image: true,
+        },
+        orderBy: { id: "asc" },
+        take: limit + 1,
+        ...(cursor
+          ? {
+              skip: 1,
+              cursor: { id: cursor },
+            }
+          : {}),
+      });
+
+      let nextCursor: string | undefined = undefined;
+      if (recommendedUsers.length > limit) {
+        const nextItem = recommendedUsers.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return {
+        users: recommendedUsers,
+        nextCursor,
+      };
+    }),
+
   createUserConnection: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {

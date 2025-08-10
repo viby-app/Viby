@@ -24,3 +24,10 @@ export function removeEmptyServices(services: Services) {
       service.price > 0,
   );
 }
+
+export const normalizeScrollLeft = (scrollLeft: number, el: HTMLDivElement) => {
+  const isRTL = getComputedStyle(el).direction === "rtl";
+  if (!isRTL) return scrollLeft;
+  if (scrollLeft < 0) return -scrollLeft;
+  return el.scrollWidth - el.clientWidth - scrollLeft;
+};

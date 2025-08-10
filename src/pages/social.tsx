@@ -7,13 +7,17 @@ import UserCard from "~/components/userCard";
 import { useCurrentLocation } from "~/hooks/userLocationHook";
 import { api } from "~/utils/api";
 import { hebrewDictionary } from "~/utils/constants";
+import { normalizeScrollLeft } from "~/utils/functions/helperFunctions";
 
 const BUSINESSES_PER_PAGE = 2;
+const FRIENDS_PER_PAGE = 10;
 
 const SocialPage = () => {
   const { location } = useCurrentLocation();
+  const [currentPage, setCurrentPage] = useState(0);
+
   const {
-    data,
+    data: recommandedBusinesses,
     fetchNextPage,
     hasNextPage,
     isLoading: loadingBusinesses,
@@ -26,41 +30,74 @@ const SocialPage = () => {
     },
   );
 
-  const { data: friendsOfFriends, isLoading: loadingFriends } =
-    api.user.getRecommendedUsers.useQuery();
-
-  const allBusinesses = useMemo(
-    () => data?.pages.flatMap((page) => page.businesses) ?? [],
-    [data],
+  const {
+    data: friendsPages,
+    fetchNextPage: fetchMoreFriends,
+    hasNextPage: hasMoreFriends,
+    isFetchingNextPage: loadingMoreFriends,
+    isLoading: loadingFriends,
+  } = api.user.getRecommendedUsers.useInfiniteQuery(
+    { limit: FRIENDS_PER_PAGE },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
   );
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const friendsOfFriends = useMemo(
+    () => friendsPages?.pages.flatMap((page) => page.users) ?? [],
+    [friendsPages],
+  );
+
+  const allBusinesses = useMemo(
+    () => recommandedBusinesses?.pages.flatMap((page) => page.businesses) ?? [],
+    [recommandedBusinesses],
+  );
+
+  const friendsListRef = useRef<HTMLDivElement>(null);
+
+  const onFriendsScroll = () => {
+    if (!friendsListRef.current || !hasMoreFriends || loadingMoreFriends)
+      return;
+
+    const { scrollTop, scrollHeight, clientHeight } = friendsListRef.current;
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      void fetchMoreFriends();
+    }
+  };
+
+  const hasPrefetched = useRef(false);
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const totalPages = data ? data.pages.length : 0;
+  const totalPages = recommandedBusinesses
+    ? recommandedBusinesses.pages.length
+    : 0;
 
   useEffect(() => {
-    if (hasNextPage && currentPage >= totalPages - 2) {
+    if (
+      hasNextPage &&
+      currentPage >= totalPages - 1 &&
+      !isFetchingNextPage &&
+      !hasPrefetched.current
+    ) {
+      hasPrefetched.current = true;
       void fetchNextPage();
     }
-  }, [currentPage, fetchNextPage, hasNextPage, totalPages]);
+  }, [currentPage, fetchNextPage, hasNextPage, totalPages, isFetchingNextPage]);
 
-  const onScroll = () => {
+  const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
-    const { scrollLeft, offsetWidth } = carouselRef.current;
-    const newPage = Math.round(scrollLeft / offsetWidth);
-    if (newPage !== currentPage) setCurrentPage(newPage);
+    const normalized = normalizeScrollLeft(
+      carouselRef.current.scrollLeft,
+      carouselRef.current,
+    );
+    const { offsetWidth } = carouselRef.current;
+    const newPage = Math.round(normalized / offsetWidth);
+    if (newPage !== currentPage) {
+      hasPrefetched.current = false; // reset so next page can prefetch
+      setCurrentPage(newPage);
+    }
   };
-
-  useEffect(() => {
-    if (!carouselRef.current) return;
-    const pageWidth = carouselRef.current.offsetWidth;
-    carouselRef.current.scrollTo({
-      left: pageWidth * currentPage,
-      behavior: "smooth",
-    });
-  }, [currentPage]);
 
   if (loadingBusinesses || loadingFriends) {
     return (
@@ -90,14 +127,10 @@ const SocialPage = () => {
         start + BUSINESSES_PER_PAGE,
       );
       return (
-        <div
-          key={pageIndex}
-          className="w-full flex-shrink-0 snap-center px-4"
-          aria-hidden={currentPage !== pageIndex}
-        >
+        <div key={pageIndex} className="w-full flex-shrink-0 snap-center px-4">
           <div className="grid grid-cols-1 grid-rows-2 gap-4">
-            {pageBusinesses.map((b) => (
-              <BusinessCard key={b.id} businessId={b.id} />
+            {pageBusinesses.map((business) => (
+              <BusinessCard key={business.id} businessId={business.id} />
             ))}
           </div>
         </div>
@@ -112,10 +145,8 @@ const SocialPage = () => {
         {Array.from({ length: dotsCount }, (_, i) => (
           <button
             key={i}
-            onClick={() => setCurrentPage(i)}
-            aria-label={`Go to page ${i + 1}`}
             className={`h-2 w-2 rounded-full transition-transform duration-300 ${
-              currentPage * -1 === i
+              currentPage === i
                 ? "scale-125 bg-[#48A6A7]"
                 : "bg-gray-300 hover:bg-gray-400"
             }`}
@@ -136,39 +167,36 @@ const SocialPage = () => {
 
             <div
               ref={carouselRef}
-              onScroll={onScroll}
+              onScroll={onBusinessesScroll}
               className="scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
               style={{ scrollSnapType: "x mandatory" }}
             >
               {renderBusinessPages()}
             </div>
-
             {renderDots()}
-
-            {isFetchingNextPage && (
-              <p className="mt-2 text-gray-500">{hebrewDictionary.loading}</p>
-            )}
           </>
         )}
       </div>
-      <div className="flex max-h-1/2 w-full flex-col items-center p-4">
-        {friendsOfFriends && friendsOfFriends.length > 0 && (
-          <>
-            <h2 className="mb-4 w-full text-start text-2xl font-bold">
-              {hebrewDictionary.suggestedFriends}
-            </h2>
-            <div className="max-h-96 w-11/12 overflow-auto rounded-xl bg-white px-4 opacity-70 shadow-inner">
-              {friendsOfFriends.map((friend) => (
-                <UserCard
-                  key={friend.id}
-                  id={friend.id}
-                  name={friend.name}
-                  image={friend.image}
-                />
-              ))}
+      <div className="flex items-center justify-center">
+        <div
+          ref={friendsListRef}
+          onScroll={onFriendsScroll}
+          className="max-h-96 w-11/12 overflow-auto rounded-xl bg-white px-4 opacity-70 shadow-inner"
+        >
+          {friendsOfFriends.map((friend) => (
+            <UserCard
+              key={friend.id}
+              id={friend.id}
+              name={friend.name}
+              image={friend.image}
+            />
+          ))}
+          {loadingMoreFriends && (
+            <div className="flex justify-center py-2">
+              <div className="loading loading-spinner loading-sm" />
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </Layout>
   );
