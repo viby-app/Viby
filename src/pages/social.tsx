@@ -7,7 +7,6 @@ import UserCard from "~/components/userCard";
 import { useCurrentLocation } from "~/hooks/userLocationHook";
 import { api } from "~/utils/api";
 import { hebrewDictionary } from "~/utils/constants";
-import { normalizeScrollLeft } from "~/utils/functions/helperFunctions";
 
 const BUSINESSES_PER_PAGE = 2;
 const FRIENDS_PER_PAGE = 10;
@@ -87,14 +86,23 @@ const SocialPage = () => {
 
   const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
-    const normalized = normalizeScrollLeft(
-      carouselRef.current.scrollLeft,
-      carouselRef.current,
-    );
-    const { offsetWidth } = carouselRef.current;
-    const newPage = Math.round(normalized / offsetWidth);
+
+    const { scrollLeft, scrollWidth, offsetWidth } = carouselRef.current;
+    const isRTL = document.dir === "rtl" || carouselRef.current.dir === "rtl";
+
+    let normalizedScrollLeft = scrollLeft;
+
+    if (isRTL) {
+      if (scrollLeft < 0) {
+        normalizedScrollLeft = -scrollLeft;
+      } else {
+        normalizedScrollLeft = scrollWidth - offsetWidth - scrollLeft;
+      }
+    }
+
+    const newPage = Math.round(normalizedScrollLeft / offsetWidth);
+
     if (newPage !== currentPage) {
-      hasPrefetched.current = false; // reset so next page can prefetch
       setCurrentPage(newPage);
     }
   };
