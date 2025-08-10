@@ -153,6 +153,7 @@ const SocialPage = () => {
 
   return (
     <Layout>
+      <p>{currentPage}</p>
       <div className="flex max-h-1/2 w-full flex-col items-center p-4">
         {allBusinesses.length > 0 && (
           <>
