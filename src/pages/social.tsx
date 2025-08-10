@@ -89,7 +89,7 @@ const SocialPage = () => {
     const newPage = Math.round(scrollLeft / offsetWidth);
 
     if (newPage !== currentPage) {
-      setCurrentPage(newPage);
+      setCurrentPage(-newPage);
     }
   };
 
@@ -135,7 +135,7 @@ const SocialPage = () => {
   const renderDots = () => {
     const dotsCount = hasNextPage ? totalPages + 1 : totalPages;
     return (
-      <div dir="ltr" className="mt-2 flex justify-center space-x-2">
+      <div dir="rtl" className="mt-2 flex justify-center space-x-2">
         {Array.from({ length: dotsCount }, (_, i) => (
           <div
             key={i}
@@ -164,7 +164,7 @@ const SocialPage = () => {
               onScroll={onBusinessesScroll}
               className="scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
               style={{ scrollSnapType: "x mandatory" }}
-              dir="ltr"
+              dir="rtl"
             >
               {renderBusinessPages()}
             </div>
