@@ -42,14 +42,12 @@ const SocialPage = () => {
 
   useEffect(() => {
     if (hasNextPage && currentPage >= totalPages - 2) {
-      console.log("Prefetching next page");
       fetchNextPage();
     }
   }, [currentPage, fetchNextPage, hasNextPage, totalPages]);
 
   const onScroll = () => {
     if (!carouselRef.current) return;
-    console.log("onScroll called");
     const { scrollLeft, offsetWidth } = carouselRef.current;
     const newPage = Math.round(scrollLeft / offsetWidth);
     if (newPage !== currentPage) setCurrentPage(newPage);
@@ -62,14 +60,13 @@ const SocialPage = () => {
       left: pageWidth * currentPage,
       behavior: "smooth",
     });
-    console.log(`Scrolled to page ${currentPage}`);
   }, [currentPage]);
 
   if (loadingBusinesses || loadingFriends) {
     return (
       <Layout>
         <div className="flex h-screen items-center justify-center">
-          <p>{hebrewDictionary.loading}</p>
+          <div className="loading loading-infinity loading-xl" />
         </div>
       </Layout>
     );

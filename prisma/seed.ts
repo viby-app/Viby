@@ -1,6 +1,7 @@
 import { PrismaClient, Gender, Role, AppointmentStatus } from "@prisma/client";
-import { faker } from "@faker-js/faker";
+import { Faker, he, en, base } from "@faker-js/faker";
 
+const faker = new Faker({ locale: [he, en, base] });
 const prisma = new PrismaClient();
 
 async function main() {
@@ -11,7 +12,7 @@ async function main() {
         data: {
           name: faker.person.fullName(),
           email: faker.internet.email(),
-          phone: faker.phone.number({ style: "national" }),
+          phone: faker.phone.number({ style: "human" }),
           gender: faker.helpers.arrayElement(Object.values(Gender)),
           role: Role.USER,
         },
@@ -19,14 +20,13 @@ async function main() {
     ),
   );
 
-  // Create Businesses (assign to random user)
   const businesses = await Promise.all(
     Array.from({ length: 5 }).map(() =>
       prisma.business.create({
         data: {
           name: faker.company.name(),
           address: faker.location.streetAddress(),
-          phone: faker.phone.number({ style: "national" }),
+          phone: faker.phone.number({ style: "human" }),
           description: faker.company.catchPhrase(),
           ownerId: faker.helpers.arrayElement(users).id,
         },
@@ -34,7 +34,24 @@ async function main() {
     ),
   );
 
-  // Create Services
+  for (const business of businesses) {
+    for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+      const openTime = faker.date.anytime(); // use fixed times for realism
+      openTime.setHours(9, 0, 0, 0);
+      const closeTime = new Date(openTime);
+      closeTime.setHours(17, 0, 0, 0);
+
+      await prisma.openingHours.create({
+        data: {
+          businessId: business.id,
+          dayOfWeek,
+          openTime,
+          closeTime,
+        },
+      });
+    }
+  }
+
   const services = await Promise.all(
     Array.from({ length: 10 }).map(() =>
       prisma.service.create({
@@ -48,7 +65,6 @@ async function main() {
     ),
   );
 
-  // Create Workers for each Business
   const workers = await Promise.all(
     businesses.flatMap((b) =>
       Array.from({ length: 4 }).map(() => {
@@ -64,7 +80,6 @@ async function main() {
     ),
   );
 
-  // Assign Services to Workers
   await Promise.all(
     workers.map((worker) => {
       const shuffled = faker.helpers.shuffle(services);
@@ -82,8 +97,7 @@ async function main() {
     }),
   );
 
-  // Create Appointments
-  await Promise.all(
+  const appointments = await Promise.all(
     Array.from({ length: 30 }).map(async () => {
       const worker = faker.helpers.arrayElement(workers);
       const user = faker.helpers.arrayElement(users);
@@ -94,6 +108,9 @@ async function main() {
 
       if (!service) return;
 
+      const date = faker.date.soon({ days: 30 });
+      date.setHours(faker.number.int({ min: 9, max: 16 }), 0, 0, 0); // inside business hours
+
       return prisma.appointment.create({
         data: {
           businessId: worker.businessId,
@@ -101,13 +118,29 @@ async function main() {
           workerId: worker.id,
           serviceId: service.serviceId,
           status: faker.helpers.arrayElement(Object.values(AppointmentStatus)),
-          date: faker.date.soon({ days: 30 }),
+          date,
         },
       });
     }),
   );
 
-  console.log("✅ Seeded successfully");
+  for (const business of businesses) {
+    const reviewCount = faker.number.int({ min: 2, max: 5 });
+    for (let i = 0; i < reviewCount; i++) {
+      await prisma.review.create({
+        data: {
+          rating: faker.number.int({ min: 3, max: 5 }),
+          comment: faker.lorem.sentence(),
+          businessId: business.id,
+          userId: faker.helpers.arrayElement(users).id,
+        },
+      });
+    }
+  }
+
+  console.log(
+    "✅ Seeded Hebrew data with opening hours, reviews, and appointments successfully",
+  );
 }
 
 main()
