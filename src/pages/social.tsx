@@ -17,7 +17,7 @@ const SocialPage = () => {
 
   const {
     data: recommandedBusinesses,
-    fetchNextPage,
+    fetchNextPage: fetchMoreBusinesses,
     hasNextPage,
     isLoading: loadingBusinesses,
     isFetchingNextPage,
@@ -75,14 +75,20 @@ const SocialPage = () => {
   useEffect(() => {
     if (
       hasNextPage &&
-      currentPage >= totalPages - 1 &&
+      currentPage * -1 >= totalPages - 1 &&
       !isFetchingNextPage &&
       !hasPrefetched.current
     ) {
       hasPrefetched.current = true;
-      void fetchNextPage();
+      void fetchMoreBusinesses();
     }
-  }, [currentPage, fetchNextPage, hasNextPage, totalPages, isFetchingNextPage]);
+  }, [
+    currentPage,
+    fetchMoreBusinesses,
+    hasNextPage,
+    totalPages,
+    isFetchingNextPage,
+  ]);
 
   const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
@@ -101,7 +107,7 @@ const SocialPage = () => {
     }
 
     const newPage = Math.round(normalizedScrollLeft / offsetWidth);
-    console.log("Current Page:", currentPage, "New Page:", newPage);
+
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
@@ -154,7 +160,7 @@ const SocialPage = () => {
           <button
             key={i}
             className={`h-2 w-2 rounded-full transition-transform duration-300 ${
-              currentPage === i
+              currentPage * -1 === i
                 ? "scale-125 bg-[#48A6A7]"
                 : "bg-gray-300 hover:bg-gray-400"
             }`}
