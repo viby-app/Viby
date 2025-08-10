@@ -90,7 +90,11 @@ const SocialPage = () => {
     const newPage = Math.round(scrollLeft / offsetWidth);
     console.log("New Page:", newPage, ", Current Page:", currentPage);
     if (newPage !== currentPage) {
-      setCurrentPage(-newPage);
+      if (newPage < 0) {
+        setCurrentPage(-newPage);
+      } else {
+        setCurrentPage(newPage);
+      }
     }
   };
 
@@ -153,7 +157,6 @@ const SocialPage = () => {
 
   return (
     <Layout>
-      <p>{currentPage}</p>
       <div className="flex max-h-1/2 w-full flex-col items-center p-4">
         {allBusinesses.length > 0 && (
           <>
