@@ -42,7 +42,7 @@ const SocialPage = () => {
 
   useEffect(() => {
     if (hasNextPage && currentPage >= totalPages - 2) {
-      fetchNextPage();
+      void fetchNextPage();
     }
   }, [currentPage, fetchNextPage, hasNextPage, totalPages]);
 
