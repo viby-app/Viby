@@ -64,8 +64,6 @@ const SocialPage = () => {
     }
   };
 
-  const hasPrefetched = useRef(false);
-
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const totalPages = recommandedBusinesses
@@ -73,13 +71,7 @@ const SocialPage = () => {
     : 0;
 
   useEffect(() => {
-    if (
-      hasNextPage &&
-      currentPage * -1 >= totalPages - 1 &&
-      !isFetchingNextPage &&
-      !hasPrefetched.current
-    ) {
-      hasPrefetched.current = true;
+    if (hasNextPage && currentPage >= totalPages - 1 && !isFetchingNextPage) {
       void fetchMoreBusinesses();
     }
   }, [
@@ -93,20 +85,8 @@ const SocialPage = () => {
   const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
 
-    const { scrollLeft, scrollWidth, offsetWidth } = carouselRef.current;
-    const isRTL = document.dir === "rtl" || carouselRef.current.dir === "rtl";
-
-    let normalizedScrollLeft = scrollLeft;
-
-    if (isRTL) {
-      if (scrollLeft < 0) {
-        normalizedScrollLeft = -scrollLeft;
-      } else {
-        normalizedScrollLeft = scrollWidth - offsetWidth - scrollLeft;
-      }
-    }
-
-    const newPage = Math.round(normalizedScrollLeft / offsetWidth);
+    const { scrollLeft, offsetWidth } = carouselRef.current;
+    const newPage = Math.round(scrollLeft / offsetWidth);
 
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
@@ -155,12 +135,12 @@ const SocialPage = () => {
   const renderDots = () => {
     const dotsCount = hasNextPage ? totalPages + 1 : totalPages;
     return (
-      <div className="mt-2 flex justify-center space-x-2">
+      <div dir="ltr" className="mt-2 flex justify-center space-x-2">
         {Array.from({ length: dotsCount }, (_, i) => (
-          <button
+          <div
             key={i}
             className={`h-2 w-2 rounded-full transition-transform duration-300 ${
-              currentPage * -1 === i
+              currentPage === i
                 ? "scale-125 bg-[#48A6A7]"
                 : "bg-gray-300 hover:bg-gray-400"
             }`}
@@ -184,6 +164,7 @@ const SocialPage = () => {
               onScroll={onBusinessesScroll}
               className="scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
               style={{ scrollSnapType: "x mandatory" }}
+              dir="ltr"
             >
               {renderBusinessPages()}
             </div>
