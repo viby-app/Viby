@@ -101,7 +101,7 @@ const SocialPage = () => {
     }
 
     const newPage = Math.round(normalizedScrollLeft / offsetWidth);
-
+    console.log("Current Page:", currentPage, "New Page:", newPage);
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
