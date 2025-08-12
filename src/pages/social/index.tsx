@@ -166,10 +166,8 @@ const SocialPage = () => {
             <div
               ref={carouselRef}
               onScroll={onBusinessesScroll}
-              className={`scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto ${
-                isFetchingNextPage ? "" : "scroll-smooth"
-              }`}
-              style={{ scrollSnapType: "x mandatory" }}
+              className="scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
+              style={{ scrollSnapType: "x proximity" }}
             >
               {renderBusinessPages()}
             </div>
