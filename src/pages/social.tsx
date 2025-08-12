@@ -71,7 +71,6 @@ const SocialPage = () => {
     : 0;
 
   useEffect(() => {
-    console.log("Current Page:", currentPage, ",", totalPages);
     if (hasNextPage && currentPage >= totalPages - 1 && !isFetchingNextPage) {
       void fetchMoreBusinesses();
     }
@@ -88,7 +87,6 @@ const SocialPage = () => {
 
     const { scrollLeft, offsetWidth } = carouselRef.current;
     const newPage = Math.round(scrollLeft / offsetWidth);
-    console.log("New Page:", newPage, ", Current Page:", currentPage);
     if (newPage !== currentPage) {
       if (newPage < 0) {
         setCurrentPage(-newPage);
@@ -157,6 +155,7 @@ const SocialPage = () => {
 
   return (
     <Layout>
+      {currentPage}
       <div className="flex max-h-1/2 w-full flex-col items-center p-4">
         {allBusinesses.length > 0 && (
           <>
