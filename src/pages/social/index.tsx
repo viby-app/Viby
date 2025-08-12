@@ -56,7 +56,7 @@ export default function SocialPage() {
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     if (currentPage >= (recommandedBusinesses?.pages.length ?? 0) - 1) {
-      fetchMoreBusinesses();
+      void fetchMoreBusinesses();
     }
   }, [
     currentPage,
