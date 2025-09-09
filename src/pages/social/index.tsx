@@ -66,16 +66,10 @@ const SocialPage = () => {
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const totalPages = recommandedBusinesses
-    ? recommandedBusinesses.pages.length
-    : 0;
-  const isSafari = useMemo(() => {
-    if (typeof navigator === "undefined") return false;
-    const ua = navigator.userAgent;
-    const isSafariLike = /Version\/[\d.]+.*Safari/.test(ua);
-    const isNotChrome = !/Chrome|Chromium|Edg/.test(ua);
-    return isSafariLike && isNotChrome;
-  }, []);
+  const totalPages = useMemo(() => {
+    const totalBusinesses = allBusinesses.length;
+    return Math.ceil(totalBusinesses / BUSINESSES_PER_PAGE);
+  }, [allBusinesses.length]);
 
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
@@ -94,14 +88,12 @@ const SocialPage = () => {
     if (!carouselRef.current) return;
 
     const { scrollLeft, offsetWidth } = carouselRef.current;
-    const newPage = Math.round(scrollLeft / offsetWidth);
-    if (newPage !== currentPage) {
-      if (newPage < 0) {
-        setCurrentPage(-newPage);
-      } else {
-        setCurrentPage(newPage);
-      }
-    }
+    const pageFromLeft = Math.round(
+      Math.max(0, scrollLeft) / Math.max(1, offsetWidth),
+    );
+    const maxPageIndex = Math.max(0, totalPages - 1);
+    const clampedPage = Math.min(Math.max(0, pageFromLeft), maxPageIndex);
+    if (clampedPage !== currentPage) setCurrentPage(clampedPage);
   };
 
   if (loadingBusinesses || loadingFriends) {
@@ -132,7 +124,7 @@ const SocialPage = () => {
         start + BUSINESSES_PER_PAGE,
       );
       return (
-        <div key={pageIndex} className="w-full flex-shrink-0 snap-center px-4">
+        <div key={pageIndex} className="w-full flex-shrink-0 snap-center">
           <div className="grid grid-cols-1 grid-rows-2 gap-4">
             {pageBusinesses.map((business) => (
               <BusinessCard key={business.id} businessId={business.id} />
@@ -173,9 +165,7 @@ const SocialPage = () => {
             <div
               ref={carouselRef}
               onScroll={onBusinessesScroll}
-              className={`scrollbar-hide flex w-full touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-contain ${
-                isSafari ? "" : "scroll-smooth"
-              }`}
+              className="scrollbar-hide flex w-full snap-x snap-mandatory space-x-4 overflow-x-auto p-2"
             >
               {renderBusinessPages()}
             </div>
