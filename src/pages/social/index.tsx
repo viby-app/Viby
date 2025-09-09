@@ -70,6 +70,15 @@ const SocialPage = () => {
     ? recommandedBusinesses.pages.length
     : 0;
 
+  // Detect Safari to work around scroll snapping/smooth issues that cause jumps
+  const isSafari = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    const ua = navigator.userAgent;
+    const isSafariLike = /Version\/[\d.]+.*Safari/.test(ua);
+    const isNotChrome = !/Chrome|Chromium|Edg/.test(ua);
+    return isSafariLike && isNotChrome;
+  }, []);
+
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     if (currentPage >= totalPages - 1) {
@@ -82,6 +91,16 @@ const SocialPage = () => {
     isFetchingNextPage,
     fetchMoreBusinesses,
   ]);
+
+  // Keep scroll position stable when the number of pages changes, especially on Safari
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const pageWidth = el.offsetWidth;
+    const targetLeft = currentPage * pageWidth;
+    // Use instant positioning to avoid momentum causing jumps
+    el.scrollTo({ left: targetLeft, behavior: "auto" });
+  }, [totalPages, currentPage]);
 
   const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
@@ -125,7 +144,7 @@ const SocialPage = () => {
         start + BUSINESSES_PER_PAGE,
       );
       return (
-        <div key={pageIndex} className="w-full flex-shrink-0 snap-center px-4">
+        <div key={pageIndex} className="w-full flex-shrink-0 snap-always snap-center px-4">
           <div className="grid grid-cols-1 grid-rows-2 gap-4">
             {pageBusinesses.map((business) => (
               <BusinessCard key={business.id} businessId={business.id} />
@@ -166,8 +185,9 @@ const SocialPage = () => {
             <div
               ref={carouselRef}
               onScroll={onBusinessesScroll}
-              className="scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
-              style={{ scrollSnapType: "x proximity" }}
+              className={`scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto ${
+                isSafari ? "" : "scroll-smooth"
+              }`}
             >
               {renderBusinessPages()}
             </div>
