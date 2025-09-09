@@ -66,13 +66,9 @@ const SocialPage = () => {
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Number of fully rendered pages based on loaded businesses
-  const renderedPages = useMemo(() => {
-    const totalBusinesses = allBusinesses.length;
-    return Math.ceil(totalBusinesses / BUSINESSES_PER_PAGE);
-  }, [allBusinesses.length]);
-
-  // Detect Safari to work around scroll snapping/smooth issues that cause jumps
+  const totalPages = recommandedBusinesses
+    ? recommandedBusinesses.pages.length
+    : 0;
   const isSafari = useMemo(() => {
     if (typeof navigator === "undefined") return false;
     const ua = navigator.userAgent;
@@ -83,43 +79,29 @@ const SocialPage = () => {
 
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
-    if (currentPage >= renderedPages - 1) {
+    if (currentPage >= totalPages - 1) {
       void fetchMoreBusinesses();
     }
   }, [
     currentPage,
-    renderedPages,
+    totalPages,
     hasNextPage,
     isFetchingNextPage,
     fetchMoreBusinesses,
   ]);
 
-  // Keep scroll position stable on Safari only to avoid jumpy behavior
-  useEffect(() => {
-    if (!isSafari) return;
-    const el = carouselRef.current;
-    if (!el) return;
-    const pageWidth = el.offsetWidth;
-    const targetLeft = currentPage * pageWidth;
-    el.scrollTo({ left: targetLeft, behavior: "auto" });
-  }, [renderedPages, currentPage, isSafari]);
-
   const onBusinessesScroll = () => {
     if (!carouselRef.current) return;
 
-    const { scrollLeft, clientWidth, scrollWidth } = carouselRef.current;
-    const width = clientWidth || 1;
-    const rawIndex = scrollLeft / width;
-    let nextIndex = Math.round(rawIndex);
-    const maxRenderedIndex = Math.max(0, renderedPages - 1);
-    // If user flings to the very end and more pages exist, allow a visual "loading" dot
-    const atVeryEnd = scrollLeft + clientWidth >= scrollWidth - 2;
-    if (hasNextPage && atVeryEnd) {
-      nextIndex = renderedPages; // one past last rendered page for dots
-    } else {
-      nextIndex = Math.min(Math.max(0, nextIndex), maxRenderedIndex);
+    const { scrollLeft, offsetWidth } = carouselRef.current;
+    const newPage = Math.round(scrollLeft / offsetWidth);
+    if (newPage !== currentPage) {
+      if (newPage < 0) {
+        setCurrentPage(-newPage);
+      } else {
+        setCurrentPage(newPage);
+      }
     }
-    if (nextIndex !== currentPage) setCurrentPage(nextIndex);
   };
 
   if (loadingBusinesses || loadingFriends) {
@@ -143,17 +125,14 @@ const SocialPage = () => {
   }
 
   const renderBusinessPages = () => {
-    return Array.from({ length: renderedPages }, (_, pageIndex) => {
+    return Array.from({ length: totalPages }, (_, pageIndex) => {
       const start = pageIndex * BUSINESSES_PER_PAGE;
       const pageBusinesses = allBusinesses.slice(
         start,
         start + BUSINESSES_PER_PAGE,
       );
       return (
-        <div
-          key={pageIndex}
-          className="w-full flex-shrink-0 snap-center snap-always px-4"
-        >
+        <div key={pageIndex} className="w-full flex-shrink-0 snap-center px-4">
           <div className="grid grid-cols-1 grid-rows-2 gap-4">
             {pageBusinesses.map((business) => (
               <BusinessCard key={business.id} businessId={business.id} />
@@ -165,7 +144,7 @@ const SocialPage = () => {
   };
 
   const renderDots = () => {
-    const dotsCount = hasNextPage ? renderedPages + 1 : renderedPages;
+    const dotsCount = hasNextPage ? totalPages + 1 : totalPages;
     return (
       <div className="mt-2 flex justify-center space-x-2">
         {Array.from({ length: dotsCount }, (_, i) => (
