@@ -106,14 +106,10 @@ const SocialPage = () => {
     if (!carouselRef.current) return;
 
     const { scrollLeft, offsetWidth } = carouselRef.current;
-    const newPage = Math.round(scrollLeft / offsetWidth);
-    if (newPage !== currentPage) {
-      if (newPage < 0) {
-        setCurrentPage(-newPage);
-      } else {
-        setCurrentPage(newPage);
-      }
-    }
+    const pageFromLeft = Math.round(Math.max(0, scrollLeft) / offsetWidth);
+    const maxPageIndex = Math.max(0, totalPages - 1);
+    const clampedPage = Math.min(Math.max(0, pageFromLeft), maxPageIndex);
+    if (clampedPage !== currentPage) setCurrentPage(clampedPage);
   };
 
   if (loadingBusinesses || loadingFriends) {
@@ -144,7 +140,10 @@ const SocialPage = () => {
         start + BUSINESSES_PER_PAGE,
       );
       return (
-        <div key={pageIndex} className="w-full flex-shrink-0 snap-always snap-center px-4">
+        <div
+          key={pageIndex}
+          className="w-full flex-shrink-0 snap-center snap-always px-4"
+        >
           <div className="grid grid-cols-1 grid-rows-2 gap-4">
             {pageBusinesses.map((business) => (
               <BusinessCard key={business.id} businessId={business.id} />
@@ -185,7 +184,7 @@ const SocialPage = () => {
             <div
               ref={carouselRef}
               onScroll={onBusinessesScroll}
-              className={`scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto ${
+              className={`scrollbar-hide flex w-full snap-x snap-mandatory overflow-x-auto overscroll-contain ${
                 isSafari ? "" : "scroll-smooth"
               }`}
             >
